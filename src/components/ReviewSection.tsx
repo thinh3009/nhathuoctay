@@ -1,16 +1,14 @@
-import type { Product } from '../data/products'
+import type { Product } from '@/lib/schemas'
+
+function renderStars(count: number) {
+  return Array.from({ length: count }, (_, index) => <span key={index}>&#9733;</span>)
+}
 
 type ReviewSectionProps = {
   product: Product
 }
 
-function renderStars(count: number) {
-  return Array.from({ length: count }, (_, index) => (
-    <span key={index}>&#9733;</span>
-  ))
-}
-
-function ReviewSection({ product }: ReviewSectionProps) {
+export default function ReviewSection({ product }: ReviewSectionProps) {
   return (
     <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
       <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -26,7 +24,8 @@ function ReviewSection({ product }: ReviewSectionProps) {
             </div>
           </div>
           <p className="mt-4 text-sm leading-6 text-slate-600">
-            Phần bình luận hiện là dữ liệu mô phỏng để hoàn thiện trải nghiệm giao diện nhà thuốc online.
+            Phần bình luận hiện là dữ liệu mô phỏng để hoàn thiện trải nghiệm giao diện nhà thuốc
+            online.
           </p>
 
           <form className="mt-6 space-y-3">
@@ -54,17 +53,8 @@ function ReviewSection({ product }: ReviewSectionProps) {
         </aside>
 
         <div>
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-700">
-                Bình luận nổi bật
-              </p>
-              <h2 className="mt-1 text-2xl font-bold text-slate-950">
-                {product.commentCount} bình luận
-              </h2>
-            </div>
-          </div>
-
+          <p className="text-sm font-semibold uppercase tracking-wide text-cyan-700">Bình luận nổi bật</p>
+          <h2 className="mt-1 text-2xl font-bold text-slate-950">{product.commentCount} bình luận</h2>
           <div className="mt-5 space-y-4">
             {product.reviews.map((review) => (
               <article className="rounded-lg border border-slate-200 p-4" key={`${review.author}-${review.date}`}>
@@ -86,5 +76,3 @@ function ReviewSection({ product }: ReviewSectionProps) {
     </section>
   )
 }
-
-export default ReviewSection
