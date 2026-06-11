@@ -87,13 +87,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         </section>
 
         <section className="mt-6 grid gap-5 lg:grid-cols-[240px_minmax(0,1fr)_280px]">
-          <aside className="h-fit rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
+          <aside className="hidden h-fit rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6 lg:block">
             <h2 className="text-base font-bold text-slate-950">Bộ lọc</h2>
             <CategoryFilters
               selectedPriceRange={result.selected.priceRange}
               selectedSort={result.selected.sort}
               selectedSubCategory={result.selected.subCategory}
               subCategories={result.filters.subCategories}
+              variant="desktop"
             />
 
             <div className="mt-6 rounded-lg border border-cyan-100 bg-cyan-50 p-4">
@@ -115,6 +116,16 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               <p className="mt-1 text-sm text-slate-600">
                 Đang hiển thị {result.items.length} / {result.pagination.total} sản phẩm
               </p>
+            </div>
+
+            <div className="mb-4 lg:hidden">
+              <CategoryFilters
+                selectedPriceRange={result.selected.priceRange}
+                selectedSort={result.selected.sort}
+                selectedSubCategory={result.selected.subCategory}
+                subCategories={result.filters.subCategories}
+                variant="mobile"
+              />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
