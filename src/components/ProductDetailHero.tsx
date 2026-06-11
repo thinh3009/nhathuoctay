@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { formatPrice } from '@/lib/catalog'
 import type { Product } from '@/lib/schemas'
 import AddToCartButton from './AddToCartButton'
-import ProductVisual from './ProductVisual'
 import QuantitySelector from './QuantitySelector'
 
 type ProductDetailHeroProps = {
@@ -15,64 +14,110 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(product.defaultQuantity)
 
+  const selectedImageLabel = product.images[selectedImageIndex]
+
+  function showPreviousImage() {
+    setSelectedImageIndex((current) => (current === 0 ? product.images.length - 1 : current - 1))
+  }
+
+  function showNextImage() {
+    setSelectedImageIndex((current) => (current === product.images.length - 1 ? 0 : current + 1))
+  }
+
   return (
     <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-6 shadow-sm">
-            <div className="grid min-h-[430px] gap-6 sm:grid-cols-[1fr_1.05fr]">
-              <div className="flex items-end justify-center">
-                <div className="relative h-72 w-32 rounded-[2rem] border border-slate-200 bg-white shadow-lg">
-                  <div className="absolute left-4 right-4 top-5 rounded-full bg-slate-100 px-2 py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                    {product.unit}
+          <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-4 sm:px-5">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
+                  Hình ảnh sản phẩm
+                </p>
+                <h2 className="mt-1 truncate text-lg font-bold text-slate-950">{product.name}</h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  aria-label="Ảnh trước"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-bold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700"
+                  onClick={showPreviousImage}
+                  type="button"
+                >
+                  ‹
+                </button>
+                <button
+                  aria-label="Ảnh sau"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-bold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700"
+                  onClick={showNextImage}
+                  type="button"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-slate-50 via-white to-cyan-50 px-4 py-6 sm:px-6">
+              <div className="flex min-h-[420px] items-center justify-center">
+                <div className="w-full max-w-[360px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-xl">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      {product.unit}
+                    </span>
+                    <span className="rounded-full bg-cyan-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
+                      {selectedImageLabel}
+                    </span>
                   </div>
-                  <div className="absolute inset-x-4 top-16 rounded-xl bg-cyan-50 px-3 py-4 text-center shadow-sm">
-                    <p className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700">
+
+                  <div className="mt-5 rounded-[1.5rem] border border-cyan-100 bg-cyan-50/70 p-6 text-center">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
                       {product.topCategory}
                     </p>
-                    <p className="mt-2 text-lg font-bold leading-tight text-slate-950">{product.name}</p>
+                    <h3 className="mt-3 text-3xl font-bold leading-tight text-slate-950">
+                      {product.name}
+                    </h3>
+                    <p className="mt-4 text-sm leading-6 text-slate-600">{product.manufacturer}</p>
                   </div>
-                  <div className="absolute bottom-6 left-1/2 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-cyan-700 text-xs font-bold text-white">
-                    {product.unit}
+
+                  <div className="mt-5 rounded-2xl bg-slate-950 px-5 py-4 text-white">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">
+                      Điểm nhấn thành phần
+                    </p>
+                    <p className="mt-2 text-base font-semibold leading-7">{product.ingredientHighlight}</p>
+                  </div>
+
+                  <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-xs font-medium text-slate-500">Quy cách</p>
+                    <p className="mt-1 text-lg font-bold text-slate-950">{product.specification}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-center">
-                <div className="relative h-80 w-full max-w-[280px] rounded-2xl border border-slate-200 bg-white p-5 shadow-lg">
-                  <div className="inline-flex rounded-full bg-cyan-700 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
-                    {product.images[selectedImageIndex]}
-                  </div>
-                  <p className="mt-5 text-sm font-semibold uppercase tracking-wide text-slate-500">
-                    {product.manufacturer}
-                  </p>
-                  <h3 className="mt-2 text-4xl font-bold leading-none text-slate-950">
-                    {product.name.split(' ')[0]}
-                  </h3>
-                  <p className="mt-1 text-xl font-semibold text-slate-800">
-                    {product.name.split(' ').slice(1).join(' ')}
-                  </p>
-                  <div className="mt-8 inline-flex rounded-full bg-cyan-50 px-4 py-2 text-sm font-semibold text-cyan-700">
-                    {product.ingredientHighlight}
-                  </div>
-                  <div className="absolute bottom-5 left-5 right-5 rounded-lg border border-slate-200 bg-white p-3">
-                    <p className="text-xs text-slate-500">Quy cách</p>
-                    <p className="mt-1 text-sm font-semibold text-slate-900">{product.specification}</p>
-                  </div>
-                </div>
+              <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-600 shadow-sm">
+                <p className="truncate font-medium">
+                  Đang xem: <span className="font-semibold text-slate-950">{selectedImageLabel}</span>
+                </p>
+                <p className="shrink-0 text-xs font-semibold uppercase tracking-wide text-cyan-700">
+                  {selectedImageIndex + 1}/{product.images.length}
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-5">
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {product.images.map((imageLabel, index) => (
-              <button key={imageLabel} onClick={() => setSelectedImageIndex(index)} type="button">
-                <ProductVisual
-                  active={selectedImageIndex === index}
-                  imageLabel={imageLabel}
-                  product={product}
-                  variant="thumb"
-                />
+              <button
+                className={`rounded-2xl border px-3 py-3 text-left transition ${
+                  selectedImageIndex === index
+                    ? 'border-cyan-700 bg-cyan-50 shadow-sm'
+                    : 'border-slate-200 bg-white hover:border-cyan-200'
+                }`}
+                key={imageLabel}
+                onClick={() => setSelectedImageIndex(index)}
+                type="button"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">{imageLabel}</p>
+                <p className="mt-1 text-sm text-slate-500">{product.unit}</p>
               </button>
             ))}
           </div>
