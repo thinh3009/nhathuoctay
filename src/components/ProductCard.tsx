@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { formatPrice } from '@/lib/catalog'
+import { getPrimaryProductImage } from '@/lib/productImages'
 import type { Product } from '@/lib/schemas'
 import AddToCartButton from './AddToCartButton'
 import ProductVisual from './ProductVisual'
@@ -9,9 +10,11 @@ type ProductCardProps = {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const primaryImage = getPrimaryProductImage(product)
+
   return (
     <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <ProductVisual imageLabel={product.images[0]} product={product} />
+      {primaryImage ? <ProductVisual image={primaryImage} product={product} /> : null}
       <div className="mt-4 flex items-center justify-between gap-3">
         <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700">
           {product.badge}

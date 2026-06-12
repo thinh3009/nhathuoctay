@@ -1,0 +1,18 @@
+﻿<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="900" rx="48" fill="#F8FAFC"/>
+  <rect x="32" y="32" width="836" height="836" rx="40" fill="white" stroke="#E2E8F0" stroke-width="4"/>
+  <circle cx="760" cy="140" r="66" fill="#0891b2" fill-opacity="0.12"/>
+  <circle cx="150" cy="760" r="92" fill="#0891b2" fill-opacity="0.08"/>
+  <rect x="92" y="92" width="716" height="84" rx="42" fill="#e0f2fe"/>
+  <text x="450" y="145" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#0891b2">Thuc pham chuc nang</text>
+  <rect x="170" y="210" width="560" height="520" rx="42" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="4"/>
+  <rect x="232" y="270" width="436" height="228" rx="34" fill="#e0f2fe"/>
+  <text x="450" y="332" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#0891b2">Angle View</text>
+  <text x="450" y="402" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="800" fill="#0F172A">Vitamin C 1000mg</text>
+  <text x="450" y="462" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" fill="#475569">Packaging Detail</text>
+  <rect x="266" y="542" width="368" height="112" rx="26" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="4"/>
+  <text x="450" y="592" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" fill="#64748B">Local Demo Image</text>
+  <text x="450" y="632" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#0F172A">/public/demo-products</text>
+  <rect x="328" y="752" width="244" height="74" rx="37" fill="#0891b2"/>
+  <text x="450" y="798" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="white">ANGLE</text>
+</svg>

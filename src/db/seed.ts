@@ -29,6 +29,8 @@ async function seedCatalog() {
       })
   }
 
+  await db.delete(productsTable)
+
   for (const product of products) {
     await db
       .insert(productsTable)

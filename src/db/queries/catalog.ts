@@ -1,7 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../client'
 import { categories, productReviews, products as productsTable } from '../schema'
-import { DEFAULT_CATEGORY_SLUG, PRODUCTS_PER_PAGE } from '@/lib/constants'
+import { products as catalogProducts } from '@/lib/catalog'
+import { DEFAULT_CATEGORY_SLUG, type CategorySlug, PRODUCTS_PER_PAGE } from '@/lib/constants'
+import { normalizeProductImages } from '@/lib/productImages'
 import {
   categoryNavItemSchema,
   productSchema,
@@ -14,6 +16,8 @@ import {
   type ProductSearchParams,
   type Review,
 } from '@/lib/schemas'
+
+const activeProductSlugs = new Set(catalogProducts.map((product) => product.slug))
 
 type ProductRow = typeof productsTable.$inferSelect & {
   category: typeof categories.$inferSelect
@@ -58,19 +62,21 @@ function mapProduct(row: ProductRow): Product {
     countryOfOrigin: row.countryOfOrigin,
     shelfLife: row.shelfLife,
     ingredientHighlight: row.ingredientHighlight,
-    images: row.images,
+    images: normalizeProductImages(row.categorySlug as CategorySlug, row.slug, row.images),
     reviews: row.reviews.map(mapReview),
   })
 }
 
 async function getProductsByCategorySlug(categorySlug: string) {
-  return db.query.products.findMany({
+  const rows = await db.query.products.findMany({
     where: eq(productsTable.categorySlug, categorySlug),
     with: {
       category: true,
       reviews: true,
     },
   })
+
+  return rows.filter((row) => activeProductSlugs.has(row.slug))
 }
 
 export async function getCategoryNavItems() {
@@ -108,6 +114,10 @@ export async function getCategoryBySlug(slug: string) {
 }
 
 export async function getProductBySlug(slug: string) {
+  if (!activeProductSlugs.has(slug)) {
+    return null
+  }
+
   const row = await db.query.products.findFirst({
     where: eq(productsTable.slug, slug),
     with: {

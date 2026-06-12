@@ -9,6 +9,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core'
+import type { ProductImage } from '@/lib/schemas'
 
 export const categories = pgTable('categories', {
   slug: text('slug').primaryKey(),
@@ -50,7 +51,7 @@ export const products = pgTable(
     countryOfOrigin: text('country_of_origin').notNull(),
     shelfLife: text('shelf_life').notNull(),
     ingredientHighlight: text('ingredient_highlight').notNull(),
-    images: jsonb('images').$type<string[]>().notNull(),
+    images: jsonb('images').$type<ProductImage[]>().notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

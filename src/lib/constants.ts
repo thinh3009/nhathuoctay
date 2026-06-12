@@ -13,28 +13,28 @@ export const CATEGORY_CONFIG = [
     label: 'Thực phẩm chức năng',
     heroTitle: 'Giải pháp bổ sung dinh dưỡng theo từng nhu cầu sức khỏe',
     heroDescription:
-      'Danh mục chọn sẵn theo tim mạch, đề kháng, xương khớp và làm đẹp để bạn tìm nhanh hơn.',
+      'Danh mục chọn sẵn theo tim mạch, đề kháng, làm đẹp và xương khớp để bạn tìm sản phẩm nhanh hơn.',
   },
   {
     slug: 'cham-soc-da',
     label: 'Chăm sóc da',
-    heroTitle: 'Sản phẩm chăm sóc da theo chu trình hằng ngày',
+    heroTitle: 'Sản phẩm chăm sóc da cho routine hằng ngày',
     heroDescription:
-      'Từ làm sạch, dưỡng ẩm đến chống nắng và serum đặc trị, mọi lựa chọn đều được nhóm sẵn.',
+      'Từ làm sạch, serum đến dưỡng ẩm phục hồi, mọi lựa chọn đều được nhóm gọn để xem và so sánh dễ hơn.',
   },
   {
     slug: 'thiet-bi-y-te',
     label: 'Thiết bị y tế',
     heroTitle: 'Thiết bị theo dõi sức khỏe và chăm sóc tại nhà',
     heroDescription:
-      'Máy đo, nhiệt kế, máy xông và vật tư cơ bản cho nhu cầu sử dụng gia đình.',
+      'Máy đo, nhiệt kế và thiết bị hỗ trợ cơ bản cho gia đình, dễ lựa chọn theo nhu cầu sử dụng thực tế.',
   },
   {
     slug: 'thuoc',
     label: 'Thuốc',
-    heroTitle: 'Danh mục thuốc phổ biến cho nhu cầu thông dụng',
+    heroTitle: 'Danh mục thuốc thông dụng cho nhu cầu cơ bản',
     heroDescription:
-      'Dữ liệu hiện là mock để hoàn thiện giao diện, phù hợp cho việc duyệt và thử trải nghiệm.',
+      'Dữ liệu hiện là mock để hoàn thiện giao diện nhà thuốc online và trải nghiệm xem sản phẩm.',
   },
 ] as const satisfies ReadonlyArray<{
   slug: CategorySlug

@@ -1,7 +1,9 @@
 'use client'
 
+import Image from 'next/image'
 import { useState } from 'react'
 import { formatPrice } from '@/lib/catalog'
+import { getProductImageSrc } from '@/lib/productImages'
 import type { Product } from '@/lib/schemas'
 import AddToCartButton from './AddToCartButton'
 import QuantitySelector from './QuantitySelector'
@@ -14,7 +16,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(product.defaultQuantity)
 
-  const selectedImageLabel = product.images[selectedImageIndex]
+  const selectedImage = product.images[selectedImageIndex]
 
   function showPreviousImage() {
     setSelectedImageIndex((current) => (current === 0 ? product.images.length - 1 : current - 1))
@@ -59,43 +61,35 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
 
             <div className="bg-gradient-to-br from-slate-50 via-white to-cyan-50 px-4 py-6 sm:px-6">
               <div className="flex min-h-[420px] items-center justify-center">
-                <div className="w-full max-w-[360px] rounded-[2rem] border border-slate-200 bg-white p-5 shadow-xl">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      {product.unit}
-                    </span>
-                    <span className="rounded-full bg-cyan-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
-                      {selectedImageLabel}
-                    </span>
+                {selectedImage ? (
+                  <div className="w-full max-w-[420px] rounded-[2rem] border border-slate-200 bg-white p-4 shadow-xl">
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <span className="rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        {product.unit}
+                      </span>
+                      <span className="rounded-full bg-cyan-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
+                        {selectedImage.label}
+                      </span>
+                    </div>
+                    <div className="relative overflow-hidden rounded-[1.5rem] bg-slate-50">
+                      <Image
+                        alt={`${product.name} - ${selectedImage.label}`}
+                        className="h-[360px] w-full object-cover"
+                        height={900}
+                        priority={selectedImageIndex === 0}
+                        sizes="(max-width: 1024px) 100vw, 420px"
+                        src={getProductImageSrc(selectedImage)}
+                        width={900}
+                      />
+                    </div>
                   </div>
-
-                  <div className="mt-5 rounded-[1.5rem] border border-cyan-100 bg-cyan-50/70 p-6 text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
-                      {product.topCategory}
-                    </p>
-                    <h3 className="mt-3 text-3xl font-bold leading-tight text-slate-950">
-                      {product.name}
-                    </h3>
-                    <p className="mt-4 text-sm leading-6 text-slate-600">{product.manufacturer}</p>
-                  </div>
-
-                  <div className="mt-5 rounded-2xl bg-slate-950 px-5 py-4 text-white">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">
-                      Điểm nhấn thành phần
-                    </p>
-                    <p className="mt-2 text-base font-semibold leading-7">{product.ingredientHighlight}</p>
-                  </div>
-
-                  <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
-                    <p className="text-xs font-medium text-slate-500">Quy cách</p>
-                    <p className="mt-1 text-lg font-bold text-slate-950">{product.specification}</p>
-                  </div>
-                </div>
+                ) : null}
               </div>
 
               <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-600 shadow-sm">
                 <p className="truncate font-medium">
-                  Đang xem: <span className="font-semibold text-slate-950">{selectedImageLabel}</span>
+                  Đang xem:{' '}
+                  <span className="font-semibold text-slate-950">{selectedImage?.label ?? 'Ảnh sản phẩm'}</span>
                 </p>
                 <p className="shrink-0 text-xs font-semibold uppercase tracking-wide text-cyan-700">
                   {selectedImageIndex + 1}/{product.images.length}
@@ -105,32 +99,36 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
-            {product.images.map((imageLabel, index) => (
+            {product.images.map((image, index) => (
               <button
                 className={`rounded-2xl border px-3 py-3 text-left transition ${
                   selectedImageIndex === index
                     ? 'border-cyan-700 bg-cyan-50 shadow-sm'
                     : 'border-slate-200 bg-white hover:border-cyan-200'
                 }`}
-                key={imageLabel}
+                key={image.storagePath}
                 onClick={() => setSelectedImageIndex(index)}
                 type="button"
               >
-                <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">{imageLabel}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-cyan-700">
+                  {image.label}
+                </p>
                 <p className="mt-1 text-sm text-slate-500">{product.unit}</p>
               </button>
             ))}
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            {['Đổi trả trong 30 ngày', 'Cam kết chính hãng', 'Miễn phí giao hàng từ 500.000đ'].map((item) => (
-              <div
-                className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700"
-                key={item}
-              >
-                {item}
-              </div>
-            ))}
+            {['Đổi trả trong 30 ngày', 'Cam kết chính hãng', 'Miễn phí giao hàng từ 500.000đ'].map(
+              (item) => (
+                <div
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700"
+                  key={item}
+                >
+                  {item}
+                </div>
+              ),
+            )}
           </div>
         </div>
 

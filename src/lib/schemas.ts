@@ -22,6 +22,14 @@ export const categoryNavItemSchema = z.object({
   heroDescription: z.string().min(1),
 })
 
+export const productImageSchema = z.object({
+  label: z.string().min(1),
+  kind: z.enum(['front', 'angle', 'info']),
+  storagePath: z.string().min(1),
+  fallbackSrc: z.string().min(1),
+  src: z.string().min(1),
+})
+
 export const productSchema = z.object({
   slug: z.string().min(1),
   name: z.string().min(1),
@@ -49,7 +57,7 @@ export const productSchema = z.object({
   countryOfOrigin: z.string().min(1),
   shelfLife: z.string().min(1),
   ingredientHighlight: z.string().min(1),
-  images: z.array(z.string().min(1)).min(1),
+  images: z.array(productImageSchema).min(1),
   reviews: z.array(reviewSchema),
 })
 
@@ -120,6 +128,7 @@ export const productReviewsResponseSchema = z.object({
 
 export type Review = z.infer<typeof reviewSchema>
 export type CategoryNavItem = z.infer<typeof categoryNavItemSchema>
+export type ProductImage = z.infer<typeof productImageSchema>
 export type Product = z.infer<typeof productSchema>
 export type ProductSearchParams = z.infer<typeof productSearchParamsSchema>
 export type CartResponse = z.infer<typeof cartResponseSchema>

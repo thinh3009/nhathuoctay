@@ -45,9 +45,9 @@ function buildSelectedTags(filters: DraftFilters) {
     tags.push(selectedPrice.label)
   }
 
-  const selectedSortLabel = sortOptions.find((item) => item.value === filters.sort)
-  if (selectedSortLabel && selectedSortLabel.value !== 'featured') {
-    tags.push(`Sắp xếp: ${selectedSortLabel.label}`)
+  const selectedSort = sortOptions.find((item) => item.value === filters.sort)
+  if (selectedSort && selectedSort.value !== 'featured') {
+    tags.push(`Sắp xếp: ${selectedSort.label}`)
   }
 
   return tags
@@ -112,21 +112,23 @@ export default function CategoryFilters({
   }, [activeFilters, isOpen])
 
   function updateQuery(next: Record<string, string | null>) {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() ?? '')
 
     Object.entries(next).forEach(([key, value]) => {
       if (!value || value === 'all' || value === 'featured' || value === 'Tất cả') {
         params.delete(key)
-      } else {
-        params.set(key, value)
+        return
       }
+
+      params.set(key, value)
     })
 
     params.delete('page')
 
     startTransition(() => {
       const query = params.toString()
-      router.replace(query ? `${pathname}?${query}` : pathname)
+      const nextPath = pathname ?? ''
+      router.replace(query ? `${nextPath}?${query}` : nextPath)
     })
   }
 

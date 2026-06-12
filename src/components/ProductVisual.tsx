@@ -1,8 +1,10 @@
-import type { Product } from '@/lib/schemas'
+import Image from 'next/image'
+import type { Product, ProductImage } from '@/lib/schemas'
+import { getProductImageSrc } from '@/lib/productImages'
 
 type ProductVisualProps = {
   product: Product
-  imageLabel: string
+  image: ProductImage
   variant?: 'card' | 'thumb'
   active?: boolean
 }
@@ -39,7 +41,7 @@ const themeByCategory: Record<
 
 export default function ProductVisual({
   product,
-  imageLabel,
+  image,
   variant = 'card',
   active = false,
 }: ProductVisualProps) {
@@ -54,7 +56,7 @@ export default function ProductVisual({
       >
         <div>
           <p className={`text-[11px] font-semibold uppercase tracking-wide ${theme.ink}`}>
-            {imageLabel}
+            {image.label}
           </p>
           <p className="mt-1 text-xs font-medium text-slate-600">{product.unit}</p>
         </div>
@@ -63,20 +65,21 @@ export default function ProductVisual({
   }
 
   return (
-    <div className={`relative h-36 overflow-hidden rounded-lg border border-slate-200 bg-gradient-to-br ${theme.shell}`}>
-      <div className={`absolute left-3 top-3 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white ${theme.accent}`}>
-        {product.subCategory}
-      </div>
-      <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3">
-        <div className={`h-20 w-12 rounded-[1.1rem] border border-white/60 ${theme.panel}`} />
-        <div className="flex-1 rounded-lg border border-white/60 bg-white/80 p-3">
-          <p className={`text-[11px] font-semibold uppercase tracking-wide ${theme.ink}`}>
-            {imageLabel}
-          </p>
-          <p className="mt-1 max-h-10 overflow-hidden text-sm font-semibold leading-5 text-slate-900">
-            {product.name}
-          </p>
+    <div className="relative h-36 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+      <Image
+        alt={`${product.name} - ${image.label}`}
+        className="object-cover"
+        fill
+        sizes="(max-width: 768px) 50vw, 320px"
+        src={getProductImageSrc(image)}
+      />
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent p-3">
+        <div
+          className={`inline-flex rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white ${theme.accent}`}
+        >
+          {product.subCategory}
         </div>
+        <p className="mt-2 line-clamp-2 text-sm font-semibold text-white">{product.name}</p>
       </div>
     </div>
   )
