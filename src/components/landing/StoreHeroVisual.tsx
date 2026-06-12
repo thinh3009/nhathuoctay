@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { formatPrice } from '@/lib/catalog'
 import { getPrimaryProductImage } from '@/lib/productImages'
 import type { Product } from '@/lib/schemas'
@@ -21,10 +21,10 @@ export default function StoreHeroVisual({ products }: StoreHeroVisualProps) {
 
   return (
     <div className="relative mx-auto max-w-xl">
-      <div className="absolute -left-6 top-8 h-24 w-24 rounded-full bg-emerald-200/70 blur-3xl" />
-      <div className="absolute -right-6 bottom-10 h-28 w-28 rounded-full bg-lime-200/80 blur-3xl" />
+      <div className="absolute -left-6 top-8 h-24 w-24 rounded-full bg-cyan-200/70 blur-3xl" />
+      <div className="absolute -right-6 bottom-10 h-28 w-28 rounded-full bg-emerald-200/80 blur-3xl" />
 
-      <div className="relative rounded-[30px] border border-white/70 bg-white/80 p-4 shadow-lg shadow-emerald-100 backdrop-blur sm:p-5">
+      <div className="relative rounded-[30px] border border-white/70 bg-white/90 p-4 shadow-lg shadow-cyan-100 backdrop-blur sm:p-5">
         <div className="grid gap-4 sm:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-3">
             <div className="rounded-[24px] border border-emerald-100 bg-white p-3 shadow-sm">
@@ -32,7 +32,7 @@ export default function StoreHeroVisual({ products }: StoreHeroVisualProps) {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[22px] bg-emerald-700 px-4 py-4 text-white">
+              <div className="rounded-[22px] bg-gradient-to-br from-emerald-700 to-teal-600 px-4 py-4 text-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100">
                   Best seller
                 </p>
@@ -45,7 +45,7 @@ export default function StoreHeroVisual({ products }: StoreHeroVisualProps) {
                   Cam kết
                 </p>
                 <p className="mt-2 text-sm leading-6 text-stone-600">
-                  Hình ảnh thật, route rõ ràng, sản phẩm nổi bật đặt ngay tại màn đầu tiên.
+                  Hình ảnh rõ ràng, điều hướng gọn và sản phẩm nổi bật được đẩy ngay ở màn đầu tiên.
                 </p>
               </div>
             </div>

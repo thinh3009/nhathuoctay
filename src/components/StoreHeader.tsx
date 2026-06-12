@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -25,7 +25,7 @@ function CartIcon({ cartCount }: { cartCount: number }) {
         <circle cx="17" cy="19" r="1.3" fill="currentColor" />
       </svg>
       {cartCount > 0 ? (
-        <span className="absolute -right-2 -top-2 min-w-5 rounded-full bg-amber-400 px-1.5 text-center text-[11px] font-bold text-slate-900">
+        <span className="absolute -right-2 -top-2 min-w-5 rounded-full bg-amber-400 px-1.5 text-center text-[11px] font-bold text-slate-900 shadow-sm shadow-amber-300 motion-safe:animate-pulse">
           {cartCount}
         </span>
       ) : null}
@@ -53,6 +53,21 @@ export default function StoreHeader({
     }
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen])
+
   if (variant === 'landing') {
     return (
       <>
@@ -76,7 +91,7 @@ export default function StoreHeader({
             <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] items-center gap-3">
               <button
                 aria-label="Mở danh mục"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition hover:bg-white/20"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition duration-300 hover:bg-white/20 active:scale-95"
                 onClick={() => setIsOpen(true)}
                 type="button"
               >
@@ -94,7 +109,7 @@ export default function StoreHeader({
 
               <Link
                 aria-label="Giỏ hàng"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition hover:bg-white/20"
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition duration-300 hover:bg-white/20 active:scale-95"
                 href="/cart"
               >
                 <CartIcon cartCount={cartCount} />
@@ -106,7 +121,7 @@ export default function StoreHeader({
                 <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
                 <path d="m16 16 4 4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
               </svg>
-              <span className="min-w-0 flex-1 truncate text-base">Freeshop qua ứng dụng</span>
+              <span className="min-w-0 flex-1 truncate text-base">Freeship qua ứng dụng</span>
               <button className="text-blue-600" type="button">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
                   <path d="M12 5a3 3 0 0 1 3 3v4a3 3 0 1 1-6 0V8a3 3 0 0 1 3-3Z" stroke="currentColor" strokeWidth="1.8" />
@@ -131,7 +146,7 @@ export default function StoreHeader({
         >
           <button
             aria-label="Đóng danh mục"
-            className={`absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] transition ${
+            className={`absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] transition duration-300 ease-out ${
               isOpen ? 'opacity-100' : 'opacity-0'
             }`}
             onClick={() => setIsOpen(false)}
@@ -139,8 +154,8 @@ export default function StoreHeader({
           />
 
           <aside
-            className={`absolute left-0 top-0 h-full w-[86%] max-w-sm bg-white px-5 pb-6 pt-5 shadow-2xl transition-all duration-300 ${
-              isOpen ? 'translate-x-0' : '-translate-x-full'
+            className={`absolute left-0 top-0 h-full w-[86%] max-w-sm bg-white px-5 pb-6 pt-5 shadow-2xl transition-all duration-300 ease-out ${
+              isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
             }`}
           >
             <div className="flex items-center justify-between gap-4">
@@ -159,12 +174,15 @@ export default function StoreHeader({
             </div>
 
             <nav className="mt-6 space-y-3">
-              {CATEGORY_CONFIG.map((item) => (
+              {CATEGORY_CONFIG.map((item, index) => (
                 <Link
-                  className="block rounded-2xl border border-stone-200 bg-stone-50 px-4 py-4 text-sm font-semibold text-stone-800 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                  className={`block rounded-2xl border border-stone-200 bg-stone-50 px-4 py-4 text-sm font-semibold text-stone-800 transition duration-300 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 ${
+                    isOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                  }`}
                   href={`/category/${item.slug}`}
                   key={item.slug}
                   onClick={() => setIsOpen(false)}
+                  style={{ transitionDelay: `${index * 45}ms` }}
                 >
                   <span className="block text-base">{item.label}</span>
                   <span className="mt-1 block text-xs font-medium leading-5 text-stone-500">

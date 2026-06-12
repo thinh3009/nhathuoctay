@@ -1,7 +1,9 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
+import LandingPromoStrip from '@/components/landing/LandingPromoStrip'
 import LandingSection from '@/components/landing/LandingSection'
+import LandingShortcutGrid from '@/components/landing/LandingShortcutGrid'
 import StoreHeroCarousel from '@/components/landing/StoreHeroCarousel'
 import { commitments, products } from '@/lib/catalog'
 import { CATEGORY_CONFIG, DEFAULT_CATEGORY_SLUG } from '@/lib/constants'
@@ -10,7 +12,7 @@ import { SITE_NAME, SITE_URL } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Thực phẩm chức năng chính hãng cho cả gia đình',
   description:
-    'NutriHome cung cấp thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với kiến trúc landing page tối ưu SEO bằng Next.js App Router.',
+    'NutriHome cung cấp thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với trang chủ tối ưu cho chuyển đổi và điều hướng mua hàng.',
   keywords: [
     'thực phẩm chức năng',
     'vitamin',
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'NutriHome - Thực phẩm chức năng và chăm sóc sức khỏe',
     description:
-      'Mua thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc trong một storefront được tối ưu SEO bằng Next.js.',
+      'Mua thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc trong một storefront được tối ưu cho mobile và SEO.',
     url: SITE_URL,
     siteName: SITE_NAME,
     images: [
@@ -60,19 +62,37 @@ const deviceHighlight = products
   .sort((left, right) => right.rating - left.rating)
   .slice(0, 3)
 
-const supportCards = [
+const promoCards = [
   {
-    title: 'Tư vấn theo nhu cầu',
-    description: 'Gợi ý sản phẩm theo mục tiêu sức khỏe như tim mạch, đề kháng, đẹp da và xương khớp.',
+    title: 'Ưu đãi đề kháng mỗi ngày',
+    description: 'Vitamin, omega 3 và nhóm hỗ trợ miễn dịch được gom vào một luồng mua sắm rõ ràng.',
+    badge: 'Ưu đãi nổi bật',
+    href: `/category/${DEFAULT_CATEGORY_SLUG}`,
+    ctaLabel: 'Mua ngay',
   },
   {
-    title: 'Danh mục rõ ràng',
-    description: 'Mỗi nhóm sản phẩm có route riêng để thuận tiện cho SEO, điều hướng và mở rộng chiến dịch.',
+    title: 'Routine đẹp da dễ chọn',
+    description: 'Kéo người dùng từ homepage sang serum, làm sạch và phục hồi mà không làm loãng trải nghiệm.',
+    badge: 'Chăm sóc da',
+    href: '/category/cham-soc-da',
+    ctaLabel: 'Xem danh mục',
   },
   {
-    title: 'Mua hàng dễ mở rộng',
-    description: 'Cấu trúc App Router giúp thêm landing campaign, blog hoặc danh mục mới mà không phải đập lại layout.',
+    title: 'Thiết bị theo dõi tại nhà',
+    description: 'Nhiệt kế, máy đo và nhóm hỗ trợ gia đình được đẩy thành block riêng cho khách cần mua nhanh.',
+    badge: 'Gia đình',
+    href: '/category/thiet-bi-y-te',
+    ctaLabel: 'Xem thiết bị',
   },
+]
+
+const shortcutItems = [
+  { title: 'Cần mua thuốc', href: '/category/thuoc', icon: 'pill' as const },
+  { title: 'Tư vấn dược sĩ', href: `/category/${DEFAULT_CATEGORY_SLUG}`, icon: 'advisor' as const },
+  { title: 'Đơn của tôi', href: '/cart', icon: 'note' as const },
+  { title: 'Tìm nhà thuốc', href: '/category/thiet-bi-y-te', icon: 'pin' as const },
+  { title: 'Tiêm vắc xin', href: '/category/thuc-pham-chuc-nang', icon: 'vaccine' as const },
+  { title: 'Tra thuốc chính hãng', href: '/category/thuoc', icon: 'lookup' as const },
 ]
 
 const comboGroups = [
@@ -129,7 +149,7 @@ const structuredData = {
   name: SITE_NAME,
   url: SITE_URL,
   description:
-    'NutriHome là storefront bán thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với kiến trúc Next.js tối ưu SEO.',
+    'NutriHome là storefront bán thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với trang chủ tối ưu cho mobile.',
   makesOffer: featuredProducts.map((product) => ({
     '@type': 'Offer',
     itemOffered: {
@@ -144,10 +164,10 @@ const structuredData = {
 
 const heroSlides = [
   {
-    eyebrow: 'Storefront chuẩn SEO',
-    title: 'Thực phẩm chức năng chính hãng cho cả gia đình với trải nghiệm mua hàng rõ ràng và dễ mở rộng',
+    eyebrow: 'Chính hãng mỗi ngày',
+    title: 'Thực phẩm chức năng chính hãng cho cả gia đình với trải nghiệm mua hàng rõ ràng và dễ chọn trên mobile',
     description:
-      'Homepage được đưa về đúng vai trò bán hàng: lấy thực phẩm chức năng làm trung tâm, hiển thị danh mục rõ ràng, đẩy sản phẩm nổi bật lên đầu và giữ nguyên lớp kỹ thuật SEO phía sau.',
+      'Trang chủ được đưa về đúng vai trò bán hàng: lấy thực phẩm chức năng làm trung tâm, đẩy sản phẩm nổi bật lên đầu và giữ luồng mua sắm gọn cho người dùng điện thoại.',
     primaryCta: {
       label: 'Mua thực phẩm chức năng',
       href: `/category/${DEFAULT_CATEGORY_SLUG}`,
@@ -176,8 +196,8 @@ const heroSlides = [
     products: featuredProducts,
   },
   {
-    eyebrow: 'Làm đẹp và phục hồi',
-    title: 'Kéo thêm doanh thu từ nhóm chăm sóc da bằng cách đặt đúng luồng mua sắm trên hero',
+    eyebrow: 'Đẹp da và phục hồi',
+    title: 'Mở thêm luồng làm đẹp bằng nhóm chăm sóc da được tách rõ ngay trên màn đầu',
     description:
       'Một slide riêng cho làm đẹp giúp homepage không chỉ bán thực phẩm chức năng mà còn mở luồng bán chéo sang serum, làm sạch và dưỡng ẩm.',
     primaryCta: {
@@ -209,7 +229,7 @@ const heroSlides = [
   },
   {
     eyebrow: 'Gia đình và theo dõi sức khỏe',
-    title: 'Thiết bị y tế tại nhà nên có lối vào riêng để tăng độ tin cậy và tăng giá trị đơn hàng',
+    title: 'Thiết bị y tế tại nhà nên có lối vào riêng để tăng độ tin cậy và giá trị đơn hàng',
     description:
       'Hero slide cho thiết bị y tế giúp storefront dễ mở rộng sang combo máy đo, nhiệt kế và sản phẩm chăm sóc gia đình.',
     primaryCta: {
@@ -253,26 +273,16 @@ export default function LandingPage() {
 
       <StoreHeroCarousel slides={heroSlides} />
 
-      <div className="mt-4 grid gap-3 lg:mt-6 lg:grid-cols-3 lg:gap-4">
-        {supportCards.map((item) => (
-          <article
-            className="rounded-[22px] border border-stone-200 bg-white p-4 shadow-sm shadow-emerald-100 sm:rounded-[24px] sm:p-5"
-            key={item.title}
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-lg font-bold text-emerald-700">
-              ✓
-            </div>
-            <h2 className="mt-3 text-lg font-bold text-stone-900">{item.title}</h2>
-            <p className="mt-2 text-sm leading-7 text-stone-600">{item.description}</p>
-          </article>
-        ))}
+      <div className="mt-4 space-y-4 sm:mt-5 sm:space-y-5">
+        <LandingPromoStrip items={promoCards} />
+        <LandingShortcutGrid items={shortcutItems} />
       </div>
 
       <div className="mt-4 space-y-4 sm:mt-6 sm:space-y-6">
         <LandingSection
           eyebrow="Danh mục trọng tâm"
           title="Đi nhanh vào từng nhóm sản phẩm"
-          description="Homepage cần dẫn người dùng vào đúng luồng mua sắm. Phần này giữ vai trò điều hướng chính, đồng thời giúp SEO hiểu được website đang bán gì."
+          description="Homepage vẫn cần dẫn người dùng vào đúng luồng mua sắm. Phần này giữ vai trò điều hướng chính và giúp khách chọn nhanh đúng danh mục."
         >
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
             {CATEGORY_CONFIG.map((category, index) => (

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -67,13 +67,13 @@ export default function StoreHeroCarousel({
   }
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-lime-50 px-5 py-6 shadow-sm shadow-emerald-100 sm:rounded-[32px] sm:p-8 lg:p-10">
+    <section className="overflow-hidden rounded-[28px] bg-gradient-to-br from-sky-300 via-cyan-200 to-emerald-100 px-4 py-4 shadow-lg shadow-cyan-100 sm:rounded-[32px] sm:p-6 lg:p-8">
       <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
         <div>
-          <div className="inline-flex rounded-full bg-emerald-700 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white sm:px-4 sm:text-xs">
+          <div className="inline-flex rounded-full bg-white/80 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-800 sm:px-4 sm:text-xs">
             {activeSlide.eyebrow}
           </div>
-          <h1 className="mt-4 max-w-4xl text-3xl font-black tracking-tight text-stone-950 sm:text-4xl lg:text-5xl">
+          <h1 className="mt-4 max-w-4xl text-3xl font-black tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
             {activeSlide.title}
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-600 sm:text-base sm:leading-8">
@@ -82,13 +82,13 @@ export default function StoreHeroCarousel({
 
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
-              className="rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
+              className="rounded-full bg-fuchsia-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-fuchsia-700"
               href={activeSlide.primaryCta.href}
             >
               {activeSlide.primaryCta.label}
             </Link>
             <Link
-              className="rounded-full border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
+              className="rounded-full border border-white/70 bg-white/80 px-5 py-3 text-sm font-semibold text-emerald-800 transition hover:border-white hover:bg-white"
               href={activeSlide.secondaryCta.href}
             >
               {activeSlide.secondaryCta.label}
@@ -97,7 +97,7 @@ export default function StoreHeroCarousel({
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             {activeSlide.stats.map((stat) => (
-              <article className="rounded-[22px] bg-white px-4 py-4 shadow-sm" key={stat.label}>
+              <article className="rounded-[22px] bg-white/80 px-4 py-4 shadow-sm backdrop-blur" key={stat.label}>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
                   {stat.label}
                 </p>
@@ -126,7 +126,7 @@ export default function StoreHeroCarousel({
               <div className="ml-auto flex gap-2">
                 <button
                   aria-label="Xem slide trước"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-200 bg-white text-emerald-700 transition hover:bg-emerald-50"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/85 text-emerald-700 transition hover:bg-white"
                   onClick={goPrevious}
                   type="button"
                 >
@@ -134,7 +134,7 @@ export default function StoreHeroCarousel({
                 </button>
                 <button
                   aria-label="Xem slide tiếp theo"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-200 bg-white text-emerald-700 transition hover:bg-emerald-50"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/85 text-emerald-700 transition hover:bg-white"
                   onClick={goNext}
                   type="button"
                 >
