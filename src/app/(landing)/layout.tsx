@@ -12,7 +12,7 @@ export default async function LandingLayout({ children }: LandingLayoutProps) {
   return (
     <main className="min-h-screen bg-stone-50 text-stone-900">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <StoreHeader cartCount={cartCount} />
+        <StoreHeader cartCount={cartCount} variant="landing" />
         <div className="mt-6">{children}</div>
         <StoreFooter />
       </div>
