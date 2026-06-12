@@ -1,9 +1,14 @@
 import type { Metadata } from 'next'
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/config/site'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'NutriHome',
-  description: 'Nhà thuốc và chăm sóc sức khỏe trực tuyến',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
 }
 
 type RootLayoutProps = Readonly<{

@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { ALL_SUBCATEGORY_LABEL } from '@/lib/constants'
 import type { ProductSearchParams } from '@/lib/schemas'
 
 type CategoryFiltersProps = {
@@ -11,8 +12,6 @@ type CategoryFiltersProps = {
   selectedSort: ProductSearchParams['sort']
   variant?: 'desktop' | 'mobile'
 }
-
-const allSubCategoryLabel = 'Tất cả'
 
 const priceOptions = [
   { value: 'all', label: 'Tất cả mức giá' },
@@ -38,7 +37,7 @@ type DraftFilters = {
 function buildSelectedTags(filters: DraftFilters) {
   const tags: string[] = []
 
-  if (filters.subCategory !== allSubCategoryLabel) {
+  if (filters.subCategory !== ALL_SUBCATEGORY_LABEL) {
     tags.push(filters.subCategory)
   }
 
@@ -67,14 +66,14 @@ export default function CategoryFilters({
   const searchParams = useSearchParams()
   const [isOpen, setIsOpen] = useState(false)
   const [draftFilters, setDraftFilters] = useState<DraftFilters>({
-    subCategory: selectedSubCategory ?? allSubCategoryLabel,
+    subCategory: selectedSubCategory ?? ALL_SUBCATEGORY_LABEL,
     priceRange: selectedPriceRange,
     sort: selectedSort,
   })
 
   const activeFilters = useMemo<DraftFilters>(
     () => ({
-      subCategory: selectedSubCategory ?? allSubCategoryLabel,
+      subCategory: selectedSubCategory ?? ALL_SUBCATEGORY_LABEL,
       priceRange: selectedPriceRange,
       sort: selectedSort,
     }),
@@ -117,7 +116,7 @@ export default function CategoryFilters({
     const params = new URLSearchParams(searchParams?.toString() ?? '')
 
     Object.entries(next).forEach(([key, value]) => {
-      if (!value || value === 'all' || value === 'featured' || value === allSubCategoryLabel) {
+      if (!value || value === 'all' || value === 'featured' || value === ALL_SUBCATEGORY_LABEL) {
         params.delete(key)
         return
       }
@@ -136,7 +135,7 @@ export default function CategoryFilters({
 
   function resetFiltersDesktop() {
     updateQuery({
-      subCategory: allSubCategoryLabel,
+      subCategory: ALL_SUBCATEGORY_LABEL,
       priceRange: 'all',
       sort: 'featured',
     })
@@ -144,7 +143,7 @@ export default function CategoryFilters({
 
   function resetFiltersMobile() {
     setDraftFilters({
-      subCategory: allSubCategoryLabel,
+      subCategory: ALL_SUBCATEGORY_LABEL,
       priceRange: 'all',
       sort: 'featured',
     })
@@ -170,10 +169,10 @@ export default function CategoryFilters({
         <div className="mt-5">
           <p className="text-sm font-semibold text-stone-800">Nhóm sản phẩm</p>
           <div className="mt-3 space-y-2">
-            {[allSubCategoryLabel, ...subCategories].map((subCategory) => (
+            {[ALL_SUBCATEGORY_LABEL, ...subCategories].map((subCategory) => (
               <label className="flex items-center gap-2 text-sm text-stone-700" key={subCategory}>
                 <input
-                  checked={(selectedSubCategory ?? allSubCategoryLabel) === subCategory}
+                  checked={(selectedSubCategory ?? ALL_SUBCATEGORY_LABEL) === subCategory}
                   className="h-4 w-4 border-stone-300 text-emerald-700"
                   name="sub-category-desktop"
                   onChange={() => updateQuery({ subCategory })}
@@ -235,7 +234,7 @@ export default function CategoryFilters({
         <div className="mt-5">
           <p className="text-sm font-semibold text-stone-800">Nhóm sản phẩm</p>
           <div className="mt-3 space-y-2">
-            {[allSubCategoryLabel, ...subCategories].map((subCategory) => (
+            {[ALL_SUBCATEGORY_LABEL, ...subCategories].map((subCategory) => (
               <label className="flex items-center gap-2 text-sm text-stone-700" key={subCategory}>
                 <input
                   checked={draftFilters.subCategory === subCategory}

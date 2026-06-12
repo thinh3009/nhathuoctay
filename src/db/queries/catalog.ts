@@ -2,7 +2,12 @@ import { eq } from 'drizzle-orm'
 import { db } from '../client'
 import { categories, productReviews, products as productsTable } from '../schema'
 import { products as catalogProducts } from '@/lib/catalog'
-import { DEFAULT_CATEGORY_SLUG, type CategorySlug, PRODUCTS_PER_PAGE } from '@/lib/constants'
+import {
+  ALL_SUBCATEGORY_LABEL,
+  DEFAULT_CATEGORY_SLUG,
+  type CategorySlug,
+  PRODUCTS_PER_PAGE,
+} from '@/lib/constants'
 import { normalizeProductImages } from '@/lib/productImages'
 import {
   categoryNavItemSchema,
@@ -11,7 +16,6 @@ import {
   productReviewsResponseSchema,
   relatedProductsResponseSchema,
   reviewSchema,
-  type CategoryNavItem,
   type Product,
   type ProductSearchParams,
   type Review,
@@ -177,7 +181,11 @@ export async function listProducts(rawParams: Partial<Record<keyof ProductSearch
   const categoryProducts = (await getProductsByCategorySlug(category.slug)).map(mapProduct)
   const filteredProducts = categoryProducts
     .filter((product) => {
-      if (params.subCategory && params.subCategory !== 'Tất cả' && product.subCategory !== params.subCategory) {
+      if (
+        params.subCategory &&
+        params.subCategory !== ALL_SUBCATEGORY_LABEL &&
+        product.subCategory !== params.subCategory
+      ) {
         return false
       }
 
@@ -219,7 +227,7 @@ export async function listProducts(rawParams: Partial<Record<keyof ProductSearch
   return {
     category,
     filters: {
-      subCategories: ['Tất cả', ...new Set(categoryProducts.map((product) => product.subCategory))],
+      subCategories: [...new Set(categoryProducts.map((product) => product.subCategory))],
     },
     items,
     pagination: {
