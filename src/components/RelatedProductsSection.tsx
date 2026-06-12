@@ -48,17 +48,17 @@ export default function RelatedProductsSection({ products }: RelatedProductsSect
   }, [products.length])
 
   return (
-    <section className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="mt-8 rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-cyan-700">Gợi ý mua thêm</p>
-          <h2 className="mt-1 text-2xl font-bold text-slate-950">Sản phẩm liên quan</h2>
+          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Gợi ý mua thêm</p>
+          <h2 className="mt-1 text-2xl font-bold text-stone-900">Sản phẩm liên quan</h2>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             aria-label="Xem sản phẩm liên quan trước"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-bold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-emerald-300 hover:text-emerald-700"
             onClick={() => scrollTrack('previous')}
             type="button"
           >
@@ -66,7 +66,7 @@ export default function RelatedProductsSection({ products }: RelatedProductsSect
           </button>
           <button
             aria-label="Xem sản phẩm liên quan tiếp theo"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-bold text-slate-700 transition hover:border-cyan-300 hover:text-cyan-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-emerald-300 hover:text-emerald-700"
             onClick={() => scrollTrack('next')}
             type="button"
           >

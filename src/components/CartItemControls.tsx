@@ -27,9 +27,9 @@ export default function CartItemControls({ productSlug, quantity }: CartItemCont
 
   return (
     <div className="flex flex-col gap-3 sm:items-end">
-      <div className="flex items-center rounded-lg border border-slate-300">
+      <div className="flex items-center rounded-lg border border-stone-300">
         <button
-          className="h-10 w-10 text-lg font-semibold text-slate-700 disabled:opacity-50"
+          className="h-10 w-10 text-lg font-semibold text-stone-700 disabled:opacity-50"
           disabled={isPending}
           onClick={() =>
             quantity <= 1
@@ -48,11 +48,11 @@ export default function CartItemControls({ productSlug, quantity }: CartItemCont
         >
           -
         </button>
-        <span className="flex h-10 min-w-12 items-center justify-center border-x border-slate-300 px-3 text-sm font-semibold text-slate-900">
+        <span className="flex h-10 min-w-12 items-center justify-center border-x border-stone-300 px-3 text-sm font-semibold text-stone-900">
           {quantity}
         </span>
         <button
-          className="h-10 w-10 text-lg font-semibold text-slate-700 disabled:opacity-50"
+          className="h-10 w-10 text-lg font-semibold text-stone-700 disabled:opacity-50"
           disabled={isPending}
           onClick={() =>
             runRequest({
@@ -69,7 +69,7 @@ export default function CartItemControls({ productSlug, quantity }: CartItemCont
       </div>
 
       <button
-        className="text-sm font-semibold text-rose-600 hover:text-rose-700 disabled:opacity-50"
+        className="text-sm font-semibold text-amber-600 hover:text-amber-700 disabled:opacity-50"
         disabled={isPending}
         onClick={() =>
           runRequest({

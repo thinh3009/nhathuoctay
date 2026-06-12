@@ -12,6 +12,8 @@ type CategoryFiltersProps = {
   variant?: 'desktop' | 'mobile'
 }
 
+const allSubCategoryLabel = 'Tất cả'
+
 const priceOptions = [
   { value: 'all', label: 'Tất cả mức giá' },
   { value: 'under-200', label: 'Dưới 200.000đ' },
@@ -36,7 +38,7 @@ type DraftFilters = {
 function buildSelectedTags(filters: DraftFilters) {
   const tags: string[] = []
 
-  if (filters.subCategory !== 'Tất cả') {
+  if (filters.subCategory !== allSubCategoryLabel) {
     tags.push(filters.subCategory)
   }
 
@@ -65,14 +67,14 @@ export default function CategoryFilters({
   const searchParams = useSearchParams()
   const [isOpen, setIsOpen] = useState(false)
   const [draftFilters, setDraftFilters] = useState<DraftFilters>({
-    subCategory: selectedSubCategory ?? 'Tất cả',
+    subCategory: selectedSubCategory ?? allSubCategoryLabel,
     priceRange: selectedPriceRange,
     sort: selectedSort,
   })
 
   const activeFilters = useMemo<DraftFilters>(
     () => ({
-      subCategory: selectedSubCategory ?? 'Tất cả',
+      subCategory: selectedSubCategory ?? allSubCategoryLabel,
       priceRange: selectedPriceRange,
       sort: selectedSort,
     }),
@@ -102,8 +104,8 @@ export default function CategoryFilters({
 
     function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setIsOpen(false)
         setDraftFilters(activeFilters)
+        setIsOpen(false)
       }
     }
 
@@ -115,7 +117,7 @@ export default function CategoryFilters({
     const params = new URLSearchParams(searchParams?.toString() ?? '')
 
     Object.entries(next).forEach(([key, value]) => {
-      if (!value || value === 'all' || value === 'featured' || value === 'Tất cả') {
+      if (!value || value === 'all' || value === 'featured' || value === allSubCategoryLabel) {
         params.delete(key)
         return
       }
@@ -134,7 +136,7 @@ export default function CategoryFilters({
 
   function resetFiltersDesktop() {
     updateQuery({
-      subCategory: 'Tất cả',
+      subCategory: allSubCategoryLabel,
       priceRange: 'all',
       sort: 'featured',
     })
@@ -142,7 +144,7 @@ export default function CategoryFilters({
 
   function resetFiltersMobile() {
     setDraftFilters({
-      subCategory: 'Tất cả',
+      subCategory: allSubCategoryLabel,
       priceRange: 'all',
       sort: 'featured',
     })
@@ -166,13 +168,13 @@ export default function CategoryFilters({
     return (
       <>
         <div className="mt-5">
-          <p className="text-sm font-semibold text-slate-800">Nhóm sản phẩm</p>
+          <p className="text-sm font-semibold text-stone-800">Nhóm sản phẩm</p>
           <div className="mt-3 space-y-2">
-            {subCategories.map((subCategory) => (
-              <label className="flex items-center gap-2 text-sm text-slate-700" key={subCategory}>
+            {[allSubCategoryLabel, ...subCategories].map((subCategory) => (
+              <label className="flex items-center gap-2 text-sm text-stone-700" key={subCategory}>
                 <input
-                  checked={(selectedSubCategory ?? 'Tất cả') === subCategory}
-                  className="h-4 w-4 border-slate-300 text-cyan-700"
+                  checked={(selectedSubCategory ?? allSubCategoryLabel) === subCategory}
+                  className="h-4 w-4 border-stone-300 text-emerald-700"
                   name="sub-category-desktop"
                   onChange={() => updateQuery({ subCategory })}
                   type="radio"
@@ -184,13 +186,13 @@ export default function CategoryFilters({
         </div>
 
         <div className="mt-6">
-          <p className="text-sm font-semibold text-slate-800">Mức giá</p>
+          <p className="text-sm font-semibold text-stone-800">Mức giá</p>
           <div className="mt-3 space-y-2">
             {priceOptions.map((range) => (
-              <label className="flex items-center gap-2 text-sm text-slate-700" key={range.value}>
+              <label className="flex items-center gap-2 text-sm text-stone-700" key={range.value}>
                 <input
                   checked={selectedPriceRange === range.value}
-                  className="h-4 w-4 border-slate-300 text-cyan-700"
+                  className="h-4 w-4 border-stone-300 text-emerald-700"
                   name="price-range-desktop"
                   onChange={() => updateQuery({ priceRange: range.value })}
                   type="radio"
@@ -202,9 +204,9 @@ export default function CategoryFilters({
         </div>
 
         <div className="mt-6">
-          <p className="text-sm font-semibold text-slate-800">Sắp xếp</p>
+          <p className="text-sm font-semibold text-stone-800">Sắp xếp</p>
           <select
-            className="mt-3 h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-700 shadow-sm"
+            className="mt-3 h-10 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-700 shadow-sm outline-none transition focus:border-emerald-500"
             onChange={(event) => updateQuery({ sort: event.target.value })}
             value={selectedSort}
           >
@@ -217,7 +219,7 @@ export default function CategoryFilters({
         </div>
 
         <button
-          className="mt-6 text-sm font-semibold text-cyan-700 hover:text-cyan-800"
+          className="mt-6 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
           onClick={resetFiltersDesktop}
           type="button"
         >
@@ -231,13 +233,13 @@ export default function CategoryFilters({
     return (
       <>
         <div className="mt-5">
-          <p className="text-sm font-semibold text-slate-800">Nhóm sản phẩm</p>
+          <p className="text-sm font-semibold text-stone-800">Nhóm sản phẩm</p>
           <div className="mt-3 space-y-2">
-            {subCategories.map((subCategory) => (
-              <label className="flex items-center gap-2 text-sm text-slate-700" key={subCategory}>
+            {[allSubCategoryLabel, ...subCategories].map((subCategory) => (
+              <label className="flex items-center gap-2 text-sm text-stone-700" key={subCategory}>
                 <input
                   checked={draftFilters.subCategory === subCategory}
-                  className="h-4 w-4 border-slate-300 text-cyan-700"
+                  className="h-4 w-4 border-stone-300 text-emerald-700"
                   name="sub-category-mobile"
                   onChange={() => setDraftFilters((current) => ({ ...current, subCategory }))}
                   type="radio"
@@ -249,13 +251,13 @@ export default function CategoryFilters({
         </div>
 
         <div className="mt-6">
-          <p className="text-sm font-semibold text-slate-800">Mức giá</p>
+          <p className="text-sm font-semibold text-stone-800">Mức giá</p>
           <div className="mt-3 space-y-2">
             {priceOptions.map((range) => (
-              <label className="flex items-center gap-2 text-sm text-slate-700" key={range.value}>
+              <label className="flex items-center gap-2 text-sm text-stone-700" key={range.value}>
                 <input
                   checked={draftFilters.priceRange === range.value}
-                  className="h-4 w-4 border-slate-300 text-cyan-700"
+                  className="h-4 w-4 border-stone-300 text-emerald-700"
                   name="price-range-mobile"
                   onChange={() =>
                     setDraftFilters((current) => ({
@@ -272,9 +274,9 @@ export default function CategoryFilters({
         </div>
 
         <div className="mt-6">
-          <p className="text-sm font-semibold text-slate-800">Sắp xếp</p>
+          <p className="text-sm font-semibold text-stone-800">Sắp xếp</p>
           <select
-            className="mt-3 h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-700 shadow-sm"
+            className="mt-3 h-10 w-full rounded-lg border border-stone-300 bg-white px-3 text-sm text-stone-700 shadow-sm outline-none transition focus:border-emerald-500"
             onChange={(event) =>
               setDraftFilters((current) => ({
                 ...current,
@@ -301,7 +303,7 @@ export default function CategoryFilters({
   return (
     <>
       <button
-        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-left shadow-sm"
+        className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-left shadow-sm"
         onClick={() => {
           setDraftFilters(activeFilters)
           setIsOpen(true)
@@ -311,20 +313,20 @@ export default function CategoryFilters({
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-slate-950">Bộ lọc sản phẩm</p>
+              <p className="text-sm font-semibold text-stone-900">Bộ lọc sản phẩm</p>
               {selectedTags.length > 0 ? (
-                <span className="rounded-full bg-cyan-700 px-2 py-0.5 text-[11px] font-bold text-white">
+                <span className="rounded-full bg-emerald-700 px-2 py-0.5 text-[11px] font-bold text-white">
                   {selectedTags.length}
                 </span>
               ) : null}
             </div>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-stone-500">
               {selectedTags.length > 0
                 ? `${selectedTags.length} lựa chọn đang áp dụng`
                 : 'Chọn bộ lọc để thu gọn danh sách'}
             </p>
           </div>
-          <span className="rounded-full bg-cyan-700 px-4 py-2 text-sm font-semibold text-white">
+          <span className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">
             Lọc
           </span>
         </div>
@@ -333,7 +335,7 @@ export default function CategoryFilters({
           <div className="mt-3 flex flex-wrap gap-2">
             {selectedTags.map((tag) => (
               <span
-                className="rounded-full bg-cyan-50 px-3 py-1 text-xs font-medium text-cyan-700"
+                className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
                 key={tag}
               >
                 {tag}
@@ -351,7 +353,7 @@ export default function CategoryFilters({
       >
         <button
           aria-label="Đóng bộ lọc"
-          className={`absolute inset-0 bg-slate-950/45 backdrop-blur-[2px] transition-all duration-300 ${
+          className={`absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px] transition-all duration-300 ${
             isOpen ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={closeDrawer}
@@ -366,19 +368,19 @@ export default function CategoryFilters({
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-lg font-bold text-slate-950">Bộ lọc</p>
+                <p className="text-lg font-bold text-stone-900">Bộ lọc</p>
                 {draftTags.length > 0 ? (
-                  <span className="rounded-full bg-cyan-700 px-2 py-0.5 text-[11px] font-bold text-white">
+                  <span className="rounded-full bg-emerald-700 px-2 py-0.5 text-[11px] font-bold text-white">
                     {draftTags.length}
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-stone-500">
                 Chọn bộ lọc rồi bấm áp dụng để cập nhật danh sách.
               </p>
             </div>
             <button
-              className="rounded-full border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700"
+              className="rounded-full border border-stone-200 px-3 py-2 text-sm font-semibold text-stone-700"
               onClick={closeDrawer}
               type="button"
             >
@@ -386,20 +388,20 @@ export default function CategoryFilters({
             </button>
           </div>
 
-          <div className="mt-4 rounded-xl bg-slate-50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Đang chọn</p>
+          <div className="mt-4 rounded-xl bg-stone-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">Đang chọn</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {draftTags.length > 0 ? (
                 draftTags.map((tag) => (
                   <span
-                    className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-medium text-cyan-700"
+                    className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700"
                     key={tag}
                   >
                     {tag}
                   </span>
                 ))
               ) : (
-                <span className="text-sm text-slate-500">Chưa áp dụng bộ lọc nào.</span>
+                <span className="text-sm text-stone-500">Chưa áp dụng bộ lọc nào.</span>
               )}
             </div>
           </div>
@@ -408,14 +410,14 @@ export default function CategoryFilters({
 
           <div className="mt-6 grid grid-cols-2 gap-3">
             <button
-              className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700"
+              className="rounded-xl border border-stone-200 px-4 py-3 text-sm font-semibold text-stone-700"
               onClick={resetFiltersMobile}
               type="button"
             >
               Đặt lại
             </button>
             <button
-              className="rounded-xl bg-cyan-700 px-4 py-3 text-sm font-semibold text-white"
+              className="rounded-xl bg-amber-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
               onClick={applyFiltersMobile}
               type="button"
             >

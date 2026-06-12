@@ -9,34 +9,9 @@ type ProductVisualProps = {
   active?: boolean
 }
 
-const themeByCategory: Record<
-  Product['topCategorySlug'],
-  { shell: string; panel: string; accent: string; ink: string }
-> = {
-  'thuc-pham-chuc-nang': {
-    shell: 'from-cyan-50 to-white',
-    panel: 'bg-cyan-100',
-    accent: 'bg-cyan-600',
-    ink: 'text-cyan-700',
-  },
-  'cham-soc-da': {
-    shell: 'from-rose-50 to-white',
-    panel: 'bg-rose-100',
-    accent: 'bg-rose-500',
-    ink: 'text-rose-700',
-  },
-  'thiet-bi-y-te': {
-    shell: 'from-emerald-50 to-white',
-    panel: 'bg-emerald-100',
-    accent: 'bg-emerald-600',
-    ink: 'text-emerald-700',
-  },
-  thuoc: {
-    shell: 'from-amber-50 to-white',
-    panel: 'bg-amber-100',
-    accent: 'bg-amber-500',
-    ink: 'text-amber-700',
-  },
+const theme = {
+  accent: 'bg-emerald-700',
+  ink: 'text-emerald-800',
 }
 
 export default function ProductVisual({
@@ -45,35 +20,33 @@ export default function ProductVisual({
   variant = 'card',
   active = false,
 }: ProductVisualProps) {
-  const theme = themeByCategory[product.topCategorySlug]
-
   if (variant === 'thumb') {
     return (
       <div
         className={`flex h-20 items-center justify-center rounded-lg border bg-white px-2 text-center shadow-sm ${
-          active ? 'border-cyan-700 ring-2 ring-cyan-200' : 'border-slate-200'
+          active ? 'border-emerald-800 ring-2 ring-emerald-200' : 'border-stone-200'
         }`}
       >
         <div>
           <p className={`text-[11px] font-semibold uppercase tracking-wide ${theme.ink}`}>
             {image.label}
           </p>
-          <p className="mt-1 text-xs font-medium text-slate-600">{product.unit}</p>
+          <p className="mt-1 text-xs font-medium text-stone-600">{product.unit}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="relative h-36 overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+    <div className="relative h-36 overflow-hidden rounded-lg border border-emerald-100 bg-emerald-950">
       <Image
         alt={`${product.name} - ${image.label}`}
-        className="object-cover"
+        className="object-cover opacity-95"
         fill
         sizes="(max-width: 768px) 50vw, 320px"
         src={getProductImageSrc(image)}
       />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent p-3">
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-950 via-emerald-950/35 to-transparent p-3">
         <div
           className={`inline-flex rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white ${theme.accent}`}
         >

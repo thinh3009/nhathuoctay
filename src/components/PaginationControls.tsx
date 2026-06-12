@@ -34,8 +34,8 @@ export default function PaginationControls({
     <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
       <Link
         aria-disabled={page === 1}
-        className={`rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium ${
-          page === 1 ? 'pointer-events-none opacity-50' : 'text-slate-700'
+        className={`rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium ${
+          page === 1 ? 'pointer-events-none opacity-50' : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
         }`}
         href={createHref(basePath, query, Math.max(1, page - 1))}
       >
@@ -46,8 +46,8 @@ export default function PaginationControls({
         <Link
           className={`flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-medium ${
             page === value
-              ? 'border-cyan-700 bg-cyan-700 text-white'
-              : 'border-slate-300 bg-white text-slate-700'
+              ? 'border-emerald-700 bg-emerald-700 text-white'
+              : 'border-stone-300 bg-white text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
           }`}
           href={createHref(basePath, query, value)}
           key={value}
@@ -58,8 +58,8 @@ export default function PaginationControls({
 
       <Link
         aria-disabled={page === totalPages}
-        className={`rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium ${
-          page === totalPages ? 'pointer-events-none opacity-50' : 'text-slate-700'
+        className={`rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium ${
+          page === totalPages ? 'pointer-events-none opacity-50' : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
         }`}
         href={createHref(basePath, query, Math.min(totalPages, page + 1))}
       >

@@ -47,33 +47,33 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-900">
+    <main className="min-h-screen bg-stone-50 text-stone-900">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <StoreHeader activeCategorySlug={result.category.slug} cartCount={cartCount} />
 
-        <section className="mt-6 overflow-hidden rounded-lg bg-slate-950 text-white shadow-sm">
+        <section className="mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-700 text-white shadow-lg shadow-emerald-100">
           <div className="grid gap-6 px-6 py-7 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-300">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-emerald-200">
                 {result.category.label}
               </p>
               <h1 className="mt-2 text-3xl font-bold leading-tight sm:text-4xl">
                 {result.category.heroTitle}
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-300">
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-emerald-50/85">
                 {result.category.heroDescription}
               </p>
             </div>
 
-            <div className="rounded-lg border border-white/10 bg-white/5 p-5">
-              <p className="text-sm font-semibold text-cyan-300">Danh mục hiện có</p>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-sm">
+              <p className="text-sm font-semibold text-emerald-100">Danh mục hiện có</p>
               <div className="mt-4 grid gap-2">
                 {CATEGORY_CONFIG.map((item) => (
                   <Link
-                    className={`rounded-lg px-4 py-3 text-sm font-medium ${
+                    className={`rounded-xl px-4 py-3 text-sm font-medium transition ${
                       item.slug === result.category.slug
-                        ? 'bg-cyan-700 text-white'
-                        : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                        ? 'bg-amber-500 text-white'
+                        : 'bg-white/5 text-emerald-50 hover:bg-white/15'
                     }`}
                     href={`/category/${item.slug}`}
                     key={item.slug}
@@ -87,8 +87,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         </section>
 
         <section className="mt-6 grid gap-5 lg:grid-cols-[240px_minmax(0,1fr)_280px]">
-          <aside className="hidden h-fit rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6 lg:block">
-            <h2 className="text-base font-bold text-slate-950">Bộ lọc</h2>
+          <aside className="hidden h-fit rounded-2xl border border-stone-200 bg-white p-4 shadow-sm lg:sticky lg:top-6 lg:block">
+            <h2 className="text-base font-bold text-stone-900">Bộ lọc</h2>
             <CategoryFilters
               selectedPriceRange={result.selected.priceRange}
               selectedSort={result.selected.sort}
@@ -97,9 +97,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               variant="desktop"
             />
 
-            <div className="mt-6 rounded-lg border border-cyan-100 bg-cyan-50 p-4">
-              <h3 className="text-sm font-bold text-slate-950">Cam kết cửa hàng</h3>
-              <ul className="mt-3 space-y-2 text-xs leading-5 text-slate-700">
+            <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+              <h3 className="text-sm font-bold text-stone-900">Cam kết cửa hàng</h3>
+              <ul className="mt-3 space-y-2 text-xs leading-5 text-stone-700">
                 {commitments.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -109,11 +109,13 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
           <section>
             <div className="mb-4">
-              <p className="text-sm font-semibold uppercase tracking-wide text-cyan-700">
+              <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
                 {result.category.label}
               </p>
-              <h2 className="text-2xl font-bold text-slate-950">Hiển thị tối đa 20 sản phẩm mỗi trang</h2>
-              <p className="mt-1 text-sm text-slate-600">
+              <h2 className="text-2xl font-bold text-stone-900">
+                Hiển thị tối đa 20 sản phẩm mỗi trang
+              </h2>
+              <p className="mt-1 text-sm text-stone-600">
                 Đang hiển thị {result.items.length} / {result.pagination.total} sản phẩm
               </p>
             </div>
@@ -130,7 +132,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {result.items.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-slate-600 sm:col-span-2 xl:col-span-3">
+                <div className="rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center text-stone-600 sm:col-span-2 xl:col-span-3">
                   Không có sản phẩm phù hợp với bộ lọc hiện tại.
                 </div>
               ) : (
@@ -146,21 +148,23 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             />
           </section>
 
-          <aside className="h-fit rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
-            <h2 className="text-base font-bold text-slate-950">Gợi ý trong danh mục</h2>
+          <aside className="h-fit rounded-2xl border border-stone-200 bg-white p-4 shadow-sm lg:sticky lg:top-6">
+            <h2 className="text-base font-bold text-stone-900">Gợi ý trong danh mục</h2>
             <div className="mt-4 space-y-3">
               {result.suggestedProducts.map((product) => (
                 <Link
-                  className="block rounded-lg border border-slate-200 p-3 hover:border-cyan-500 hover:bg-cyan-50"
+                  className="block rounded-xl border border-stone-200 p-3 transition hover:border-emerald-500 hover:bg-emerald-50"
                   href={`/product/${product.slug}`}
                   key={product.slug}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-slate-950">{product.name}</p>
-                      <p className="mt-1 text-xs leading-5 text-slate-600">{product.benefit}</p>
+                      <p className="text-sm font-semibold text-stone-900">{product.name}</p>
+                      <p className="mt-1 text-xs leading-5 text-stone-600">{product.benefit}</p>
                     </div>
-                    <p className="shrink-0 text-sm font-bold text-cyan-700">{formatPrice(product.price)}</p>
+                    <p className="shrink-0 text-sm font-bold text-emerald-700">
+                      {formatPrice(product.price)}
+                    </p>
                   </div>
                 </Link>
               ))}

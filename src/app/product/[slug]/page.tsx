@@ -26,12 +26,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const relatedProducts = await getRelatedProducts(product)
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900">
+    <main className="min-h-screen bg-stone-50 px-4 py-8 text-stone-900">
       <div className="mx-auto max-w-7xl">
         <StoreHeader activeCategorySlug={product.topCategorySlug} cartCount={cartCount} />
         <div className="mt-6">
           <Link
-            className="text-sm font-semibold text-cyan-700 hover:text-cyan-800"
+            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
             href={`/category/${product.topCategorySlug}`}
           >
             ← Quay lại {product.topCategory.toLowerCase()}

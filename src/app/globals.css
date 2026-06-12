@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  color: #0f172a;
-  background: #f8fafc;
+  color: #1f2937;
+  background: #f8faf5;
   font-family: "Public Sans", "IBM Plex Sans", "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,13 +19,13 @@ body {
   min-width: 320px;
   margin: 0;
   background:
-    radial-gradient(circle at 0% 0%, #e0f2fe 0%, transparent 38%),
-    radial-gradient(circle at 100% 100%, #cffafe 0%, transparent 40%),
-    #f8fafc;
+    radial-gradient(circle at 0% 0%, #dcfce7 0%, transparent 38%),
+    radial-gradient(circle at 100% 100%, #bbf7d0 0%, transparent 40%),
+    #f8faf5;
 }
 
 body {
-  color: #0f172a;
+  color: #1f2937;
 }
 
 button,
