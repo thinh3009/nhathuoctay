@@ -9,7 +9,7 @@ import { SITE_NAME, SITE_URL } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Thực phẩm chức năng chính hãng cho cả gia đình',
   description:
-    'NutriHome cung cấp thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với cấu trúc landing page tối ưu SEO bằng Next.js App Router.',
+    'NutriHome cung cấp thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với kiến trúc landing page tối ưu SEO bằng Next.js App Router.',
   keywords: [
     'thực phẩm chức năng',
     'vitamin',
@@ -45,44 +45,77 @@ const featuredProducts = products
   .sort((left, right) => right.rating - left.rating)
   .slice(0, 3)
 
-const highlightProducts = products
-  .filter((product) => product.topCategorySlug !== DEFAULT_CATEGORY_SLUG)
-  .sort((left, right) => right.rating - left.rating)
-  .slice(0, 3)
+const bestSellerProducts = [...products].sort((left, right) => right.reviewCount - left.reviewCount).slice(0, 4)
 
-const serviceHighlights = [
+const supportCards = [
   {
     title: 'Tư vấn theo nhu cầu',
-    description:
-      'Nhóm nội dung được chia theo mục tiêu sức khỏe để người dùng tìm đúng sản phẩm nhanh hơn.',
+    description: 'Gợi ý sản phẩm theo mục tiêu sức khỏe như tim mạch, đề kháng, đẹp da và xương khớp.',
   },
   {
     title: 'Danh mục rõ ràng',
-    description:
-      'Thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc được tách route riêng để thuận tiện SEO và điều hướng.',
+    description: 'Mỗi nhóm sản phẩm có route riêng để thuận tiện cho SEO, điều hướng và mở rộng chiến dịch.',
   },
   {
-    title: 'Kiến trúc sẵn sàng mở rộng',
+    title: 'Mua hàng dễ mở rộng',
+    description: 'Cấu trúc App Router giúp thêm landing campaign, blog SEO hoặc danh mục mới mà không phải đập lại layout.',
+  },
+]
+
+const testimonials = [
+  {
+    name: 'Ngọc Anh',
+    role: 'Khách mua vitamin',
+    quote:
+      'Trang chủ đi thẳng vào nhóm thực phẩm chức năng nên mình tìm sản phẩm nhanh hơn, không bị rối giữa quá nhiều nội dung.',
+  },
+  {
+    name: 'Minh Khang',
+    role: 'Khách mua cho gia đình',
+    quote:
+      'Bố cục category và product rõ ràng, nhìn vào là biết website bán gì. Phần đánh giá và gợi ý sản phẩm liên quan cũng dễ xem.',
+  },
+  {
+    name: 'Thanh Vy',
+    role: 'Khách mua collagen',
+    quote:
+      'Landing page có cảm giác chuyên nghiệp hơn vì vừa giới thiệu được danh mục, vừa đưa ra sản phẩm nổi bật ngay từ đầu.',
+  },
+]
+
+const seoArticles = [
+  {
+    title: 'Cách xây landing page bán thực phẩm chức năng để dễ SEO hơn',
     description:
-      'Landing page, category page và product detail được tổ chức tách lớp, phù hợp để thêm content marketing hoặc campaign mới.',
+      'Tập trung vào 1 nhóm chính, chia category rõ ràng, thêm FAQ và schema product để tăng độ phủ từ khóa.',
+  },
+  {
+    title: 'Checklist metadata cho homepage bán hàng bằng Next.js',
+    description:
+      'Title, description, canonical, Open Graph, sitemap và robots nên được khai báo tách lớp để dễ kiểm soát.',
+  },
+  {
+    title: 'Khi nào nên thêm landing campaign riêng cho sản phẩm hot',
+    description:
+      'Dùng route group để dựng trang đích mới cho từng chiến dịch mà không phá vỡ cấu trúc category hiện tại.',
   },
 ]
 
 const faqItems = [
   {
-    question: 'Website này phù hợp để bán những nhóm sản phẩm nào?',
+    question: 'Trang chủ nên tập trung vào nhóm sản phẩm nào?',
     answer:
-      'Trang chủ được thiết kế cho thực phẩm chức năng là trọng tâm, đồng thời vẫn mở rộng tốt cho chăm sóc da, thiết bị y tế và thuốc.',
+      'Với website của bạn, thực phẩm chức năng nên là trọng tâm. Các nhóm chăm sóc da, thiết bị y tế và thuốc đóng vai trò bán chéo và mở rộng độ phủ.',
   },
   {
-    question: 'Kiến trúc hiện tại có tối ưu SEO không?',
+    question: 'Kiến trúc hiện tại có phù hợp để chạy SEO lâu dài không?',
     answer:
-      'Có. App Router, metadata, sitemap, robots, Open Graph và middleware redirect đã được tách thành các lớp riêng để phục vụ SEO và điều hướng.',
+      'Có. App Router, metadata, sitemap, robots, Open Graph và middleware redirect đang được giữ ở tầng code, còn homepage hiển thị theo đúng ngữ cảnh bán hàng.',
   },
   {
-    question: 'Có thể thêm landing campaign riêng sau này không?',
+    question: 'Có thể thêm landing campaign riêng cho từng sản phẩm nổi bật không?',
     answer:
-      'Có. Route group `(landing)` giúp bạn thêm các route chiến dịch hoặc trang đích riêng mà không ảnh hưởng các khu vực category và product hiện tại.',
+      'Có. Route group `(landing)` cho phép thêm trang đích mới mà không ảnh hưởng các route category, product và cart đang có.',
   },
 ]
 
@@ -119,15 +152,14 @@ export default function LandingPage() {
         <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <div className="inline-flex rounded-full bg-emerald-700 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-white">
-              Landing page chuẩn storefront
+              Storefront chuẩn SEO
             </div>
             <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight text-stone-950 sm:text-5xl">
-              Website bán thực phẩm chức năng với kiến trúc Next.js rõ ràng, tối ưu SEO và sẵn sàng mở rộng
+              Thực phẩm chức năng chính hãng cho cả gia đình với trải nghiệm mua hàng rõ ràng và dễ mở rộng
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-stone-600">
-              Phần homepage đã được chỉnh lại đúng mục tiêu bán hàng: lấy thực phẩm chức năng làm trọng tâm, giữ lại kiến trúc App Router,
-              metadata, sitemap, robots và redirect ở tầng code, còn giao diện hiển thị ra ngoài tập trung vào điều hướng danh mục, sản phẩm nổi bật
-              và lý do mua hàng.
+              Homepage giờ được đưa về đúng vai trò bán hàng: lấy thực phẩm chức năng làm trung tâm, hiển thị danh mục rõ ràng,
+              đẩy sản phẩm nổi bật lên đầu và giữ nguyên lớp kỹ thuật SEO phía sau bằng Next.js App Router, sitemap, robots và redirect.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -135,13 +167,13 @@ export default function LandingPage() {
                 className="rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
                 href={`/category/${DEFAULT_CATEGORY_SLUG}`}
               >
-                Xem thực phẩm chức năng
+                Mua thực phẩm chức năng
               </Link>
               <Link
                 className="rounded-full border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
-                href="#san-pham-noi-bat"
+                href="#best-seller"
               >
-                Xem sản phẩm nổi bật
+                Xem best seller
               </Link>
             </div>
 
@@ -160,23 +192,23 @@ export default function LandingPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <article className="rounded-[28px] bg-white p-5 shadow-sm">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Danh mục chính</p>
-              <p className="mt-3 text-3xl font-black text-stone-900">4 nhóm</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Social proof</p>
+              <p className="mt-3 text-3xl font-black text-stone-900">4.8/5</p>
               <p className="mt-2 text-sm leading-7 text-stone-600">
-                Tách route riêng cho thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc.
+                Điểm đánh giá trung bình cao giúp tăng độ tin cậy ngay tại màn hình đầu tiên.
               </p>
             </article>
 
             <article className="rounded-[28px] bg-white p-5 shadow-sm">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Mục tiêu SEO</p>
-              <p className="mt-3 text-3xl font-black text-stone-900">SSR + Metadata</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Mục tiêu chính</p>
+              <p className="mt-3 text-3xl font-black text-stone-900">Bán nhanh hơn</p>
               <p className="mt-2 text-sm leading-7 text-stone-600">
-                Trang chủ được render bằng server component với metadata, sitemap và robots tách riêng.
+                Điều hướng thẳng vào danh mục và sản phẩm nổi bật thay vì để người dùng tự dò tìm.
               </p>
             </article>
 
             <article className="rounded-[28px] bg-white p-5 shadow-sm sm:col-span-2">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Cam kết hiển thị</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Cam kết mua hàng</p>
               <ul className="mt-3 space-y-2 text-sm leading-7 text-stone-600">
                 {commitments.map((item) => (
                   <li key={item}>{item}</li>
@@ -188,7 +220,7 @@ export default function LandingPage() {
       </section>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        {serviceHighlights.map((item) => (
+        {supportCards.map((item) => (
           <article
             className="rounded-[24px] border border-stone-200 bg-white p-5 shadow-sm shadow-emerald-100"
             key={item.title}
@@ -206,7 +238,7 @@ export default function LandingPage() {
         <LandingSection
           eyebrow="Danh mục trọng tâm"
           title="Đi nhanh vào từng nhóm sản phẩm"
-          description="Giữ cấu trúc route rõ ràng để cả người dùng lẫn công cụ tìm kiếm đều hiểu website đang bán gì và mỗi nhóm sản phẩm nằm ở đâu."
+          description="Homepage cần dẫn người dùng vào đúng luồng mua sắm. Phần này giữ vai trò điều hướng chính, đồng thời giúp SEO hiểu được website đang bán gì."
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {CATEGORY_CONFIG.map((category, index) => (
@@ -231,49 +263,87 @@ export default function LandingPage() {
           </div>
         </LandingSection>
 
-        <div id="san-pham-noi-bat">
+        <LandingSection
+          eyebrow="Sản phẩm nổi bật"
+          title="Ba sản phẩm nên đẩy lên màn hình đầu"
+          description="Đây là nhóm thực phẩm chức năng xuất hiện đầu tiên để tăng khả năng click vào product detail hoặc thêm vào giỏ hàng ngay từ homepage."
+        >
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.slug} product={product} />
+            ))}
+          </div>
+        </LandingSection>
+
+        <div id="best-seller">
           <LandingSection
-            eyebrow="Sản phẩm nổi bật"
-            title="Ba sản phẩm thực phẩm chức năng nên đưa lên landing đầu tiên"
-            description="Phần này dùng lại card sản phẩm đang có trong storefront để tránh nhân đôi UI và giữ trải nghiệm mua hàng nhất quán giữa homepage và category page."
+            eyebrow="Best seller"
+            title="Các sản phẩm có độ quan tâm cao trên storefront"
+            description="Thêm một lớp nội dung best seller để tăng chuyển đổi và tạo tín hiệu xã hội rõ hơn cho người dùng mới."
           >
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.slug} product={product} />
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {bestSellerProducts.map((product) => (
+                <article className="rounded-[24px] border border-stone-200 bg-stone-50 p-5" key={product.slug}>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                    {product.badge}
+                  </p>
+                  <h3 className="mt-3 text-lg font-bold text-stone-900">{product.name}</h3>
+                  <p className="mt-2 text-sm leading-7 text-stone-600">{product.shortDescription}</p>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-stone-500">
+                      {product.reviewCount} đánh giá
+                    </span>
+                    <Link
+                      className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                      href={`/product/${product.slug}`}
+                    >
+                      Xem ngay
+                    </Link>
+                  </div>
+                </article>
               ))}
             </div>
           </LandingSection>
         </div>
 
         <LandingSection
-          eyebrow="Mở rộng bán chéo"
-          title="Các nhóm sản phẩm phụ vẫn giữ được vai trò trên trang chủ"
-          description="Dù homepage lấy thực phẩm chức năng làm trung tâm, bạn vẫn nên hiển thị thêm vài sản phẩm từ nhóm chăm sóc da, thiết bị y tế hoặc thuốc để tăng lối đi mua sắm."
+          eyebrow="Khách hàng nói gì"
+          title="Feedback để tăng độ tin cậy trên landing"
+          description="Nhóm phản hồi ngắn này giúp trang chủ có cảm giác sống hơn và hỗ trợ quyết định mua hàng sớm hơn."
         >
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {highlightProducts.map((product) => (
-              <ProductCard key={product.slug} product={product} />
+          <div className="grid gap-4 lg:grid-cols-3">
+            {testimonials.map((item) => (
+              <article className="rounded-[24px] border border-stone-200 bg-white p-5 shadow-sm" key={item.name}>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">
+                    {item.name
+                      .split(' ')
+                      .map((part) => part[0])
+                      .join('')
+                      .slice(0, 2)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-stone-900">{item.name}</p>
+                    <p className="text-sm text-stone-500">{item.role}</p>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-7 text-stone-600">&ldquo;{item.quote}&rdquo;</p>
+              </article>
             ))}
           </div>
         </LandingSection>
 
         <LandingSection
-          eyebrow="SEO và nội dung"
-          title="Homepage bán hàng nhưng vẫn được dựng trên kiến trúc tối ưu SEO"
-          description="Phần kỹ thuật không hiển thị trực tiếp trên giao diện người dùng, nhưng đang hoạt động ở tầng code để giúp website dễ index và dễ mở rộng campaign về sau."
+          eyebrow="Nội dung SEO"
+          title="Ba chủ đề blog hoặc knowledge block nên đặt gần cuối homepage"
+          description="Phần này giúp homepage có chiều sâu nội dung, đồng thời mở đường cho các bài viết hỗ trợ SEO về sau."
         >
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {[
-              'Route group `(landing)` tách homepage khỏi category và product.',
-              'Metadata riêng cho homepage với title, description, canonical và Open Graph.',
-              'Sitemap sinh tự động cho trang chủ, category và product.',
-              'Middleware redirect giữ các alias cũ như `/shop` hoặc `/landing` trỏ đúng đích.',
-            ].map((item, index) => (
-              <article className="rounded-[22px] border border-stone-200 bg-stone-50 p-5" key={item}>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
-                  Điểm {index + 1}
-                </p>
-                <p className="mt-3 text-sm leading-7 text-stone-700">{item}</p>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {seoArticles.map((item) => (
+              <article className="rounded-[24px] border border-stone-200 bg-stone-50 p-5" key={item.title}>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Bài viết gợi ý</p>
+                <h3 className="mt-3 text-lg font-bold text-stone-900">{item.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-stone-600">{item.description}</p>
               </article>
             ))}
           </div>
@@ -282,7 +352,7 @@ export default function LandingPage() {
         <LandingSection
           eyebrow="FAQ"
           title="Câu hỏi thường gặp cho landing page bán thực phẩm chức năng"
-          description="FAQ giúp tăng chiều sâu nội dung trên homepage và hỗ trợ SEO tốt hơn cho các truy vấn thông tin."
+          description="FAQ giúp tăng chiều sâu nội dung và hỗ trợ SEO tốt hơn cho các truy vấn thông tin."
         >
           <div className="space-y-4">
             {faqItems.map((item) => (
