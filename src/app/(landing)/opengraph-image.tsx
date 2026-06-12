@@ -19,7 +19,7 @@ export default function OpenGraphImage() {
           justifyContent: 'space-between',
           padding: '56px',
           background:
-            'linear-gradient(135deg, #ecfccb 0%, #d9f99d 20%, #dcfce7 50%, #ffffff 100%)',
+            'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 30%, #bbf7d0 65%, #fef3c7 100%)',
           color: '#14532d',
           fontFamily: 'sans-serif',
         }}
@@ -36,20 +36,20 @@ export default function OpenGraphImage() {
             fontWeight: 700,
           }}
         >
-          Next.js Landing Architecture
+          NutriHome
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ fontSize: 68, fontWeight: 800, lineHeight: 1.1, maxWidth: 920 }}>
-            Kiến trúc landing page tối ưu SEO, redirect và metadata với App Router
+            Thực phẩm chức năng và chăm sóc sức khỏe cho cả gia đình
           </div>
           <div style={{ fontSize: 28, color: '#365314', maxWidth: 860, lineHeight: 1.4 }}>
-            Sitemap, robots, middleware, canonical và Open Graph được tổ chức rõ ràng để triển khai production.
+            Bố cục landing page bán hàng được dựng bằng Next.js App Router với metadata, sitemap và redirect tối ưu SEO.
           </div>
         </div>
 
         <div style={{ display: 'flex', fontSize: 24, fontWeight: 600, color: '#15803d' }}>
-          nextjs • seo • redirect • metadata
+          supplements • skincare • medical devices • pharmacy
         </div>
       </div>
     ),

@@ -16,13 +16,13 @@ export const redirects: RedirectRule[] = [
     permanent: true,
   },
   {
-    source: '/index.html',
-    destination: '/',
+    source: '/shop',
+    destination: '/category/thuc-pham-chuc-nang',
     permanent: true,
   },
   {
-    source: '/old-seo-guide',
-    destination: '/',
-    permanent: false,
+    source: '/supplements',
+    destination: '/category/thuc-pham-chuc-nang',
+    permanent: true,
   },
 ]

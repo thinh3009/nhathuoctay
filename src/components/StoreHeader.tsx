@@ -8,7 +8,7 @@ type StoreHeaderProps = {
 
 export default function StoreHeader({ activeCategorySlug, cartCount }: StoreHeaderProps) {
   return (
-    <header className="rounded-lg border border-stone-200 bg-white shadow-sm">
+    <header className="rounded-2xl border border-stone-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">NutriHome</p>
@@ -19,13 +19,13 @@ export default function StoreHeader({ activeCategorySlug, cartCount }: StoreHead
 
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:border-emerald-600 hover:text-emerald-700"
+            className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-emerald-600 hover:text-emerald-700"
             href="/"
           >
             Trang chủ
           </Link>
           <Link
-            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600"
+            className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600"
             href="/cart"
           >
             Giỏ hàng ({cartCount})

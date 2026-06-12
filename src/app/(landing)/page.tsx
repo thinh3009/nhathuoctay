@@ -1,20 +1,30 @@
 import type { Metadata } from 'next'
-import LandingCodeBlock from '@/components/landing/LandingCodeBlock'
+import Link from 'next/link'
+import ProductCard from '@/components/ProductCard'
 import LandingSection from '@/components/landing/LandingSection'
+import { commitments, products } from '@/lib/catalog'
+import { CATEGORY_CONFIG, DEFAULT_CATEGORY_SLUG } from '@/lib/constants'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
 export const metadata: Metadata = {
-  title: 'Kiến trúc Landing Page Next.js tối ưu SEO và Redirect',
+  title: 'Thực phẩm chức năng chính hãng cho cả gia đình',
   description:
-    'Mô hình landing page với App Router, Metadata API, sitemap, robots, Open Graph và middleware redirect cho production.',
-  keywords: ['Next.js', 'landing page', 'SEO', 'redirect', 'metadata', 'middleware'],
+    'NutriHome cung cấp thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với cấu trúc landing page tối ưu SEO bằng Next.js App Router.',
+  keywords: [
+    'thực phẩm chức năng',
+    'vitamin',
+    'omega 3',
+    'collagen',
+    'chăm sóc sức khỏe',
+    'nhà thuốc online',
+  ],
   alternates: {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: 'Kiến trúc Landing Page Next.js tối ưu SEO và Redirect',
+    title: 'NutriHome - Thực phẩm chức năng và chăm sóc sức khỏe',
     description:
-      'Server Components, Metadata API, sitemap, robots và middleware được tổ chức rõ ràng để phục vụ SEO và redirect.',
+      'Mua thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc trong một storefront được tối ưu SEO bằng Next.js.',
     url: SITE_URL,
     siteName: SITE_NAME,
     images: [
@@ -22,7 +32,7 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/opengraph-image`,
         width: 1200,
         height: 630,
-        alt: 'Kiến trúc landing page Next.js',
+        alt: 'NutriHome storefront',
       },
     ],
     locale: 'vi_VN',
@@ -30,270 +40,259 @@ export const metadata: Metadata = {
   },
 }
 
-const folderStructure = String.raw`my-landing-page/
-├── src/
-│   ├── app/
-│   │   ├── [locale]/               # (Tùy chọn) Hỗ trợ đa ngôn ngữ i18n
-│   │   ├── (landing)/              # Route Group cho Landing Page
-│   │   │   ├── page.tsx            # Trang landing page chính
-│   │   │   ├── layout.tsx          # Layout riêng cho landing page
-│   │   │   └── opengraph-image.tsx # Ảnh chia sẻ Open Graph động
-│   │   ├── sitemap.ts              # Tạo sitemap tự động
-│   │   ├── robots.ts               # Tạo robots.txt
-│   │   └── layout.tsx              # Root layout tổng của ứng dụng
-│   ├── components/
-│   │   ├── common/                 # Button, Input, Card
-│   │   └── landing/                # Hero, Features, Pricing, CTA
-│   ├── config/
-│   │   └── redirects.ts            # Danh sách các redirect rule
-│   ├── middleware.ts               # Redirect ở tầng Edge
-│   └── styles/
-│       └── globals.css             # Tailwind / CSS Variables`
+const featuredProducts = products
+  .filter((product) => product.topCategorySlug === DEFAULT_CATEGORY_SLUG)
+  .sort((left, right) => right.rating - left.rating)
+  .slice(0, 3)
 
-const metadataSnippet = String.raw`import type { Metadata } from 'next'
+const highlightProducts = products
+  .filter((product) => product.topCategorySlug !== DEFAULT_CATEGORY_SLUG)
+  .sort((left, right) => right.rating - left.rating)
+  .slice(0, 3)
 
-export const metadata: Metadata = {
-  title: 'Giải pháp Công nghệ Xanh cho Doanh nghiệp | Tên Thương Hiệu',
-  description:
-    'Landing page tối ưu hóa quy trình vận hành tự động, tiết kiệm 40% chi phí vận hành. Đăng ký tư vấn ngay.',
-  keywords: ['tự động hóa', 'phần mềm doanh nghiệp', 'tối ưu quy trình'],
-  alternates: {
-    canonical: 'https://domain.com',
-  },
-  openGraph: {
-    title: 'Giải pháp Công nghệ Xanh cho Doanh nghiệp',
+const serviceHighlights = [
+  {
+    title: 'Tư vấn theo nhu cầu',
     description:
-      'Tiết kiệm 40% chi phí vận hành với hệ thống tự động hóa thế hệ mới.',
-    url: 'https://domain.com',
-    siteName: 'Tên Thương Hiệu',
-    locale: 'vi_VN',
-    type: 'website',
+      'Nhóm nội dung được chia theo mục tiêu sức khỏe để người dùng tìm đúng sản phẩm nhanh hơn.',
   },
-}`
+  {
+    title: 'Danh mục rõ ràng',
+    description:
+      'Thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc được tách route riêng để thuận tiện SEO và điều hướng.',
+  },
+  {
+    title: 'Kiến trúc sẵn sàng mở rộng',
+    description:
+      'Landing page, category page và product detail được tổ chức tách lớp, phù hợp để thêm content marketing hoặc campaign mới.',
+  },
+]
 
-const sitemapSnippet = String.raw`// src/app/sitemap.ts
-import type { MetadataRoute } from 'next'
+const faqItems = [
+  {
+    question: 'Website này phù hợp để bán những nhóm sản phẩm nào?',
+    answer:
+      'Trang chủ được thiết kế cho thực phẩm chức năng là trọng tâm, đồng thời vẫn mở rộng tốt cho chăm sóc da, thiết bị y tế và thuốc.',
+  },
+  {
+    question: 'Kiến trúc hiện tại có tối ưu SEO không?',
+    answer:
+      'Có. App Router, metadata, sitemap, robots, Open Graph và middleware redirect đã được tách thành các lớp riêng để phục vụ SEO và điều hướng.',
+  },
+  {
+    question: 'Có thể thêm landing campaign riêng sau này không?',
+    answer:
+      'Có. Route group `(landing)` giúp bạn thêm các route chiến dịch hoặc trang đích riêng mà không ảnh hưởng các khu vực category và product hiện tại.',
+  },
+]
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: 'https://domain.com',
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 1,
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Store',
+  name: SITE_NAME,
+  url: SITE_URL,
+  description:
+    'NutriHome là storefront bán thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc với kiến trúc Next.js tối ưu SEO.',
+  makesOffer: featuredProducts.map((product) => ({
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Product',
+      name: product.name,
     },
-  ]
-}`
-
-const redirectSnippet = String.raw`// src/config/redirects.ts
-export const redirects = [
-  { source: '/home', destination: '/', permanent: true },
-  { source: '/landing', destination: '/', permanent: true },
-  { source: '/index.html', destination: '/', permanent: true },
-  { source: '/old-seo-guide', destination: '/', permanent: false },
-]
-
-// src/middleware.ts
-import type { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
-
-export function middleware(request: NextRequest) {
-  const rule = redirects.find((item) => item.source === request.nextUrl.pathname)
-  if (!rule) return NextResponse.next()
-
-  return NextResponse.redirect(
-    new URL(rule.destination, request.url),
-    rule.permanent ? 308 : 307,
-  )
-}`
-
-const architecturePoints = [
-  'Dùng App Router để tận dụng Server Components mặc định, tối ưu render cho bot và tốc độ tải lần đầu.',
-  'Tách route landing bằng Route Group nếu site còn có dashboard, blog hoặc khu vực sản phẩm khác.',
-  'Đưa Metadata API, sitemap, robots và Open Graph vào tầng app để quản lý tập trung.',
-  'Dùng middleware để xử lý redirect sớm ở Edge thay vì chờ request đi sâu vào page logic.',
-]
-
-const seoPoints = [
-  'Title, description, canonical và Open Graph nên được khai báo bằng Metadata API ngay tại route landing chính.',
-  'Sitemap và robots nên được tự động sinh bằng file convention của Next.js để tránh quên cập nhật thủ công.',
-  'Nếu landing có nhiều locale hoặc chiến dịch, canonical và alternates phải được quản lý rõ để tránh duplicate content.',
-  'Giữ phần nội dung chính ở server-rendered markup để crawler đọc được ngay mà không phụ thuộc client hydration.',
-]
-
-const redirectPoints = [
-  'Tập trung toàn bộ redirect rule ở một file config để dễ audit trước khi deploy.',
-  'Middleware nên giữ logic mỏng: match path, giữ nguyên query string, trả 307 hoặc 308 đúng mục đích.',
-  'Chỉ redirect ở middleware cho các rule phổ biến; các trường hợp business phức tạp có thể xử lý trong route riêng.',
-  'Nên tránh xung đột giữa redirect từ middleware, next.config.js và layer reverse proxy.',
-]
+    priceCurrency: 'VND',
+    price: product.price,
+    availability: 'https://schema.org/InStock',
+  })),
+}
 
 export default function LandingPage() {
   return (
     <>
-      <section className="rounded-[32px] border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-lime-50 p-8 shadow-sm shadow-emerald-100 sm:p-10">
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+        type="application/ld+json"
+      />
+
+      <section className="overflow-hidden rounded-[32px] border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-lime-50 p-8 shadow-sm shadow-emerald-100 sm:p-10">
+        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <div className="inline-flex rounded-full bg-emerald-700 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-white">
-              Blueprint thực chiến
+              Landing page chuẩn storefront
             </div>
             <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight text-stone-950 sm:text-5xl">
-              Kiến trúc landing page bằng Next.js cho SEO chuẩn, redirect rõ ràng và dễ mở rộng
+              Website bán thực phẩm chức năng với kiến trúc Next.js rõ ràng, tối ưu SEO và sẵn sàng mở rộng
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-stone-600">
-              Trang này được tinh chỉnh lại đúng theo nội dung bạn đưa: giữ những phần layout còn tận dụng được,
-              bỏ các block bán hàng không còn phù hợp, và thay bằng kiến trúc landing page tập trung vào App Router,
-              Metadata API, sitemap, robots và middleware redirect.
+              Phần homepage đã được chỉnh lại đúng mục tiêu bán hàng: lấy thực phẩm chức năng làm trọng tâm, giữ lại kiến trúc App Router,
+              metadata, sitemap, robots và redirect ở tầng code, còn giao diện hiển thị ra ngoài tập trung vào điều hướng danh mục, sản phẩm nổi bật
+              và lý do mua hàng.
             </p>
+
             <div className="mt-6 flex flex-wrap gap-3">
-              <a
+              <Link
                 className="rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
-                href="#kien-truc"
+                href={`/category/${DEFAULT_CATEGORY_SLUG}`}
               >
-                Xem cấu trúc đề xuất
-              </a>
-              <a
+                Xem thực phẩm chức năng
+              </Link>
+              <Link
                 className="rounded-full border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
-                href="#redirect"
+                href="#san-pham-noi-bat"
               >
-                Xem flow redirect
-              </a>
+                Xem sản phẩm nổi bật
+              </Link>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {CATEGORY_CONFIG.map((category) => (
+                <Link
+                  className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
+                  href={`/category/${category.slug}`}
+                  key={category.slug}
+                >
+                  {category.label}
+                </Link>
+              ))}
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-stone-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">
-              Điều đang có trong code
-            </p>
-            <ul className="mt-4 space-y-3 text-sm leading-7 text-stone-700">
-              <li>
-                <code>/</code> là landing page độc lập.
-              </li>
-              <li>
-                <code>metadata</code>, <code>sitemap</code>, <code>robots</code>, <code>opengraph-image</code> đã được
-                khai báo.
-              </li>
-              <li>
-                <code>middleware.ts</code> và <code>config/redirects.ts</code> đã được thêm để mô phỏng redirect chuẩn.
-              </li>
-              <li>Phần nội dung cũ không đúng ngữ cảnh đã được loại bỏ thay vì xóa trắng toàn bộ.</li>
-            </ul>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <article className="rounded-[28px] bg-white p-5 shadow-sm">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Danh mục chính</p>
+              <p className="mt-3 text-3xl font-black text-stone-900">4 nhóm</p>
+              <p className="mt-2 text-sm leading-7 text-stone-600">
+                Tách route riêng cho thực phẩm chức năng, chăm sóc da, thiết bị y tế và thuốc.
+              </p>
+            </article>
+
+            <article className="rounded-[28px] bg-white p-5 shadow-sm">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Mục tiêu SEO</p>
+              <p className="mt-3 text-3xl font-black text-stone-900">SSR + Metadata</p>
+              <p className="mt-2 text-sm leading-7 text-stone-600">
+                Trang chủ được render bằng server component với metadata, sitemap và robots tách riêng.
+              </p>
+            </article>
+
+            <article className="rounded-[28px] bg-white p-5 shadow-sm sm:col-span-2">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Cam kết hiển thị</p>
+              <ul className="mt-3 space-y-2 text-sm leading-7 text-stone-600">
+                {commitments.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
           </div>
         </div>
       </section>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
-        {architecturePoints.map((item) => (
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {serviceHighlights.map((item) => (
           <article
             className="rounded-[24px] border border-stone-200 bg-white p-5 shadow-sm shadow-emerald-100"
-            key={item}
+            key={item.title}
           >
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-lg font-bold text-emerald-700">
               ✓
             </div>
-            <p className="mt-4 text-sm leading-7 text-stone-700">{item}</p>
+            <h2 className="mt-4 text-lg font-bold text-stone-900">{item.title}</h2>
+            <p className="mt-2 text-sm leading-7 text-stone-600">{item.description}</p>
           </article>
         ))}
       </div>
 
       <div className="mt-6 space-y-6">
-        <div id="kien-truc">
-          <LandingSection
-            eyebrow="1. Cấu trúc thư mục"
-            title="Folder structure nên rõ phần landing, config và file SEO hệ thống"
-            description="Đây là cấu trúc đề xuất chuẩn để landing page không bị lẫn với dashboard, blog hoặc các route nghiệp vụ khác. Route Group giúp tách logic gọn hơn mà không làm thay đổi URL public."
-          >
-            <LandingCodeBlock code={folderStructure} />
-          </LandingSection>
-        </div>
+        <LandingSection
+          eyebrow="Danh mục trọng tâm"
+          title="Đi nhanh vào từng nhóm sản phẩm"
+          description="Giữ cấu trúc route rõ ràng để cả người dùng lẫn công cụ tìm kiếm đều hiểu website đang bán gì và mỗi nhóm sản phẩm nằm ở đâu."
+        >
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {CATEGORY_CONFIG.map((category, index) => (
+              <Link
+                className={`rounded-[24px] px-5 py-5 text-white shadow-md ${
+                  index % 4 === 0
+                    ? 'bg-gradient-to-br from-emerald-800 to-green-500'
+                    : index % 4 === 1
+                      ? 'bg-gradient-to-br from-lime-700 to-emerald-500'
+                      : index % 4 === 2
+                        ? 'bg-gradient-to-br from-green-700 to-teal-500'
+                        : 'bg-gradient-to-br from-emerald-700 to-lime-500'
+                }`}
+                href={`/category/${category.slug}`}
+                key={category.slug}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">Danh mục</p>
+                <p className="mt-2 text-xl font-bold">{category.label}</p>
+                <p className="mt-2 text-sm leading-6 text-white/90">{category.heroDescription}</p>
+              </Link>
+            ))}
+          </div>
+        </LandingSection>
 
-        <div id="seo">
+        <div id="san-pham-noi-bat">
           <LandingSection
-            eyebrow="2. Tối ưu SEO"
-            title="Metadata, canonical, Open Graph, sitemap và robots nên là lớp bắt buộc"
-            description="Với landing page, tốc độ tải trang và metadata là hai phần cần ưu tiên. Next.js App Router đã cho bạn nền tảng tốt nhờ Server Components và Metadata API."
+            eyebrow="Sản phẩm nổi bật"
+            title="Ba sản phẩm thực phẩm chức năng nên đưa lên landing đầu tiên"
+            description="Phần này dùng lại card sản phẩm đang có trong storefront để tránh nhân đôi UI và giữ trải nghiệm mua hàng nhất quán giữa homepage và category page."
           >
-            <div className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
-              <div className="rounded-[24px] border border-emerald-100 bg-emerald-50 p-5">
-                <h3 className="text-lg font-bold text-stone-900">Nguyên tắc triển khai</h3>
-                <ul className="mt-4 space-y-3 text-sm leading-7 text-stone-700">
-                  {seoPoints.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <LandingCodeBlock code={metadataSnippet} />
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.slug} product={product} />
+              ))}
             </div>
           </LandingSection>
         </div>
 
         <LandingSection
-          eyebrow="2b. Sitemap và Robots"
-          title="Dùng file convention của Next.js để sinh sitemap.xml và robots.txt"
-          description="Google Bot rất cần các file hệ thống này để index chính xác. Với Next.js App Router, bạn không cần generate thủ công bằng script ngoài nếu chỉ là các route cơ bản."
+          eyebrow="Mở rộng bán chéo"
+          title="Các nhóm sản phẩm phụ vẫn giữ được vai trò trên trang chủ"
+          description="Dù homepage lấy thực phẩm chức năng làm trung tâm, bạn vẫn nên hiển thị thêm vài sản phẩm từ nhóm chăm sóc da, thiết bị y tế hoặc thuốc để tăng lối đi mua sắm."
         >
-          <div className="grid gap-6 lg:grid-cols-2">
-            <LandingCodeBlock code={sitemapSnippet} />
-            <div className="rounded-[24px] border border-stone-200 bg-white p-5">
-              <h3 className="text-lg font-bold text-stone-900">Đang áp dụng trong dự án</h3>
-              <ul className="mt-4 space-y-3 text-sm leading-7 text-stone-700">
-                <li>
-                  <code>src/app/sitemap.ts</code>
-                </li>
-                <li>
-                  <code>src/app/robots.ts</code>
-                </li>
-                <li>
-                  <code>src/app/(landing)/opengraph-image.tsx</code>
-                </li>
-              </ul>
-            </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {highlightProducts.map((product) => (
+              <ProductCard key={product.slug} product={product} />
+            ))}
           </div>
         </LandingSection>
 
-        <div id="redirect">
-          <LandingSection
-            eyebrow="3. Redirect"
-            title="Redirect sớm ở Edge bằng middleware để giảm vòng xử lý không cần thiết"
-            description="Redirect nên được tổ chức riêng thay vì viết rải rác. Khi có chiến dịch mới, domain phụ hoặc route cũ, bạn chỉ cần cập nhật đúng một nguồn cấu hình."
-          >
-            <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-              <div className="rounded-[24px] border border-emerald-100 bg-emerald-50 p-5">
-                <h3 className="text-lg font-bold text-stone-900">Checklist redirect</h3>
-                <ul className="mt-4 space-y-3 text-sm leading-7 text-stone-700">
-                  {redirectPoints.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <LandingCodeBlock code={redirectSnippet} />
-            </div>
-          </LandingSection>
-        </div>
+        <LandingSection
+          eyebrow="SEO và nội dung"
+          title="Homepage bán hàng nhưng vẫn được dựng trên kiến trúc tối ưu SEO"
+          description="Phần kỹ thuật không hiển thị trực tiếp trên giao diện người dùng, nhưng đang hoạt động ở tầng code để giúp website dễ index và dễ mở rộng campaign về sau."
+        >
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              'Route group `(landing)` tách homepage khỏi category và product.',
+              'Metadata riêng cho homepage với title, description, canonical và Open Graph.',
+              'Sitemap sinh tự động cho trang chủ, category và product.',
+              'Middleware redirect giữ các alias cũ như `/shop` hoặc `/landing` trỏ đúng đích.',
+            ].map((item, index) => (
+              <article className="rounded-[22px] border border-stone-200 bg-stone-50 p-5" key={item}>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                  Điểm {index + 1}
+                </p>
+                <p className="mt-3 text-sm leading-7 text-stone-700">{item}</p>
+              </article>
+            ))}
+          </div>
+        </LandingSection>
 
-        <div id="trien-khai">
-          <LandingSection
-            eyebrow="4. Triển khai"
-            title="Thứ tự triển khai hợp lý để landing page vừa sạch code vừa tốt cho SEO"
-            description="Nếu bạn muốn dựng project sạch ngay từ đầu, đây là phần nên ưu tiên trước khi viết các section bán hàng như Hero, Features, Pricing hay CTA."
-          >
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {[
-                'Chốt cấu trúc thư mục và route group cho landing page.',
-                'Khai báo metadata, canonical, Open Graph và ảnh chia sẻ.',
-                'Thêm sitemap, robots, redirect config và middleware.',
-                'Sau cùng mới tách các section giao diện như Hero, Features, CTA.',
-              ].map((item, index) => (
-                <article className="rounded-[22px] border border-stone-200 bg-stone-50 p-5" key={item}>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
-                    Bước {index + 1}
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-stone-700">{item}</p>
-                </article>
-              ))}
-            </div>
-          </LandingSection>
-        </div>
+        <LandingSection
+          eyebrow="FAQ"
+          title="Câu hỏi thường gặp cho landing page bán thực phẩm chức năng"
+          description="FAQ giúp tăng chiều sâu nội dung trên homepage và hỗ trợ SEO tốt hơn cho các truy vấn thông tin."
+        >
+          <div className="space-y-4">
+            {faqItems.map((item) => (
+              <article className="rounded-[22px] border border-stone-200 bg-stone-50 p-5" key={item.question}>
+                <h3 className="text-lg font-bold text-stone-900">{item.question}</h3>
+                <p className="mt-2 text-sm leading-7 text-stone-600">{item.answer}</p>
+              </article>
+            ))}
+          </div>
+        </LandingSection>
       </div>
     </>
   )
