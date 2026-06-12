@@ -33,6 +33,120 @@ function CartIcon({ cartCount }: { cartCount: number }) {
   )
 }
 
+function HeaderTopRow({
+  cartCount,
+  onOpenMenu,
+  light = false,
+}: {
+  cartCount: number
+  onOpenMenu: () => void
+  light?: boolean
+}) {
+  const buttonClass = light
+    ? 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+    : 'bg-white/15 text-white hover:bg-white/20'
+
+  const eyebrowClass = light ? 'text-emerald-600' : 'text-emerald-100'
+  const titleClass = light ? 'text-stone-900' : 'text-white'
+
+  return (
+    <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] items-center gap-3">
+      <button
+        aria-label="Mở danh mục"
+        className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition duration-300 active:scale-95 ${buttonClass}`}
+        onClick={onOpenMenu}
+        type="button"
+      >
+        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+        </svg>
+      </button>
+
+      <div className="min-w-0 text-center">
+        <p className={`text-xs uppercase tracking-[0.26em] ${eyebrowClass}`}>Nhà thuốc</p>
+        <Link className={`block truncate text-[1.8rem] font-extrabold tracking-tight ${titleClass}`} href="/">
+          NutriHome
+        </Link>
+      </div>
+
+      <Link
+        aria-label="Giỏ hàng"
+        className={`flex h-12 w-12 items-center justify-center rounded-full backdrop-blur-sm transition duration-300 active:scale-95 ${buttonClass}`}
+        href="/cart"
+      >
+        <CartIcon cartCount={cartCount} />
+      </Link>
+    </div>
+  )
+}
+
+function CategoryDrawer({
+  activeCategorySlug,
+  isOpen,
+  onClose,
+}: {
+  activeCategorySlug?: string
+  isOpen: boolean
+  onClose: () => void
+}) {
+  return (
+    <div aria-hidden={!isOpen} className={`fixed inset-0 z-50 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+      <button
+        aria-label="Đóng danh mục"
+        className={`absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px] transition duration-300 ease-out ${
+          isOpen ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+        type="button"
+      />
+
+      <aside
+        className={`absolute left-0 top-0 h-full w-[86%] max-w-sm bg-white px-5 pb-6 pt-5 shadow-2xl transition-all duration-300 ease-out ${
+          isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">Danh mục</p>
+            <h2 className="mt-1 text-2xl font-bold text-stone-900">Mở nhanh khu mua sắm</h2>
+          </div>
+          <button
+            aria-label="Đóng"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 text-stone-600"
+            onClick={onClose}
+            type="button"
+          >
+            ✕
+          </button>
+        </div>
+
+        <nav className="mt-6 space-y-3">
+          {CATEGORY_CONFIG.map((item, index) => {
+            const isActive = item.slug === activeCategorySlug
+
+            return (
+              <Link
+                className={`block rounded-2xl border px-4 py-4 text-sm font-semibold transition duration-300 ${
+                  isActive
+                    ? 'border-emerald-700 bg-emerald-50 text-emerald-800'
+                    : 'border-stone-200 bg-stone-50 text-stone-800 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700'
+                } ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'}`}
+                href={`/category/${item.slug}`}
+                key={item.slug}
+                onClick={onClose}
+                style={{ transitionDelay: `${index * 45}ms` }}
+              >
+                <span className="block text-base">{item.label}</span>
+                <span className="mt-1 block text-xs font-medium leading-5 text-stone-500">{item.heroTitle}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      </aside>
+    </div>
+  )
+}
+
 export default function StoreHeader({
   activeCategorySlug,
   cartCount,
@@ -88,33 +202,7 @@ export default function StoreHeader({
           </div>
 
           <div className="px-4 pb-5 pt-4">
-            <div className="grid grid-cols-[48px_minmax(0,1fr)_48px] items-center gap-3">
-              <button
-                aria-label="Mở danh mục"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition duration-300 hover:bg-white/20 active:scale-95"
-                onClick={() => setIsOpen(true)}
-                type="button"
-              >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
-                </svg>
-              </button>
-
-              <div className="min-w-0 text-center">
-                <p className="text-xs uppercase tracking-[0.26em] text-emerald-100">Nhà thuốc</p>
-                <Link className="block truncate text-[1.8rem] font-extrabold tracking-tight" href="/">
-                  NutriHome
-                </Link>
-              </div>
-
-              <Link
-                aria-label="Giỏ hàng"
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition duration-300 hover:bg-white/20 active:scale-95"
-                href="/cart"
-              >
-                <CartIcon cartCount={cartCount} />
-              </Link>
-            </div>
+            <HeaderTopRow cartCount={cartCount} onOpenMenu={() => setIsOpen(true)} />
 
             <div className="mt-4 flex items-center gap-3 rounded-full bg-white px-4 py-3 text-stone-500 shadow-md shadow-emerald-700/15">
               <svg className="h-5 w-5 shrink-0 text-emerald-700" fill="none" viewBox="0 0 24 24">
@@ -138,98 +226,39 @@ export default function StoreHeader({
           </div>
         </header>
 
-        <div
-          aria-hidden={!isOpen}
-          className={`fixed inset-0 z-50 ${
-            isOpen ? 'pointer-events-auto' : 'pointer-events-none'
-          }`}
-        >
-          <button
-            aria-label="Đóng danh mục"
-            className={`absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px] transition duration-300 ease-out ${
-              isOpen ? 'opacity-100' : 'opacity-0'
-            }`}
-            onClick={() => setIsOpen(false)}
-            type="button"
-          />
-
-          <aside
-            className={`absolute left-0 top-0 h-full w-[86%] max-w-sm bg-white px-5 pb-6 pt-5 shadow-2xl transition-all duration-300 ease-out ${
-              isOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
-            }`}
-          >
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">Danh mục</p>
-                <h2 className="mt-1 text-2xl font-bold text-stone-900">Mở nhanh khu mua sắm</h2>
-              </div>
-              <button
-                aria-label="Đóng"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 text-stone-600"
-                onClick={() => setIsOpen(false)}
-                type="button"
-              >
-                ✕
-              </button>
-            </div>
-
-            <nav className="mt-6 space-y-3">
-              {CATEGORY_CONFIG.map((item, index) => (
-                <Link
-                  className={`block rounded-2xl border border-stone-200 bg-stone-50 px-4 py-4 text-sm font-semibold text-stone-800 transition duration-300 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 ${
-                    isOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
-                  }`}
-                  href={`/category/${item.slug}`}
-                  key={item.slug}
-                  onClick={() => setIsOpen(false)}
-                  style={{ transitionDelay: `${index * 45}ms` }}
-                >
-                  <span className="block text-base">{item.label}</span>
-                  <span className="mt-1 block text-xs font-medium leading-5 text-stone-500">
-                    {item.heroTitle}
-                  </span>
-                </Link>
-              ))}
-            </nav>
-          </aside>
-        </div>
+        <CategoryDrawer activeCategorySlug={activeCategorySlug} isOpen={isOpen} onClose={() => setIsOpen(false)} />
       </>
     )
   }
 
   return (
-    <header className="rounded-2xl border border-emerald-100 bg-white shadow-sm shadow-emerald-100/70">
-      <div className="px-5 py-5">
-        <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">NutriHome</p>
-        <Link className="mt-1 block text-2xl font-bold text-stone-900 sm:text-3xl" href="/">
-          Nhà thuốc và chăm sóc sức khỏe
-        </Link>
-      </div>
+    <>
+      <header className="overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-sm shadow-emerald-100/70">
+        <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-600 px-4 py-4 text-white">
+          <HeaderTopRow cartCount={cartCount} light={false} onOpenMenu={() => setIsOpen(true)} />
+          <div className="mt-4 flex flex-wrap gap-2">
+            {CATEGORY_CONFIG.map((item) => {
+              const isActive = item.slug === activeCategorySlug
 
-      <div className="flex flex-col gap-3 border-t border-stone-200 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
-        <nav className="flex flex-wrap gap-2">
-          {CATEGORY_CONFIG.map((item) => (
-            <Link
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                activeCategorySlug === item.slug
-                  ? 'bg-emerald-700 text-white'
-                  : 'text-stone-600 hover:bg-emerald-50 hover:text-emerald-700'
-              }`}
-              href={`/category/${item.slug}`}
-              key={item.slug}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+              return (
+                <Link
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                    isActive
+                      ? 'bg-white text-emerald-800'
+                      : 'bg-white/10 text-white hover:bg-white/20'
+                  }`}
+                  href={`/category/${item.slug}`}
+                  key={item.slug}
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </header>
 
-        <Link
-          className="self-start rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800 lg:self-auto"
-          href="/cart"
-        >
-          Giỏ hàng ({cartCount})
-        </Link>
-      </div>
-    </header>
+      <CategoryDrawer activeCategorySlug={activeCategorySlug} isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </>
   )
 }
