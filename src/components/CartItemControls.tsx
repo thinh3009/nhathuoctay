@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { startTransition, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -69,7 +69,7 @@ export default function CartItemControls({ productSlug, quantity }: CartItemCont
       </div>
 
       <button
-        className="text-sm font-semibold text-amber-600 hover:text-amber-700 disabled:opacity-50"
+        className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 disabled:opacity-50"
         disabled={isPending}
         onClick={() =>
           runRequest({

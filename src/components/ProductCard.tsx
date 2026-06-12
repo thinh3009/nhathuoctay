@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { formatPrice } from '@/lib/catalog'
 import { getPrimaryProductImage } from '@/lib/productImages'
 import type { Product } from '@/lib/schemas'
@@ -29,7 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <p className="mt-4 text-xl font-bold text-emerald-800">{formatPrice(product.price)}</p>
       <div className="mt-4 grid gap-2">
         <Link
-          className="block rounded-xl bg-amber-500 px-4 py-2 text-center font-medium text-white transition hover:bg-amber-600"
+          className="block rounded-xl bg-emerald-700 px-4 py-2 text-center font-medium text-white transition hover:bg-emerald-800"
           href={`/product/${product.slug}`}
         >
           Xem chi tiết

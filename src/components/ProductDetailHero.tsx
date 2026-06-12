@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import { useState } from 'react'
@@ -27,11 +27,11 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
   }
 
   return (
-    <section className="mt-6 rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+    <section className="mt-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/70 sm:p-6">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <div className="overflow-hidden rounded-[1.75rem] border border-stone-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-stone-200 bg-stone-50 px-4 py-4 sm:px-5">
+          <div className="overflow-hidden rounded-[1.75rem] border border-emerald-100 bg-white shadow-sm shadow-emerald-100/60">
+            <div className="flex items-center justify-between border-b border-stone-200 bg-emerald-50 px-4 py-4 sm:px-5">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
                   Hình ảnh sản phẩm
@@ -62,7 +62,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
             <div className="bg-gradient-to-br from-stone-50 via-white to-emerald-50 px-4 py-6 sm:px-6">
               <div className="flex min-h-[420px] items-center justify-center">
                 {selectedImage ? (
-                  <div className="w-full max-w-[420px] rounded-[2rem] border border-stone-200 bg-white p-4 shadow-xl">
+                  <div className="w-full max-w-[420px] rounded-[2rem] border border-stone-200 bg-white p-4 shadow-xl shadow-emerald-100/60">
                     <div className="mb-4 flex items-center justify-between gap-3">
                       <span className="rounded-full bg-stone-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
                         {product.unit}
@@ -88,8 +88,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
 
               <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white/90 px-4 py-3 text-sm text-stone-600 shadow-sm">
                 <p className="truncate font-medium">
-                  Đang xem:{' '}
-                  <span className="font-semibold text-stone-900">{selectedImage?.label ?? 'Ảnh sản phẩm'}</span>
+                  Đang xem: <span className="font-semibold text-stone-900">{selectedImage?.label ?? 'Ảnh sản phẩm'}</span>
                 </p>
                 <p className="shrink-0 text-xs font-semibold uppercase tracking-wide text-emerald-700">
                   {selectedImageIndex + 1}/{product.images.length}
@@ -146,7 +145,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
 
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-stone-600">
             <span>{product.sku}</span>
-            <span className="text-amber-500">&#9733; {product.rating.toFixed(1)}</span>
+            <span className="text-emerald-600">★ {product.rating.toFixed(1)}</span>
             <span>{product.reviewCount} đánh giá</span>
             <span>{product.commentCount} bình luận</span>
           </div>
@@ -171,7 +170,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <AddToCartButton
-                className="rounded-full bg-amber-500 px-5 py-4 text-lg font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
+                className="rounded-full bg-emerald-700 px-5 py-4 text-lg font-semibold text-white hover:bg-emerald-800 disabled:opacity-60"
                 label="Chọn mua"
                 productSlug={product.slug}
                 quantity={quantity}

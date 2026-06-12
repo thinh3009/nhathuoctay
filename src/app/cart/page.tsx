@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import CartItemControls from '@/components/CartItemControls'
 import StoreFooter from '@/components/StoreFooter'
 import StoreHeader from '@/components/StoreHeader'
@@ -13,12 +13,12 @@ export default async function CartPage() {
   const cartCount = await getServerCartCount()
 
   return (
-    <main className="min-h-screen bg-stone-50 px-4 py-8 text-stone-900">
+    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
       <div className="mx-auto max-w-7xl">
         <StoreHeader cartCount={cartCount} />
 
         <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/60">
             <div className="flex flex-col gap-2 border-b border-stone-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Giỏ hàng</p>
@@ -34,7 +34,7 @@ export default async function CartPage() {
                   Hãy quay lại danh mục để thêm sản phẩm phù hợp với nhu cầu của bạn.
                 </p>
                 <Link
-                  className="mt-5 inline-block rounded-lg bg-amber-500 px-4 py-2 font-medium text-white hover:bg-amber-600"
+                  className="mt-5 inline-block rounded-lg bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800"
                   href={`/category/${DEFAULT_CATEGORY_SLUG}`}
                 >
                   Tiếp tục mua sắm
@@ -43,7 +43,7 @@ export default async function CartPage() {
             ) : (
               <div className="mt-4 space-y-4">
                 {cart.items.map((item) => (
-                  <article className="rounded-lg border border-stone-200 p-4" key={item.productSlug}>
+                  <article className="rounded-2xl border border-stone-200 p-4" key={item.productSlug}>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
@@ -69,7 +69,7 @@ export default async function CartPage() {
             )}
           </div>
 
-          <aside className="h-fit rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+          <aside className="h-fit rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/60">
             <h2 className="text-lg font-semibold text-stone-900">Tóm tắt đơn hàng</h2>
             <div className="mt-4 space-y-3 text-sm text-stone-700">
               <div className="flex items-center justify-between">
@@ -86,13 +86,13 @@ export default async function CartPage() {
               </div>
             </div>
 
-            <div className="mt-5 rounded-lg bg-emerald-50 p-4">
+            <div className="mt-5 rounded-2xl bg-emerald-50 p-4">
               <p className="text-sm font-semibold text-stone-900">Tổng thanh toán</p>
               <p className="mt-2 text-2xl font-bold text-emerald-700">{formatPrice(cart?.subtotal ?? 0)}</p>
             </div>
 
             <button
-              className="mt-5 w-full rounded-lg bg-amber-500 px-4 py-2 font-medium text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-5 w-full rounded-lg bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={!cart || cart.items.length === 0}
               type="button"
             >

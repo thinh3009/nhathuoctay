@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useRef } from 'react'
 import type { Product } from '@/lib/schemas'
@@ -48,7 +48,7 @@ export default function RelatedProductsSection({ products }: RelatedProductsSect
   }, [products.length])
 
   return (
-    <section className="mt-8 rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
+    <section className="mt-8 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/60">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Gợi ý mua thêm</p>

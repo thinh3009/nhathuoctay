@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 
 type PaginationControlsProps = {
   basePath: string
@@ -35,7 +35,9 @@ export default function PaginationControls({
       <Link
         aria-disabled={page === 1}
         className={`rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium ${
-          page === 1 ? 'pointer-events-none opacity-50' : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
+          page === 1
+            ? 'pointer-events-none opacity-50'
+            : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
         }`}
         href={createHref(basePath, query, Math.max(1, page - 1))}
       >
@@ -59,7 +61,9 @@ export default function PaginationControls({
       <Link
         aria-disabled={page === totalPages}
         className={`rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium ${
-          page === totalPages ? 'pointer-events-none opacity-50' : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
+          page === totalPages
+            ? 'pointer-events-none opacity-50'
+            : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
         }`}
         href={createHref(basePath, query, Math.min(totalPages, page + 1))}
       >

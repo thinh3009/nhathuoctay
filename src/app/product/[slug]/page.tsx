@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductBySlug, getRelatedProducts } from '@/db/queries/catalog'
 import ProductDetailHero from '@/components/ProductDetailHero'
@@ -26,7 +26,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const relatedProducts = await getRelatedProducts(product)
 
   return (
-    <main className="min-h-screen bg-stone-50 px-4 py-8 text-stone-900">
+    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
       <div className="mx-auto max-w-7xl">
         <StoreHeader activeCategorySlug={product.topCategorySlug} cartCount={cartCount} />
         <div className="mt-6">

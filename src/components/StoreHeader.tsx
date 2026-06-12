@@ -25,7 +25,7 @@ function CartIcon({ cartCount }: { cartCount: number }) {
         <circle cx="17" cy="19" r="1.3" fill="currentColor" />
       </svg>
       {cartCount > 0 ? (
-        <span className="absolute -right-2 -top-2 min-w-5 rounded-full bg-amber-400 px-1.5 text-center text-[11px] font-bold text-slate-900 shadow-sm shadow-amber-300 motion-safe:animate-pulse">
+        <span className="absolute -right-2 -top-2 min-w-5 rounded-full bg-emerald-950 px-1.5 text-center text-[11px] font-bold text-white shadow-sm shadow-emerald-700/30 motion-safe:animate-pulse">
           {cartCount}
         </span>
       ) : null}
@@ -71,8 +71,8 @@ export default function StoreHeader({
   if (variant === 'landing') {
     return (
       <>
-        <header className="overflow-hidden rounded-[28px] bg-gradient-to-b from-blue-700 via-blue-600 to-sky-500 text-white shadow-lg shadow-blue-200">
-          <div className="bg-blue-800/95 px-4 py-3 text-sm">
+        <header className="overflow-hidden rounded-[28px] bg-gradient-to-b from-emerald-900 via-emerald-800 to-green-600 text-white shadow-lg shadow-emerald-200">
+          <div className="bg-emerald-950/95 px-4 py-3 text-sm">
             <div className="flex items-center gap-2">
               <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
@@ -101,7 +101,7 @@ export default function StoreHeader({
               </button>
 
               <div className="min-w-0 text-center">
-                <p className="text-xs uppercase tracking-[0.26em] text-blue-100">Nhà thuốc</p>
+                <p className="text-xs uppercase tracking-[0.26em] text-emerald-100">Nhà thuốc</p>
                 <Link className="block truncate text-[1.8rem] font-extrabold tracking-tight" href="/">
                   NutriHome
                 </Link>
@@ -116,19 +116,19 @@ export default function StoreHeader({
               </Link>
             </div>
 
-            <div className="mt-4 flex items-center gap-3 rounded-full bg-white px-4 py-3 text-slate-500 shadow-md shadow-blue-500/15">
-              <svg className="h-5 w-5 shrink-0 text-blue-600" fill="none" viewBox="0 0 24 24">
+            <div className="mt-4 flex items-center gap-3 rounded-full bg-white px-4 py-3 text-stone-500 shadow-md shadow-emerald-700/15">
+              <svg className="h-5 w-5 shrink-0 text-emerald-700" fill="none" viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
                 <path d="m16 16 4 4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
               </svg>
               <span className="min-w-0 flex-1 truncate text-base">Freeship qua ứng dụng</span>
-              <button className="text-blue-600" type="button">
+              <button className="text-emerald-700" type="button">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
                   <path d="M12 5a3 3 0 0 1 3 3v4a3 3 0 1 1-6 0V8a3 3 0 0 1 3-3Z" stroke="currentColor" strokeWidth="1.8" />
                   <path d="M7 11.5a5 5 0 0 0 10 0M12 19v-2.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
                 </svg>
               </button>
-              <button className="text-blue-600" type="button">
+              <button className="text-emerald-700" type="button">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
                   <path d="M8 4H6a2 2 0 0 0-2 2v2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
                   <rect x="8" y="8" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
@@ -146,7 +146,7 @@ export default function StoreHeader({
         >
           <button
             aria-label="Đóng danh mục"
-            className={`absolute inset-0 bg-slate-950/40 backdrop-blur-[2px] transition duration-300 ease-out ${
+            className={`absolute inset-0 bg-emerald-950/40 backdrop-blur-[2px] transition duration-300 ease-out ${
               isOpen ? 'opacity-100' : 'opacity-0'
             }`}
             onClick={() => setIsOpen(false)}
@@ -198,7 +198,7 @@ export default function StoreHeader({
   }
 
   return (
-    <header className="rounded-2xl border border-stone-200 bg-white shadow-sm">
+    <header className="rounded-2xl border border-emerald-100 bg-white shadow-sm shadow-emerald-100/70">
       <div className="px-5 py-5">
         <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">NutriHome</p>
         <Link className="mt-1 block text-2xl font-bold text-stone-900 sm:text-3xl" href="/">
@@ -224,7 +224,7 @@ export default function StoreHeader({
         </nav>
 
         <Link
-          className="self-start rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600 lg:self-auto"
+          className="self-start rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800 lg:self-auto"
           href="/cart"
         >
           Giỏ hàng ({cartCount})

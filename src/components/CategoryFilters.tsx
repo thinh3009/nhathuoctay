@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { startTransition, useEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -302,7 +302,7 @@ export default function CategoryFilters({
   return (
     <>
       <button
-        className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-left shadow-sm"
+        className="w-full rounded-xl border border-emerald-100 bg-white px-4 py-3 text-left shadow-sm shadow-emerald-100/60"
         onClick={() => {
           setDraftFilters(activeFilters)
           setIsOpen(true)
@@ -416,7 +416,7 @@ export default function CategoryFilters({
               Đặt lại
             </button>
             <button
-              className="rounded-xl bg-amber-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
+              className="rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800"
               onClick={applyFiltersMobile}
               type="button"
             >
