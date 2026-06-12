@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import LandingSection from '@/components/landing/LandingSection'
-import StoreHeroVisual from '@/components/landing/StoreHeroVisual'
+import StoreHeroCarousel from '@/components/landing/StoreHeroCarousel'
 import { commitments, products } from '@/lib/catalog'
 import { CATEGORY_CONFIG, DEFAULT_CATEGORY_SLUG } from '@/lib/constants'
 import { SITE_NAME, SITE_URL } from '@/config/site'
@@ -50,6 +50,16 @@ const bestSellerProducts = [...products]
   .sort((left, right) => right.reviewCount - left.reviewCount)
   .slice(0, 4)
 
+const skincareHighlight = products
+  .filter((product) => product.topCategorySlug === 'cham-soc-da')
+  .sort((left, right) => right.rating - left.rating)
+  .slice(0, 3)
+
+const deviceHighlight = products
+  .filter((product) => product.topCategorySlug === 'thiet-bi-y-te')
+  .sort((left, right) => right.rating - left.rating)
+  .slice(0, 3)
+
 const supportCards = [
   {
     title: 'Tư vấn theo nhu cầu',
@@ -62,6 +72,33 @@ const supportCards = [
   {
     title: 'Mua hàng dễ mở rộng',
     description: 'Cấu trúc App Router giúp thêm landing campaign, blog hoặc danh mục mới mà không phải đập lại layout.',
+  },
+]
+
+const comboGroups = [
+  {
+    title: 'Combo đề kháng mỗi ngày',
+    description: 'Bộ gợi ý cho người cần bổ sung vitamin C, omega 3 và nhóm dưỡng chất nền tảng.',
+    href: '/category/thuc-pham-chuc-nang',
+    items: featuredProducts.slice(0, 2),
+  },
+  {
+    title: 'Combo đẹp da và phục hồi',
+    description: 'Gợi ý kết hợp collagen và chăm sóc da để kéo người dùng sang luồng mua hàng làm đẹp.',
+    href: '/category/cham-soc-da',
+    items: [featuredProducts[2], ...skincareHighlight.slice(0, 1)].filter(Boolean),
+  },
+  {
+    title: 'Combo chăm sóc gia đình',
+    description: 'Phù hợp cho nhà có trẻ nhỏ hoặc người lớn tuổi cần thiết bị theo dõi sức khỏe tại nhà.',
+    href: '/category/thiet-bi-y-te',
+    items: deviceHighlight.slice(0, 2),
+  },
+  {
+    title: 'Combo tim mạch và xương khớp',
+    description: 'Tập trung vào nhu cầu bồi bổ nền tảng cho người làm việc cường độ cao và người trưởng thành.',
+    href: '/category/thuc-pham-chuc-nang',
+    items: [featuredProducts[0], featuredProducts[1]].filter(Boolean),
   },
 ]
 
@@ -105,6 +142,105 @@ const structuredData = {
   })),
 }
 
+const heroSlides = [
+  {
+    eyebrow: 'Storefront chuẩn SEO',
+    title: 'Thực phẩm chức năng chính hãng cho cả gia đình với trải nghiệm mua hàng rõ ràng và dễ mở rộng',
+    description:
+      'Homepage được đưa về đúng vai trò bán hàng: lấy thực phẩm chức năng làm trung tâm, hiển thị danh mục rõ ràng, đẩy sản phẩm nổi bật lên đầu và giữ nguyên lớp kỹ thuật SEO phía sau.',
+    primaryCta: {
+      label: 'Mua thực phẩm chức năng',
+      href: `/category/${DEFAULT_CATEGORY_SLUG}`,
+    },
+    secondaryCta: {
+      label: 'Xem best seller',
+      href: '#best-seller',
+    },
+    stats: [
+      {
+        label: 'Social proof',
+        value: '4.8/5',
+        description: 'Điểm đánh giá trung bình cao cho nhóm sản phẩm chủ lực.',
+      },
+      {
+        label: 'Mục tiêu chính',
+        value: 'Bán nhanh hơn',
+        description: 'Đi thẳng từ homepage vào danh mục và sản phẩm hot.',
+      },
+      {
+        label: 'Cam kết',
+        value: 'Chính hãng',
+        description: commitments[0] ?? 'Sản phẩm rõ nguồn gốc.',
+      },
+    ],
+    products: featuredProducts,
+  },
+  {
+    eyebrow: 'Làm đẹp và phục hồi',
+    title: 'Kéo thêm doanh thu từ nhóm chăm sóc da bằng cách đặt đúng luồng mua sắm trên hero',
+    description:
+      'Một slide riêng cho làm đẹp giúp homepage không chỉ bán thực phẩm chức năng mà còn mở luồng bán chéo sang serum, làm sạch và dưỡng ẩm.',
+    primaryCta: {
+      label: 'Xem chăm sóc da',
+      href: '/category/cham-soc-da',
+    },
+    secondaryCta: {
+      label: 'Xem combo đẹp da',
+      href: '#combo-suc-khoe',
+    },
+    stats: [
+      {
+        label: 'Bán chéo',
+        value: '2 luồng',
+        description: 'Kết nối giữa collagen và routine chăm sóc da.',
+      },
+      {
+        label: 'Mục tiêu',
+        value: 'Đẹp da',
+        description: 'Dành cho khách hàng quan tâm phục hồi và sáng da.',
+      },
+      {
+        label: 'Tối ưu',
+        value: 'Route riêng',
+        description: 'Category riêng cho chăm sóc da hỗ trợ SEO và quảng cáo.',
+      },
+    ],
+    products: skincareHighlight,
+  },
+  {
+    eyebrow: 'Gia đình và theo dõi sức khỏe',
+    title: 'Thiết bị y tế tại nhà nên có lối vào riêng để tăng độ tin cậy và tăng giá trị đơn hàng',
+    description:
+      'Hero slide cho thiết bị y tế giúp storefront dễ mở rộng sang combo máy đo, nhiệt kế và sản phẩm chăm sóc gia đình.',
+    primaryCta: {
+      label: 'Xem thiết bị y tế',
+      href: '/category/thiet-bi-y-te',
+    },
+    secondaryCta: {
+      label: 'Xem combo gia đình',
+      href: '#combo-suc-khoe',
+    },
+    stats: [
+      {
+        label: 'Thiết bị',
+        value: '3 nhóm',
+        description: 'Nhiệt kế, máy đo huyết áp và máy xông khí dung.',
+      },
+      {
+        label: 'Mục tiêu',
+        value: 'Gia đình',
+        description: 'Dành cho nhu cầu theo dõi sức khỏe tại nhà.',
+      },
+      {
+        label: 'Upsell',
+        value: 'Cao hơn',
+        description: 'Nhóm sản phẩm có tiềm năng tăng giá trị giỏ hàng.',
+      },
+    ],
+    products: deviceHighlight,
+  },
+]
+
 export default function LandingPage() {
   return (
     <>
@@ -115,70 +251,7 @@ export default function LandingPage() {
         type="application/ld+json"
       />
 
-      <section className="overflow-hidden rounded-[28px] border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-lime-50 px-5 py-6 shadow-sm shadow-emerald-100 sm:rounded-[32px] sm:p-8 lg:p-10">
-        <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
-          <div>
-            <div className="inline-flex rounded-full bg-emerald-700 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white sm:px-4 sm:text-xs">
-              Storefront chuẩn SEO
-            </div>
-            <h1 className="mt-4 max-w-4xl text-3xl font-black tracking-tight text-stone-950 sm:text-4xl lg:text-5xl">
-              Thực phẩm chức năng chính hãng cho cả gia đình với trải nghiệm mua hàng rõ ràng và dễ mở rộng
-            </h1>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-600 sm:text-base sm:leading-8">
-              Homepage được đưa về đúng vai trò bán hàng: lấy thực phẩm chức năng làm trung tâm, hiển thị danh mục rõ ràng,
-              đẩy sản phẩm nổi bật lên đầu và giữ nguyên lớp kỹ thuật SEO phía sau bằng Next.js App Router, sitemap, robots và redirect.
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link
-                className="rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
-                href={`/category/${DEFAULT_CATEGORY_SLUG}`}
-              >
-                Mua thực phẩm chức năng
-              </Link>
-              <Link
-                className="rounded-full border border-emerald-300 bg-white px-5 py-3 text-sm font-semibold text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
-                href="#best-seller"
-              >
-                Xem best seller
-              </Link>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <article className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Social proof</p>
-                <p className="mt-2 text-2xl font-black text-stone-900 sm:text-3xl">4.8/5</p>
-                <p className="mt-1 text-sm leading-6 text-stone-600">Điểm đánh giá trung bình cao cho nhóm sản phẩm chủ lực.</p>
-              </article>
-
-              <article className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Mục tiêu chính</p>
-                <p className="mt-2 text-2xl font-black text-stone-900 sm:text-3xl">Bán nhanh hơn</p>
-                <p className="mt-1 text-sm leading-6 text-stone-600">Đi thẳng từ homepage vào danh mục và sản phẩm hot.</p>
-              </article>
-
-              <article className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Cam kết</p>
-                <p className="mt-2 text-sm leading-6 text-stone-600">{commitments[0]}</p>
-              </article>
-            </div>
-
-            <div className="mt-5 flex flex-wrap gap-2.5">
-              {CATEGORY_CONFIG.map((category) => (
-                <Link
-                  className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
-                  href={`/category/${category.slug}`}
-                  key={category.slug}
-                >
-                  {category.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <StoreHeroVisual products={featuredProducts} />
-        </div>
-      </section>
+      <StoreHeroCarousel slides={heroSlides} />
 
       <div className="mt-4 grid gap-3 lg:mt-6 lg:grid-cols-3 lg:gap-4">
         {supportCards.map((item) => (
@@ -235,6 +308,43 @@ export default function LandingPage() {
             ))}
           </div>
         </LandingSection>
+
+        <div id="combo-suc-khoe">
+          <LandingSection
+            eyebrow="Combo theo mục tiêu sức khỏe"
+            title="Gợi ý mua theo nhu cầu để tăng giá trị đơn hàng"
+            description="Thay vì chỉ bán từng sản phẩm lẻ, nhóm combo giúp người dùng hiểu ngay nên bắt đầu từ đâu và cũng tạo cơ hội bán chéo tốt hơn."
+          >
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {comboGroups.map((combo) => (
+                <article className="rounded-[22px] border border-stone-200 bg-stone-50 p-4 sm:rounded-[24px] sm:p-5" key={combo.title}>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Combo</p>
+                  <h3 className="mt-3 text-lg font-bold text-stone-900">{combo.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-stone-600">{combo.description}</p>
+
+                  <div className="mt-4 space-y-2">
+                    {combo.items.map((item) => (
+                      <div
+                        className="rounded-2xl border border-white bg-white px-3 py-3 text-sm shadow-sm"
+                        key={item.slug}
+                      >
+                        <p className="font-semibold text-stone-900">{item.name}</p>
+                        <p className="mt-1 text-emerald-700">{item.subCategory}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Link
+                    className="mt-4 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                    href={combo.href}
+                  >
+                    Xem danh mục
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </LandingSection>
+        </div>
 
         <div id="best-seller">
           <LandingSection
