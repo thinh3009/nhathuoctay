@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ProductCard from '@/components/ProductCard'
 import LandingSection from '@/components/landing/LandingSection'
+import StoreHeroVisual from '@/components/landing/StoreHeroVisual'
 import { commitments, products } from '@/lib/catalog'
 import { CATEGORY_CONFIG, DEFAULT_CATEGORY_SLUG } from '@/lib/constants'
 import { SITE_NAME, SITE_URL } from '@/config/site'
@@ -114,21 +115,21 @@ export default function LandingPage() {
         type="application/ld+json"
       />
 
-      <section className="overflow-hidden rounded-[32px] border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-lime-50 p-8 shadow-sm shadow-emerald-100 sm:p-10">
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+      <section className="overflow-hidden rounded-[28px] border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-lime-50 px-5 py-6 shadow-sm shadow-emerald-100 sm:rounded-[32px] sm:p-8 lg:p-10">
+        <div className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
           <div>
-            <div className="inline-flex rounded-full bg-emerald-700 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-white">
+            <div className="inline-flex rounded-full bg-emerald-700 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white sm:px-4 sm:text-xs">
               Storefront chuẩn SEO
             </div>
-            <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight text-stone-950 sm:text-5xl">
+            <h1 className="mt-4 max-w-4xl text-3xl font-black tracking-tight text-stone-950 sm:text-4xl lg:text-5xl">
               Thực phẩm chức năng chính hãng cho cả gia đình với trải nghiệm mua hàng rõ ràng và dễ mở rộng
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-stone-600">
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-600 sm:text-base sm:leading-8">
               Homepage được đưa về đúng vai trò bán hàng: lấy thực phẩm chức năng làm trung tâm, hiển thị danh mục rõ ràng,
               đẩy sản phẩm nổi bật lên đầu và giữ nguyên lớp kỹ thuật SEO phía sau bằng Next.js App Router, sitemap, robots và redirect.
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 className="rounded-full bg-amber-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
                 href={`/category/${DEFAULT_CATEGORY_SLUG}`}
@@ -143,7 +144,26 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <article className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Social proof</p>
+                <p className="mt-2 text-2xl font-black text-stone-900 sm:text-3xl">4.8/5</p>
+                <p className="mt-1 text-sm leading-6 text-stone-600">Điểm đánh giá trung bình cao cho nhóm sản phẩm chủ lực.</p>
+              </article>
+
+              <article className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Mục tiêu chính</p>
+                <p className="mt-2 text-2xl font-black text-stone-900 sm:text-3xl">Bán nhanh hơn</p>
+                <p className="mt-1 text-sm leading-6 text-stone-600">Đi thẳng từ homepage vào danh mục và sản phẩm hot.</p>
+              </article>
+
+              <article className="rounded-[22px] bg-white px-4 py-4 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Cam kết</p>
+                <p className="mt-2 text-sm leading-6 text-stone-600">{commitments[0]}</p>
+              </article>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2.5">
               {CATEGORY_CONFIG.map((category) => (
                 <Link
                   className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
@@ -156,60 +176,35 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <article className="rounded-[28px] bg-white p-5 shadow-sm">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Social proof</p>
-              <p className="mt-3 text-3xl font-black text-stone-900">4.8/5</p>
-              <p className="mt-2 text-sm leading-7 text-stone-600">
-                Điểm đánh giá trung bình cao giúp tăng độ tin cậy ngay tại màn hình đầu tiên.
-              </p>
-            </article>
-
-            <article className="rounded-[28px] bg-white p-5 shadow-sm">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Mục tiêu chính</p>
-              <p className="mt-3 text-3xl font-black text-stone-900">Bán nhanh hơn</p>
-              <p className="mt-2 text-sm leading-7 text-stone-600">
-                Điều hướng thẳng vào danh mục và sản phẩm nổi bật thay vì để người dùng tự dò tìm.
-              </p>
-            </article>
-
-            <article className="rounded-[28px] bg-white p-5 shadow-sm sm:col-span-2">
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">Cam kết mua hàng</p>
-              <ul className="mt-3 space-y-2 text-sm leading-7 text-stone-600">
-                {commitments.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </article>
-          </div>
+          <StoreHeroVisual products={featuredProducts} />
         </div>
       </section>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid gap-3 lg:mt-6 lg:grid-cols-3 lg:gap-4">
         {supportCards.map((item) => (
           <article
-            className="rounded-[24px] border border-stone-200 bg-white p-5 shadow-sm shadow-emerald-100"
+            className="rounded-[22px] border border-stone-200 bg-white p-4 shadow-sm shadow-emerald-100 sm:rounded-[24px] sm:p-5"
             key={item.title}
           >
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-lg font-bold text-emerald-700">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-lg font-bold text-emerald-700">
               ✓
             </div>
-            <h2 className="mt-4 text-lg font-bold text-stone-900">{item.title}</h2>
+            <h2 className="mt-3 text-lg font-bold text-stone-900">{item.title}</h2>
             <p className="mt-2 text-sm leading-7 text-stone-600">{item.description}</p>
           </article>
         ))}
       </div>
 
-      <div className="mt-6 space-y-6">
+      <div className="mt-4 space-y-4 sm:mt-6 sm:space-y-6">
         <LandingSection
           eyebrow="Danh mục trọng tâm"
           title="Đi nhanh vào từng nhóm sản phẩm"
           description="Homepage cần dẫn người dùng vào đúng luồng mua sắm. Phần này giữ vai trò điều hướng chính, đồng thời giúp SEO hiểu được website đang bán gì."
         >
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
             {CATEGORY_CONFIG.map((category, index) => (
               <Link
-                className={`rounded-[24px] px-5 py-5 text-white shadow-md ${
+                className={`rounded-[22px] px-4 py-4 text-white shadow-md sm:rounded-[24px] sm:px-5 sm:py-5 ${
                   index % 4 === 0
                     ? 'bg-gradient-to-br from-emerald-800 to-green-500'
                     : index % 4 === 1
@@ -247,9 +242,9 @@ export default function LandingPage() {
             title="Các sản phẩm có độ quan tâm cao trên storefront"
             description="Thêm một lớp nội dung best seller để tăng chuyển đổi và tạo tín hiệu xã hội rõ hơn cho người dùng mới."
           >
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 sm:gap-4">
               {bestSellerProducts.map((product) => (
-                <article className="rounded-[24px] border border-stone-200 bg-stone-50 p-5" key={product.slug}>
+                <article className="rounded-[22px] border border-stone-200 bg-stone-50 p-4 sm:rounded-[24px] sm:p-5" key={product.slug}>
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
                     {product.badge}
                   </p>
@@ -277,7 +272,7 @@ export default function LandingPage() {
         >
           <div className="grid gap-4 lg:grid-cols-3">
             {testimonials.map((item) => (
-              <article className="rounded-[24px] border border-stone-200 bg-white p-5 shadow-sm" key={item.name}>
+              <article className="rounded-[22px] border border-stone-200 bg-white p-4 shadow-sm sm:rounded-[24px] sm:p-5" key={item.name}>
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">
                     {item.name
