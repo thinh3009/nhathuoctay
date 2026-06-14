@@ -1,6 +1,13 @@
 export {}
 
-process.loadEnvFile?.('.env')
+import { existsSync } from 'node:fs'
+
+// Load .env.local nếu có, fallback về .env
+if (existsSync('.env.local')) {
+  process.loadEnvFile?.('.env.local')
+} else if (existsSync('.env')) {
+  process.loadEnvFile?.('.env')
+}
 
 const { default: postgres } = await import('postgres')
 
