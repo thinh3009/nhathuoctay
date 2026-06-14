@@ -2,7 +2,7 @@
 
 :root {
   color: #1f2937;
-  background: #f8faf5;
+  background: #f6fbf4;
   font-family: "Public Sans", "IBM Plex Sans", "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -14,14 +14,18 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   min-width: 320px;
   margin: 0;
   background:
-    radial-gradient(circle at 0% 0%, #dcfce7 0%, transparent 38%),
-    radial-gradient(circle at 100% 100%, #bbf7d0 0%, transparent 40%),
-    #f8faf5;
+    radial-gradient(circle at 0% 0%, #d1fae5 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, #a7f3d0 0%, transparent 45%),
+    #f6fbf4;
 }
 
 body {
@@ -34,4 +38,154 @@ select,
 textarea,
 a {
   font: inherit;
+}
+
+/* ── Keyframe animations ── */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideProgress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ── Animation utility classes ── */
+
+.anim-fade-up {
+  animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-fade-in {
+  animation: fadeIn 0.45s ease both;
+}
+
+.anim-slide-left {
+  animation: slideFromLeft 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-slide-right {
+  animation: slideFromRight 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-scale-up {
+  animation: scaleUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-float {
+  animation: floatY 4s ease-in-out infinite;
+}
+
+/* ── Scroll reveal classes ── */
+
+.reveal,
+.reveal-left,
+.reveal-right,
+.reveal-scale {
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: 0.65s;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(24px);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.94);
+}
+
+.reveal.is-visible,
+.reveal-left.is-visible,
+.reveal-right.is-visible,
+.reveal-scale.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .anim-fade-up,
+  .anim-fade-in,
+  .anim-slide-left,
+  .anim-slide-right,
+  .anim-scale-up,
+  .anim-float {
+    animation: none;
+  }
 }
