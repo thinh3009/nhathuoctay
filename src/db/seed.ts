@@ -1,5 +1,12 @@
+import { existsSync } from 'node:fs'
+
 async function seedCatalog() {
-  process.loadEnvFile?.('.env')
+  // Load .env.local nếu có, fallback về .env
+  if (existsSync('.env.local')) {
+    process.loadEnvFile?.('.env.local')
+  } else if (existsSync('.env')) {
+    process.loadEnvFile?.('.env')
+  }
 
   const [{ db }, { categories, productReviews, products: productsTable }, { categoryNavItems, products }] =
     await Promise.all([
