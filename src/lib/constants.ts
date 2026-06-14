@@ -44,7 +44,8 @@ export const CATEGORY_CONFIG = [
 }>
 
 export const DEFAULT_CATEGORY_SLUG: CategorySlug = 'thuc-pham-chuc-nang'
-export const CART_COOKIE_NAME = 'nutrihome_cart_id'
+export const CART_COOKIE_NAME = 'nhathuoc16_cart'
+export const AUTH_COOKIE_NAME = 'nhathuoc16_auth'
 export const PRODUCTS_PER_PAGE = 20
 export const ALL_SUBCATEGORY_LABEL = 'Tất cả'
 

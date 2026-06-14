@@ -4,10 +4,13 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { CATEGORY_CONFIG } from '@/lib/constants'
 
+type AuthUser = { userId: string; email: string; role: string } | null
+
 type StoreHeaderProps = {
   activeCategorySlug?: string
   cartCount: number
   variant?: 'default' | 'landing'
+  user?: AuthUser
 }
 
 function CartIcon({ cartCount }: { cartCount: number }) {
@@ -151,6 +154,7 @@ export default function StoreHeader({
   activeCategorySlug,
   cartCount,
   variant = 'default',
+  user,
 }: StoreHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -186,18 +190,40 @@ export default function StoreHeader({
     return (
       <>
         <header className="overflow-hidden rounded-[28px] bg-gradient-to-b from-emerald-900 via-emerald-800 to-green-600 text-white shadow-lg shadow-emerald-200">
-          <div className="bg-emerald-950/95 px-4 py-3 text-sm">
-            <div className="flex items-center gap-2">
-              <svg className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.8" />
-                <path d="m16 16 4 4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
-              </svg>
-              <p className="font-medium">
-                Trung tâm chăm sóc sức khỏe NutriHome.
-                <Link className="ml-1 underline underline-offset-4" href="/category/thiet-bi-y-te">
-                  Tìm hiểu ngay
-                </Link>
+          <div className="bg-emerald-950/95 px-4 py-2.5 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-medium text-emerald-100">
+                🏥 Nhà thuốc 16 — Chính hãng, giao nhanh, dược sĩ tư vấn 24/7
               </p>
+              <div className="flex shrink-0 items-center gap-2">
+                {user ? (
+                  <Link
+                    className="flex items-center gap-1.5 rounded-full bg-emerald-800 px-3 py-1 text-xs font-semibold text-emerald-100 transition hover:bg-emerald-700"
+                    href="/account/orders"
+                  >
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+                    </svg>
+                    Tài khoản
+                  </Link>
+                ) : (
+                  <Link
+                    className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white transition hover:bg-white/20"
+                    href="/auth/login"
+                  >
+                    Đăng nhập
+                  </Link>
+                )}
+                {user?.role === 'admin' && (
+                  <Link
+                    className="rounded-full bg-amber-500 px-3 py-1 text-xs font-bold text-white transition hover:bg-amber-600"
+                    href="/admin"
+                  >
+                    Admin
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
 

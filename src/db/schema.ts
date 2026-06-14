@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm'
 import {
+  boolean,
   integer,
   jsonb,
   pgTable,
@@ -11,6 +12,36 @@ import {
 } from 'drizzle-orm/pg-core'
 import type { ProductImage } from '@/lib/schemas'
 
+/* ── Users ── */
+
+export const users = pgTable('users', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  fullName: text('full_name').notNull(),
+  phone: text('phone'),
+  role: text('role', { enum: ['customer', 'admin', 'pharmacist'] }).notNull().default('customer'),
+  isActive: boolean('is_active').notNull().default(true),
+  emailVerified: boolean('email_verified').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const userAddresses = pgTable('user_addresses', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  fullName: text('full_name').notNull(),
+  phone: text('phone').notNull(),
+  addressLine: text('address_line').notNull(),
+  ward: text('ward'),
+  district: text('district'),
+  city: text('city').notNull(),
+  isDefault: boolean('is_default').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+/* ── Categories ── */
+
 export const categories = pgTable('categories', {
   slug: text('slug').primaryKey(),
   label: text('label').notNull(),
@@ -19,6 +50,8 @@ export const categories = pgTable('categories', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
+
+/* ── Products ── */
 
 export const products = pgTable(
   'products',
@@ -34,6 +67,7 @@ export const products = pgTable(
     description: text('description').notNull(),
     shortDescription: text('short_description').notNull(),
     price: integer('price').notNull(),
+    salePrice: integer('sale_price'),
     badge: text('badge').notNull(),
     ingredients: jsonb('ingredients').$type<string[]>().notNull(),
     usage: text('usage').notNull(),
@@ -52,6 +86,9 @@ export const products = pgTable(
     shelfLife: text('shelf_life').notNull(),
     ingredientHighlight: text('ingredient_highlight').notNull(),
     images: jsonb('images').$type<ProductImage[]>().notNull(),
+    prescriptionRequired: boolean('prescription_required').notNull().default(false),
+    isActive: boolean('is_active').notNull().default(true),
+    stockQuantity: integer('stock_quantity').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -70,19 +107,20 @@ export const productReviews = pgTable('product_reviews', {
   date: text('date').notNull(),
   title: text('title').notNull(),
   content: text('content').notNull(),
+  isApproved: boolean('is_approved').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
-export const carts = pgTable(
-  'carts',
-  {
-    id: uuid('id').defaultRandom().primaryKey(),
-    cartToken: text('cart_token').notNull().unique(),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-)
+/* ── Cart ── */
+
+export const carts = pgTable('carts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  cartToken: text('cart_token').notNull().unique(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
 
 export const cartItems = pgTable(
   'cart_items',
@@ -103,6 +141,86 @@ export const cartItems = pgTable(
   }),
 )
 
+/* ── Orders ── */
+
+type ShippingAddress = {
+  fullName: string
+  phone: string
+  addressLine: string
+  ward?: string
+  district?: string
+  city: string
+}
+
+export const orders = pgTable('orders', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  orderNumber: text('order_number').notNull().unique(),
+  status: text('status', {
+    enum: ['pending', 'confirmed', 'processing', 'shipping', 'delivered', 'cancelled', 'refunded'],
+  }).notNull().default('pending'),
+  totalAmount: integer('total_amount').notNull(),
+  shippingFee: integer('shipping_fee').notNull().default(0),
+  discountAmount: integer('discount_amount').notNull().default(0),
+  paymentMethod: text('payment_method', {
+    enum: ['cod', 'bank_transfer', 'momo', 'vnpay'],
+  }).notNull().default('cod'),
+  paymentStatus: text('payment_status', {
+    enum: ['pending', 'paid', 'failed', 'refunded'],
+  }).notNull().default('pending'),
+  shippingAddress: jsonb('shipping_address').$type<ShippingAddress>().notNull(),
+  note: text('note'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const orderItems = pgTable('order_items', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: uuid('order_id')
+    .notNull()
+    .references(() => orders.id, { onDelete: 'cascade' }),
+  productSlug: text('product_slug')
+    .notNull()
+    .references(() => products.slug),
+  productName: text('product_name').notNull(),
+  quantity: integer('quantity').notNull(),
+  price: integer('price').notNull(),
+  subtotal: integer('subtotal').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+/* ── Wishlists ── */
+
+export const wishlists = pgTable(
+  'wishlists',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    productSlug: text('product_slug')
+      .notNull()
+      .references(() => products.slug, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userProductUnique: uniqueIndex('wishlist_user_product_unique').on(table.userId, table.productSlug),
+  }),
+)
+
+/* ── Relations ── */
+
+export const usersRelations = relations(users, ({ many }) => ({
+  addresses: many(userAddresses),
+  orders: many(orders),
+  wishlists: many(wishlists),
+  carts: many(carts),
+}))
+
+export const userAddressesRelations = relations(userAddresses, ({ one }) => ({
+  user: one(users, { fields: [userAddresses.userId], references: [users.id] }),
+}))
+
 export const categoriesRelations = relations(categories, ({ many }) => ({
   products: many(products),
 }))
@@ -114,6 +232,8 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   reviews: many(productReviews),
   cartItems: many(cartItems),
+  orderItems: many(orderItems),
+  wishlists: many(wishlists),
 }))
 
 export const productReviewsRelations = relations(productReviews, ({ one }) => ({
@@ -123,17 +243,27 @@ export const productReviewsRelations = relations(productReviews, ({ one }) => ({
   }),
 }))
 
-export const cartsRelations = relations(carts, ({ many }) => ({
+export const cartsRelations = relations(carts, ({ many, one }) => ({
   items: many(cartItems),
+  user: one(users, { fields: [carts.userId], references: [users.id] }),
 }))
 
 export const cartItemsRelations = relations(cartItems, ({ one }) => ({
-  cart: one(carts, {
-    fields: [cartItems.cartId],
-    references: [carts.id],
-  }),
-  product: one(products, {
-    fields: [cartItems.productSlug],
-    references: [products.slug],
-  }),
+  cart: one(carts, { fields: [cartItems.cartId], references: [carts.id] }),
+  product: one(products, { fields: [cartItems.productSlug], references: [products.slug] }),
+}))
+
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(users, { fields: [orders.userId], references: [users.id] }),
+  items: many(orderItems),
+}))
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
+  product: one(products, { fields: [orderItems.productSlug], references: [products.slug] }),
+}))
+
+export const wishlistsRelations = relations(wishlists, ({ one }) => ({
+  user: one(users, { fields: [wishlists.userId], references: [users.id] }),
+  product: one(products, { fields: [wishlists.productSlug], references: [products.slug] }),
 }))
