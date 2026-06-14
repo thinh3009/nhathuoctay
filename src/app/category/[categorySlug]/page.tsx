@@ -1,4 +1,5 @@
 ﻿import Link from 'next/link'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { listProducts } from '@/db/queries/catalog'
 import CategoryFilters from '@/components/CategoryFilters'
@@ -98,13 +99,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         <section className="mt-6 grid gap-5 lg:grid-cols-[240px_minmax(0,1fr)_280px]">
           <aside className="hidden h-fit rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm shadow-emerald-100/60 lg:sticky lg:top-6 lg:block">
             <h2 className="text-base font-bold text-stone-900">Bộ lọc</h2>
-            <CategoryFilters
-              selectedPriceRange={result.selected.priceRange}
-              selectedSort={result.selected.sort}
-              selectedSubCategory={result.selected.subCategory}
-              subCategories={result.filters.subCategories}
-              variant="desktop"
-            />
+            <Suspense>
+              <CategoryFilters
+                selectedPriceRange={result.selected.priceRange}
+                selectedSort={result.selected.sort}
+                selectedSubCategory={result.selected.subCategory}
+                subCategories={result.filters.subCategories}
+                variant="desktop"
+              />
+            </Suspense>
 
             <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
               <h3 className="text-sm font-bold text-stone-900">Cam kết cửa hàng</h3>
@@ -128,13 +131,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             </div>
 
             <div className="mb-4 lg:hidden">
-              <CategoryFilters
-                selectedPriceRange={result.selected.priceRange}
-                selectedSort={result.selected.sort}
-                selectedSubCategory={result.selected.subCategory}
-                subCategories={result.filters.subCategories}
-                variant="mobile"
-              />
+              <Suspense>
+                <CategoryFilters
+                  selectedPriceRange={result.selected.priceRange}
+                  selectedSort={result.selected.sort}
+                  selectedSubCategory={result.selected.subCategory}
+                  subCategories={result.filters.subCategories}
+                  variant="mobile"
+                />
+              </Suspense>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
