@@ -7,7 +7,6 @@ import PaginationControls from '@/components/PaginationControls'
 import ProductCard from '@/components/ProductCard'
 import StoreFooter from '@/components/StoreFooter'
 import StoreHeader from '@/components/StoreHeader'
-import { CATEGORY_CONFIG } from '@/lib/constants'
 import { commitments } from '@/lib/catalog'
 import { getServerCartCount } from '@/lib/cart'
 
@@ -62,10 +61,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 <span>/</span>
                 <span>{result.category.label}</span>
               </div>
-              <p className="mt-4 text-sm font-semibold uppercase tracking-[0.22em] text-emerald-700">
-                Danh mục sản phẩm
-              </p>
-              <h1 className="mt-2 text-3xl font-bold leading-tight text-stone-900 sm:text-4xl">
+              <h1 className="mt-4 text-3xl font-bold leading-tight text-stone-900 sm:text-4xl">
                 {result.category.label}
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-stone-600">
@@ -75,24 +71,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
             <div className="rounded-2xl bg-emerald-50 px-5 py-4 text-sm text-stone-700">
               <p className="font-semibold text-stone-900">{result.pagination.total} sản phẩm</p>
-              <p className="mt-1">Hiển thị tối đa 20 sản phẩm mỗi trang để danh sách dễ xem hơn.</p>
             </div>
-          </div>
-
-          <div className="mt-5 flex flex-wrap gap-2">
-            {CATEGORY_CONFIG.map((item) => (
-              <Link
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                  item.slug === result.category.slug
-                    ? 'bg-emerald-700 text-white'
-                    : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
-                }`}
-                href={`/category/${item.slug}`}
-                key={item.slug}
-              >
-                {item.label}
-              </Link>
-            ))}
           </div>
         </section>
 

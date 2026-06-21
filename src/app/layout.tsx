@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import DrugChatbot from '@/components/DrugChatbot'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/config/site'
 import './globals.css'
 
@@ -18,7 +19,10 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body>
+        {children}
+        <DrugChatbot />
+      </body>
     </html>
   )
 }

@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev --hostname 0.0.0.0 --port 3000",
+    "dev": "next dev --webpack --hostname 0.0.0.0 --port 3000",
+    "dev:turbo": "next dev --turbopack --hostname 0.0.0.0 --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -12,9 +13,11 @@
     "db:studio": "drizzle-kit studio",
     "db:bootstrap": "node --experimental-strip-types src/db/bootstrap.ts",
     "db:seed": "node --experimental-strip-types src/db/seed.ts",
+    "admin:create": "node --experimental-strip-types src/db/bootstrap-admin.ts",
     "storage:sync": "node --experimental-strip-types src/storage/syncProductImages.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.105.0",
     "@tailwindcss/postcss": "^4.3.0",
     "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.2",
@@ -24,6 +27,8 @@
     "postgres": "^3.4.9",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.3.0",
     "zod": "^4.4.3"
   },

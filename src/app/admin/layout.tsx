@@ -9,6 +9,8 @@ const NAV_ITEMS = [
   { href: '/admin/products', label: 'Sản phẩm', icon: 'box' },
   { href: '/admin/categories', label: 'Danh mục', icon: 'tag' },
   { href: '/admin/orders', label: 'Đơn hàng', icon: 'receipt' },
+  { href: '/admin/articles', label: 'Bài viết', icon: 'pen' },
+  { href: '/admin/users', label: 'Người dùng', icon: 'users' },
 ] as const
 
 function NavIcon({ name }: { name: string }) {
@@ -30,6 +32,19 @@ function NavIcon({ name }: { name: string }) {
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
       <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z" stroke="currentColor" strokeWidth="1.8" />
       <circle cx="7" cy="7" fill="currentColor" r="1.5" />
+    </svg>
+  )
+  if (name === 'users') return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  )
+  if (name === 'pen') return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path d="M12 20h9" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" stroke="currentColor" strokeWidth="1.8" />
     </svg>
   )
   return (

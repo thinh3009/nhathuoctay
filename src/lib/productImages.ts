@@ -378,18 +378,22 @@ export function getProductImageAssets(productSlug: string) {
 
 export function buildProductImages(categorySlug: CategorySlug, productSlug: string): ProductImage[] {
   const assets = getProductImageAssets(productSlug)
-  const assetList = assets.length > 0 ? assets : fallbackImageAssetsByCategory[categorySlug]
+  // Chỉ sản phẩm có ảnh được khai báo (đã upload lên Supabase) mới dùng URL remote.
+  // Sản phẩm dùng ảnh fallback (vd: sản phẩm mẫu) trỏ thẳng ảnh demo local để tránh lỗi 400.
+  const usingFallback = assets.length === 0
+  const assetList = usingFallback ? fallbackImageAssetsByCategory[categorySlug] : assets
 
   return assetList.map((asset) => {
     const storagePath = buildProductStoragePath(categorySlug, productSlug, asset.targetFileName)
     const fallbackSrc = buildFallbackPath(asset.sourceFile)
+    const remoteSrc = usingFallback ? null : buildPublicProductImageUrl(storagePath)
 
     return productImageSchema.parse({
       kind: asset.kind,
       label: asset.label,
       storagePath,
       fallbackSrc,
-      src: buildPublicProductImageUrl(storagePath) ?? fallbackSrc,
+      src: remoteSrc ?? fallbackSrc,
     })
   })
 }
@@ -401,6 +405,8 @@ export function normalizeProductImages(
 ) {
   const rawList = Array.isArray(rawImages) ? rawImages : []
   const manifest = buildProductImages(categorySlug, productSlug)
+  // Sản phẩm dùng ảnh fallback (không khai báo asset, chưa upload Supabase) phải giữ ảnh local.
+  const usingFallback = getProductImageAssets(productSlug).length === 0
 
   if (rawList.length === 0) {
     return manifest
@@ -419,9 +425,11 @@ export function normalizeProductImages(
     const parsed = productImageSchema.safeParse(rawImage)
 
     if (parsed.success) {
+      const remoteSrc = usingFallback ? null : buildPublicProductImageUrl(parsed.data.storagePath)
+
       return productImageSchema.parse({
         ...parsed.data,
-        src: buildPublicProductImageUrl(parsed.data.storagePath) ?? parsed.data.fallbackSrc,
+        src: remoteSrc ?? parsed.data.fallbackSrc,
       })
     }
 

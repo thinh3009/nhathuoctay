@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { AUTH_COOKIE_NAME } from './constants'
 
 const JWT_SECRET = new TextEncoder().encode(
@@ -34,6 +35,15 @@ export async function getAuthUser(): Promise<JWTPayload | null> {
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value
   if (!token) return null
   return verifyJWT(token)
+}
+
+// Dùng trong server action / API: đảm bảo người gọi là admin (chặn gọi trực tiếp).
+export async function requireAdmin(): Promise<JWTPayload> {
+  const user = await getAuthUser()
+  if (!user || user.role !== 'admin') {
+    redirect('/')
+  }
+  return user
 }
 
 export async function setAuthCookie(token: string) {

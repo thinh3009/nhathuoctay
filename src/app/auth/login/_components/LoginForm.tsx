@@ -8,7 +8,7 @@ import { SITE_NAME } from '@/config/site'
 export default function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const from = searchParams.get('from') ?? '/'
+  const from = searchParams?.get('from') ?? '/'
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')

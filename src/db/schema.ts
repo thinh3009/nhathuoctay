@@ -112,6 +112,23 @@ export const productReviews = pgTable('product_reviews', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+/* ── Articles (bài viết / blog) ── */
+
+export const articles = pgTable('articles', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  excerpt: text('excerpt').notNull(),
+  content: text('content').notNull(),
+  coverImage: text('cover_image'),
+  category: text('category').notNull().default('Tin sức khỏe'),
+  status: text('status', { enum: ['draft', 'published'] }).notNull().default('draft'),
+  authorId: uuid('author_id').references(() => users.id, { onDelete: 'set null' }),
+  publishedAt: timestamp('published_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 /* ── Cart ── */
 
 export const carts = pgTable('carts', {

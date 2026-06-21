@@ -4,9 +4,8 @@ import ProductCard from '@/components/ProductCard'
 import LandingPromoStrip from '@/components/landing/LandingPromoStrip'
 import LandingSection from '@/components/landing/LandingSection'
 import LandingShortcutGrid from '@/components/landing/LandingShortcutGrid'
-import StoreHeroCarousel from '@/components/landing/StoreHeroCarousel'
 import AnimateIn from '@/components/ui/AnimateIn'
-import { commitments, products } from '@/lib/catalog'
+import { products } from '@/lib/catalog'
 import { CATEGORY_CONFIG, DEFAULT_CATEGORY_SLUG } from '@/lib/constants'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
@@ -184,50 +183,14 @@ const trustItems = [
   },
 ]
 
-const heroSlides = [
-  {
-    eyebrow: 'Chính hãng mỗi ngày',
-    title: 'Thực phẩm chức năng chính hãng cho cả gia đình',
-    description:
-      'Lấy thực phẩm chức năng làm trung tâm, đẩy sản phẩm nổi bật lên đầu và giữ luồng mua sắm gọn cho người dùng điện thoại.',
-    primaryCta: { label: 'Mua thực phẩm chức năng', href: `/category/${DEFAULT_CATEGORY_SLUG}` },
-    secondaryCta: { label: 'Xem best seller', href: '#best-seller' },
-    stats: [
-      { label: 'Đánh giá', value: '4.8/5', description: 'Điểm đánh giá trung bình nhóm sản phẩm chủ lực' },
-      { label: 'Sản phẩm', value: '500+', description: 'Sản phẩm chính hãng sẵn kho' },
-      { label: 'Cam kết', value: 'Chính hãng', description: commitments[0] ?? 'Sản phẩm rõ nguồn gốc' },
-    ],
-    products: featuredProducts,
-  },
-  {
-    eyebrow: 'Đẹp da và phục hồi',
-    title: 'Luồng làm đẹp với nhóm chăm sóc da được tách rõ',
-    description:
-      'Một slide riêng cho làm đẹp giúp homepage mở thêm luồng bán chéo sang serum, làm sạch và dưỡng ẩm hiệu quả.',
-    primaryCta: { label: 'Xem chăm sóc da', href: '/category/cham-soc-da' },
-    secondaryCta: { label: 'Xem combo đẹp da', href: '#combo-suc-khoe' },
-    stats: [
-      { label: 'Bán chéo', value: '2 luồng', description: 'Kết nối giữa collagen và routine chăm sóc da' },
-      { label: 'Mục tiêu', value: 'Đẹp da', description: 'Dành cho khách quan tâm phục hồi và sáng da' },
-      { label: 'Route', value: 'Riêng biệt', description: 'Category riêng hỗ trợ SEO và quảng cáo' },
-    ],
-    products: skincareHighlight,
-  },
-  {
-    eyebrow: 'Gia đình và sức khỏe',
-    title: 'Thiết bị y tế tại nhà — lối vào riêng, tin cậy hơn',
-    description:
-      'Hero slide cho thiết bị y tế giúp storefront mở rộng sang combo máy đo, nhiệt kế và sản phẩm chăm sóc gia đình.',
-    primaryCta: { label: 'Xem thiết bị y tế', href: '/category/thiet-bi-y-te' },
-    secondaryCta: { label: 'Xem combo gia đình', href: '#combo-suc-khoe' },
-    stats: [
-      { label: 'Thiết bị', value: '3 nhóm', description: 'Nhiệt kế, máy đo huyết áp, máy xông' },
-      { label: 'Mục tiêu', value: 'Gia đình', description: 'Theo dõi sức khỏe tại nhà dễ dàng' },
-      { label: 'Upsell', value: 'Cao hơn', description: 'Tiềm năng tăng giá trị giỏ hàng tốt' },
-    ],
-    products: deviceHighlight,
-  },
-]
+const hero = {
+  eyebrow: 'Chính hãng mỗi ngày',
+  title: 'Thực phẩm chức năng chính hãng cho cả gia đình',
+  description:
+    'Lấy thực phẩm chức năng làm trung tâm, đẩy sản phẩm nổi bật lên đầu và giữ luồng mua sắm gọn cho người dùng điện thoại.',
+  primaryCta: { label: 'Mua thực phẩm chức năng', href: `/category/${DEFAULT_CATEGORY_SLUG}` },
+  secondaryCta: { label: 'Xem tất cả sản phẩm', href: '#tat-ca-san-pham' },
+}
 
 const structuredData = {
   '@context': 'https://schema.org',
@@ -256,8 +219,50 @@ export default function LandingPage() {
     <>
       <script dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} type="application/ld+json" />
 
-      {/* ── Hero ── */}
-      <StoreHeroCarousel slides={heroSlides} />
+      {/* ── Hero (tĩnh, không tự trượt) ── */}
+      <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-800 px-5 py-7 shadow-2xl shadow-emerald-900/25 sm:rounded-[32px] sm:px-8 sm:py-10 lg:px-12 lg:py-14">
+        {/* Decorative background blobs */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-emerald-400/10 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-teal-400/10 blur-3xl" />
+          <div className="absolute left-1/3 top-1/2 h-48 w-48 -translate-y-1/2 rounded-full bg-lime-400/5 blur-2xl" />
+        </div>
+
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-4 py-1.5 backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-300">
+              {hero.eyebrow}
+            </span>
+          </div>
+
+          <h1 className="mt-5 max-w-3xl text-[2rem] font-black leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-5xl">
+            {hero.title}
+          </h1>
+
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-emerald-100/75 sm:text-base sm:leading-8">
+            {hero.description}
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-emerald-900 shadow-lg shadow-white/10 transition-all duration-200 hover:scale-[1.03] hover:bg-emerald-50 hover:shadow-xl active:scale-95 motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100"
+              href={hero.primaryCta.href}
+            >
+              {hero.primaryCta.label}
+              <svg aria-hidden="true" className="h-4 w-4" fill="none" focusable="false" viewBox="0 0 24 24">
+                <path d="m9 18 6-6-6-6" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2" />
+              </svg>
+            </Link>
+            <Link
+              className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/18 hover:border-white/35"
+              href={hero.secondaryCta.href}
+            >
+              {hero.secondaryCta.label}
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ── Trust badges ── */}
       <AnimateIn className="mt-4 sm:mt-5" variant="up" delay={100}>
@@ -312,7 +317,7 @@ export default function LandingPage() {
                     <p className="mt-2 text-sm leading-6 text-white/85">{category.heroDescription}</p>
                     <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-white/80 transition-all group-hover:text-white">
                       Xem ngay
-                      <svg className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24">
+                      <svg aria-hidden="true" className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" fill="none" focusable="false" viewBox="0 0 24 24">
                         <path d="m9 18 6-6-6-6" stroke="currentColor" strokeLinecap="round" strokeWidth="2.5" />
                       </svg>
                     </div>
@@ -376,7 +381,7 @@ export default function LandingPage() {
                         href={combo.href}
                       >
                         Xem danh mục
-                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                        <svg aria-hidden="true" className="h-3.5 w-3.5" fill="none" focusable="false" viewBox="0 0 24 24">
                           <path d="m9 18 6-6-6-6" stroke="currentColor" strokeLinecap="round" strokeWidth="2.5" />
                         </svg>
                       </Link>
@@ -429,6 +434,23 @@ export default function LandingPage() {
           </LandingSection>
         </div>
 
+        {/* ── All products (catalog đầy đủ) ── */}
+        <div id="tat-ca-san-pham">
+          <LandingSection
+            eyebrow="Tất cả sản phẩm"
+            title="Toàn bộ sản phẩm chính hãng"
+            description="Xem đầy đủ danh mục sản phẩm chính hãng đang có sẵn và chọn mua nhanh ngay tại đây."
+          >
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {products.map((product, i) => (
+                <AnimateIn delay={(i % 6) * 70} key={product.slug} variant="up">
+                  <ProductCard product={product} />
+                </AnimateIn>
+              ))}
+            </div>
+          </LandingSection>
+        </div>
+
         {/* ── Testimonials ── */}
         <LandingSection
           eyebrow="Khách hàng nói gì"
@@ -471,7 +493,7 @@ export default function LandingPage() {
         <AnimateIn variant="scale">
           <section className="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-800 px-6 py-10 text-center shadow-xl shadow-emerald-900/20 sm:rounded-[32px] sm:px-10 sm:py-14">
             {/* Decorations */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
               <div className="absolute -left-16 top-0 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
               <div className="absolute -right-16 bottom-0 h-64 w-64 rounded-full bg-teal-400/10 blur-3xl" />
             </div>
@@ -494,11 +516,11 @@ export default function LandingPage() {
 
               <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                 <Link
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-emerald-900 shadow-lg shadow-white/10 transition-all hover:scale-[1.03] hover:bg-emerald-50 hover:shadow-xl active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-bold text-emerald-900 shadow-lg shadow-white/10 transition-all hover:scale-[1.03] hover:bg-emerald-50 hover:shadow-xl active:scale-95 motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100"
                   href={`/category/${DEFAULT_CATEGORY_SLUG}`}
                 >
                   Xem tất cả sản phẩm
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="h-4 w-4" fill="none" focusable="false" viewBox="0 0 24 24">
                     <path d="m9 18 6-6-6-6" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2" />
                   </svg>
                 </Link>

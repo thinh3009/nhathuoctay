@@ -6,6 +6,7 @@ import { formatPrice } from '@/lib/catalog'
 import { getProductImageSrc } from '@/lib/productImages'
 import type { Product } from '@/lib/schemas'
 import AddToCartButton from './AddToCartButton'
+import PharmacyFinder from './PharmacyFinder'
 import QuantitySelector from './QuantitySelector'
 
 type ProductDetailHeroProps = {
@@ -175,12 +176,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
                 productSlug={product.slug}
                 quantity={quantity}
               />
-              <button
-                className="rounded-full bg-emerald-50 px-5 py-4 text-lg font-semibold text-emerald-700 hover:bg-emerald-100"
-                type="button"
-              >
-                Tìm nhà thuốc
-              </button>
+              <PharmacyFinder productName={product.name} />
             </div>
           </div>
 

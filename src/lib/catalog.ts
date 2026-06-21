@@ -104,264 +104,198 @@ function createProduct(category: CategoryMeta, seed: ProductSeed, index: number)
   })
 }
 
-function buildProducts(categorySlug: CategorySlug, seeds: ProductSeed[]) {
-  return seeds.map((seed, index) => createProduct(categoryMetaMap[categorySlug], seed, index))
+function buildProducts(categorySlug: CategorySlug, seeds: ProductSeed[], startIndex = 0) {
+  return seeds.map((seed, index) => createProduct(categoryMetaMap[categorySlug], seed, startIndex + index))
 }
 
-const supplementProducts = buildProducts('thuc-pham-chuc-nang', [
-  {
-    slug: 'omega-3-premium',
-    name: 'Omega-3 Premium',
-    subCategory: 'Tim mạch',
-    benefit: 'Hỗ trợ tim mạch và não bộ',
-    description:
-      'Dầu cá tinh khiết giàu EPA và DHA cho người cần chăm sóc tim mạch và duy trì sự tập trung mỗi ngày.',
-    shortDescription:
-      'Bổ sung Omega-3 giúp hỗ trợ tim mạch, mắt và khả năng tập trung trong sinh hoạt hằng ngày.',
-    price: 389000,
-    badge: 'Bán chạy',
-    ingredients: ['EPA 360mg', 'DHA 240mg', 'Dầu cá tinh khiết 1000mg'],
-    usage: 'Uống 1 viên, ngày 2 lần sau bữa ăn.',
-    unit: 'Hộp',
-    manufacturer: 'Nordic Pure Labs',
-    countryOfOrigin: 'Na Uy',
-    form: 'Viên nang mềm',
-    specification: 'Hộp 60 viên',
-    shelfLife: '24 tháng',
-    ingredientHighlight: 'Mỗi viên chứa EPA 360mg, DHA 240mg.',
-  },
-  {
-    slug: 'vitamin-c-1000mg',
-    name: 'Vitamin C 1000mg',
-    subCategory: 'Đề kháng',
-    benefit: 'Tăng cường đề kháng hằng ngày',
-    description:
-      'Vitamin C hàm lượng cao kết hợp bioflavonoid giúp hỗ trợ miễn dịch và chống oxy hóa.',
-    shortDescription:
-      'Phù hợp cho người cần nâng đỡ hệ miễn dịch và muốn bổ sung vitamin C đều đặn.',
-    price: 219000,
-    badge: 'Mới',
-    ingredients: ['Vitamin C 1000mg', 'Citrus bioflavonoids 50mg'],
-    usage: 'Uống 1 viên mỗi ngày sau bữa sáng.',
-    unit: 'Hộp',
-    manufacturer: 'Healthy Plus',
-    countryOfOrigin: 'Úc',
-    form: 'Viên nén',
-    specification: 'Hộp 30 viên',
-    shelfLife: '36 tháng',
-    ingredientHighlight: 'Mỗi viên chứa Vitamin C 1000mg và bioflavonoid.',
-  },
-  {
-    slug: 'collagen-peptide',
-    name: 'Collagen Peptide',
-    subCategory: 'Làm đẹp',
-    benefit: 'Hỗ trợ da, tóc và móng',
-    description:
-      'Collagen peptide thủy phân kết hợp biotin và kẽm cho nhu cầu chăm sóc sắc đẹp từ bên trong.',
-    shortDescription:
-      'Dòng collagen dạng bột cho người muốn nuôi dưỡng làn da và bổ sung dưỡng chất làm đẹp.',
-    price: 559000,
-    badge: 'Ưu đãi',
-    ingredients: ['Marine collagen peptides 5000mg', 'Biotin 2500mcg', 'Zinc 7mg'],
-    usage: 'Pha 1 muỗng với 200ml nước, dùng 1 lần mỗi ngày.',
-    unit: 'Hộp',
-    manufacturer: 'Beauty Nutrition Co.',
-    countryOfOrigin: 'Nhật Bản',
-    form: 'Bột hòa tan',
-    specification: 'Hộp 15 gói',
-    shelfLife: '24 tháng',
-    ingredientHighlight: 'Mỗi khẩu phần chứa Collagen peptide 5000mg.',
-  },
-])
+/* ──────────────────────────────────────────────────────────────────────────
+ * Dữ liệu sản phẩm thật tham khảo từ nhathuoclongchau.com.vn (tên, giá, đơn vị,
+ * thương hiệu). Các trường mô tả/cách dùng/thành phần được sinh tự động theo
+ * mẫu — vui lòng đọc kỹ hướng dẫn sử dụng và hỏi dược sĩ trước khi dùng.
+ * Mỗi danh mục 20 sản phẩm.
+ * ────────────────────────────────────────────────────────────────────────── */
 
-const skincareProducts = buildProducts('cham-soc-da', [
-  {
-    slug: 'gentle-cleanser-b5',
-    name: 'Sữa rửa mặt Gentle Cleanser B5',
-    subCategory: 'Làm sạch',
-    benefit: 'Làm sạch dịu nhẹ, không khô da',
-    description: 'Sữa rửa mặt dịu nhẹ với B5 và glycerin phù hợp da nhạy cảm và da thiếu ẩm.',
-    shortDescription: 'Làm sạch cơ bản cho da nhạy cảm, giữ cảm giác mềm và ẩm sau khi rửa.',
-    price: 245000,
-    badge: 'Bán chạy',
-    ingredients: ['Panthenol', 'Glycerin', 'Amino acid cleanser'],
-    usage: 'Lấy lượng vừa đủ, massage trên da ướt rồi rửa sạch.',
-    unit: 'Tuýp',
-    manufacturer: 'Skin Lab Studio',
-    countryOfOrigin: 'Hàn Quốc',
-    form: 'Gel rửa mặt',
-    specification: 'Tuýp 150ml',
-    shelfLife: '24 tháng',
-    ingredientHighlight: 'B5 và glycerin giúp làm sạch mà vẫn giữ độ ẩm tự nhiên.',
-  },
-  {
-    slug: 'niacinamide-10-serum',
-    name: 'Serum Niacinamide 10%',
-    subCategory: 'Serum',
-    benefit: 'Hỗ trợ sáng da và giảm dầu',
-    description:
-      'Serum niacinamide nồng độ 10% giúp cân bằng dầu, hỗ trợ đều màu da và bề mặt da mịn hơn.',
-    shortDescription: 'Tinh chất phù hợp da dầu, lỗ chân lông to và da không đều màu.',
-    price: 319000,
-    badge: 'Nổi bật',
-    ingredients: ['Niacinamide 10%', 'Zinc PCA'],
-    usage: 'Thoa 2-3 giọt sau bước làm sạch và toner.',
-    unit: 'Chai',
-    manufacturer: 'Derma Focus',
-    countryOfOrigin: 'Pháp',
-    form: 'Tinh chất',
-    specification: 'Chai 30ml',
-    shelfLife: '24 tháng',
-    ingredientHighlight: 'Niacinamide 10% hỗ trợ đều màu da và kiểm soát bã nhờn.',
-  },
-  {
-    slug: 'cica-repair-cream',
-    name: 'Kem dưỡng Cica Repair',
-    subCategory: 'Dưỡng ẩm',
-    benefit: 'Phục hồi và làm dịu da',
-    description:
-      'Kem dưỡng chứa cica, panthenol và squalane cho da nhạy cảm hoặc sau treatment.',
-    shortDescription: 'Kem dưỡng cho da cần phục hồi, khóa ẩm và làm dịu nhanh.',
-    price: 355000,
-    badge: 'Nổi bật',
-    ingredients: ['Centella asiatica', 'Panthenol', 'Squalane'],
-    usage: 'Thoa đều sau serum ở bước cuối routine.',
-    unit: 'Hũ',
-    manufacturer: 'Skin Lab Studio',
-    countryOfOrigin: 'Nhật Bản',
-    form: 'Kem',
-    specification: 'Hũ 50g',
-    shelfLife: '24 tháng',
-    ingredientHighlight: 'Cica, panthenol và squalane hỗ trợ làm dịu và khóa ẩm.',
-  },
-])
+// [tên, giá (VND), đơn vị, nhóm con, thương hiệu, quy cách?, nước sản xuất?]
+type ProductRow = [
+  name: string,
+  price: number,
+  unit: string,
+  subCategory: string,
+  manufacturer: string,
+  specification?: string,
+  country?: string,
+]
 
-const deviceProducts = buildProducts('thiet-bi-y-te', [
-  {
-    slug: 'digital-thermometer-flex',
-    name: 'Nhiệt kế điện tử đầu mềm Flex',
-    subCategory: 'Nhiệt kế',
-    benefit: 'Đo nhiệt độ nhanh và dễ đọc',
-    description:
-      'Nhiệt kế điện tử đầu mềm với màn hình rõ nét, phù hợp theo dõi tại nhà cho gia đình.',
-    shortDescription: 'Thiết bị cơ bản cho tủ thuốc gia đình và nhu cầu chăm sóc trẻ nhỏ.',
-    price: 125000,
-    badge: 'Thiết yếu',
-    ingredients: ['Đầu đo mềm', 'Màn hình LCD'],
-    usage: 'Bật thiết bị, đặt đúng vị trí đo và chờ tín hiệu hoàn tất.',
-    unit: 'Cái',
-    manufacturer: 'CareTech Medical',
-    countryOfOrigin: 'Nhật Bản',
-    form: 'Thiết bị đo',
-    specification: 'Hộp 1 cái',
-    shelfLife: '60 tháng',
-    ingredientHighlight: 'Đầu đo mềm, thời gian đo nhanh trong vài chục giây.',
-  },
-  {
-    slug: 'blood-pressure-home',
-    name: 'Máy đo huyết áp Home',
-    subCategory: 'Máy đo huyết áp',
-    benefit: 'Theo dõi huyết áp tại nhà',
-    description:
-      'Máy đo huyết áp bắp tay với màn hình lớn, thao tác một nút và có bộ nhớ lưu kết quả.',
-    shortDescription: 'Thiết bị phù hợp cho gia đình và người lớn tuổi cần theo dõi định kỳ.',
-    price: 890000,
-    badge: 'Nổi bật',
-    ingredients: ['Bộ nhớ lưu 60 kết quả', 'Màn hình LCD lớn'],
-    usage: 'Quấn vòng bít đúng vị trí, ngồi thẳng và nhấn nút bắt đầu.',
-    unit: 'Bộ',
-    manufacturer: 'CareTech Medical',
-    countryOfOrigin: 'Trung Quốc',
-    form: 'Thiết bị điện tử',
-    specification: 'Hộp 1 máy + vòng bít',
-    shelfLife: '60 tháng',
-    ingredientHighlight: 'Lưu bộ nhớ và hiển thị huyết áp, nhịp tim rõ ràng.',
-  },
-  {
-    slug: 'mesh-nebulizer-air',
-    name: 'Máy xông khí dung Mesh Air',
-    subCategory: 'Máy xông',
-    benefit: 'Hỗ trợ xông khí dung tại nhà',
-    description:
-      'Máy xông khí dung dạng mesh nhỏ gọn, độ ồn thấp và tiện mang theo khi cần.',
-    shortDescription:
-      'Giải pháp xông khí dung tiện lợi cho gia đình có trẻ nhỏ hoặc người lớn tuổi.',
-    price: 1350000,
-    badge: 'Cao cấp',
-    ingredients: ['Công nghệ mesh', 'Cốc thuốc dung tích tiêu chuẩn'],
-    usage: 'Cho dung dịch vào cốc, lắp mặt nạ và bật máy theo hướng dẫn.',
-    unit: 'Bộ',
-    manufacturer: 'MediAir',
-    countryOfOrigin: 'Đức',
-    form: 'Thiết bị điện tử',
-    specification: 'Hộp 1 máy + phụ kiện',
-    shelfLife: '48 tháng',
-    ingredientHighlight: 'Công nghệ mesh cho hạt sương mịn, vận hành êm.',
-  },
-])
+const usedSlugs = new Set<string>()
 
-const medicineProducts = buildProducts('thuoc', [
-  {
-    slug: 'paracetamol-500',
-    name: 'Paracetamol 500mg',
-    subCategory: 'Giảm đau hạ sốt',
-    benefit: 'Hỗ trợ giảm đau, hạ sốt',
-    description:
-      'Sản phẩm mock phục vụ trình diễn giao diện nhà thuốc online với thông tin cơ bản đầy đủ.',
-    shortDescription: 'Dữ liệu mô phỏng cho nhóm thuốc giảm đau hạ sốt.',
-    price: 32000,
-    badge: 'Phổ biến',
-    ingredients: ['Paracetamol 500mg'],
-    usage: 'Dùng theo hướng dẫn của dược sĩ hoặc bác sĩ.',
-    unit: 'Hộp',
-    manufacturer: 'PharmaCare',
-    countryOfOrigin: 'Việt Nam',
-    form: 'Viên nén',
-    specification: 'Hộp 10 vỉ x 10 viên',
-    shelfLife: '36 tháng',
-    ingredientHighlight: 'Mỗi viên chứa Paracetamol 500mg.',
-  },
-  {
-    slug: 'cough-syrup-honey',
-    name: 'Siro ho Honey',
-    subCategory: 'Ho cảm',
-    benefit: 'Hỗ trợ làm dịu họng',
-    description:
-      'Dữ liệu mock để mô phỏng danh mục thuốc với bố cục chi tiết, review và sản phẩm liên quan.',
-    shortDescription: 'Sản phẩm mô phỏng cho nhóm siro ho và cảm.',
-    price: 68000,
-    badge: 'Mới',
-    ingredients: ['Chiết xuất mật ong', 'Thảo dược làm dịu họng'],
-    usage: 'Dùng theo hướng dẫn sử dụng trên bao bì.',
-    unit: 'Chai',
-    manufacturer: 'PharmaCare',
-    countryOfOrigin: 'Việt Nam',
-    form: 'Siro',
-    specification: 'Chai 100ml',
-    shelfLife: '24 tháng',
-    ingredientHighlight: 'Công thức siro dịu họng mô phỏng cho nhóm ho cảm.',
-  },
-  {
-    slug: 'allergy-relief-10mg',
-    name: 'Allergy Relief 10mg',
-    subCategory: 'Dị ứng',
-    benefit: 'Hỗ trợ giảm triệu chứng dị ứng',
-    description:
-      'Dữ liệu mock dành cho thử nghiệm giao diện danh mục thuốc, không thay thế thông tin y khoa.',
-    shortDescription: 'Mô phỏng một lựa chọn thuộc nhóm thuốc dị ứng.',
-    price: 54000,
-    badge: 'Tiện dụng',
-    ingredients: ['Hoạt chất kháng histamine 10mg'],
-    usage: 'Tham khảo hướng dẫn hoặc tư vấn chuyên môn trước khi dùng.',
-    unit: 'Hộp',
-    manufacturer: 'GlobalMed',
-    countryOfOrigin: 'Ấn Độ',
-    form: 'Viên nén',
-    specification: 'Hộp 2 vỉ x 10 viên',
-    shelfLife: '36 tháng',
-    ingredientHighlight: 'Mỗi viên chứa hoạt chất kháng histamine 10mg.',
-  },
-])
+function slugify(value: string): string {
+  const base = value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60)
+  return base || 'san-pham'
+}
+
+function uniqueSlug(name: string): string {
+  const base = slugify(name)
+  let slug = base
+  let counter = 2
+  while (usedSlugs.has(slug)) {
+    slug = `${base}-${counter}`
+    counter += 1
+  }
+  usedSlugs.add(slug)
+  return slug
+}
+
+function deriveForm(name: string, unit: string): string {
+  const n = name.toLowerCase()
+  if (n.includes('siro') || n.includes('hỗn dịch') || n.includes('dung dịch') || n.includes('dầu')) {
+    return 'Dạng lỏng'
+  }
+  if (n.includes('viên sủi')) return 'Viên sủi'
+  if (n.includes('viên nang')) return 'Viên nang'
+  if (n.includes('viên') || n.includes('cốm')) return 'Viên/Cốm'
+  if (n.includes('kem') || n.includes('gel')) return 'Kem/Gel bôi'
+  if (n.includes('máy')) return 'Thiết bị điện tử'
+  if (n.includes('nhiệt kế')) return 'Thiết bị đo'
+  if (n.includes('que thử') || n.includes('combo')) return 'Que/Bộ thử'
+  if (n.includes('xịt')) return 'Dạng xịt'
+  if (n.includes('kim') || n.includes('gạc')) return 'Vật tư y tế'
+  return unit
+}
+
+function rowsToSeeds(rows: ProductRow[]): ProductSeed[] {
+  return rows.map(([name, price, unit, subCategory, manufacturer, specification, country], index) => {
+    const spec = specification ?? `1 ${unit}`
+    return {
+      slug: uniqueSlug(name),
+      name,
+      subCategory,
+      benefit: subCategory,
+      description:
+        `${name} thuộc nhóm ${subCategory}, thương hiệu ${manufacturer}. ` +
+        'Sản phẩm tham khảo từ danh mục nhà thuốc; vui lòng đọc kỹ hướng dẫn sử dụng ' +
+        'và hỏi ý kiến dược sĩ/bác sĩ trước khi dùng.',
+      shortDescription: `${subCategory} — ${manufacturer}. Quy cách: ${spec}.`,
+      price,
+      badge: 'Chính hãng',
+      ingredients: ['Xem chi tiết thành phần trên bao bì sản phẩm'],
+      usage: 'Dùng theo hướng dẫn trên bao bì hoặc theo tư vấn của dược sĩ/bác sĩ.',
+      unit,
+      manufacturer,
+      countryOfOrigin: country ?? 'Việt Nam',
+      form: deriveForm(name, unit),
+      specification: spec,
+      shelfLife: '24 tháng',
+      ingredientHighlight: `${name} — quy cách ${spec}.`,
+      rating: Number((4.5 + (index % 5) / 10).toFixed(1)),
+      reviewCount: 12 + (index % 40),
+      commentCount: 8 + (index % 30),
+    }
+  })
+}
+
+const SUPPLEMENT_ROWS: ProductRow[] = [
+  ['Viên uống bổ sung lợi khuẩn, D-mannose, việt quất Lactobact Intima', 685000, 'Hộp', 'Tiêu hóa', 'Lactobact', 'Hộp 30 viên', 'Đức'],
+  ['Cốm vi sinh bổ sung lợi khuẩn đường ruột Lacto Biomin Gold+ New', 149000, 'Hộp', 'Tiêu hóa', 'Biomin', 'Hộp 20 gói x 5g'],
+  ['Viên uống bổ gan tăng cường chức năng gan Kanzo Gold', 768000, 'Hộp', 'Gan mật', 'Kanzo', 'Hộp 60 viên'],
+  ['Viên uống tăng tuần hoàn não Hoạt Huyết Thông Mạch Gold TW3', 120000, 'Hộp', 'Tim mạch - Não', 'Foripharm', 'Hộp 3 vỉ x 10 viên'],
+  ['Viên uống bổ não, giảm rối loạn tiền đình Bổ Não Ích Trí Gold', 210000, 'Hộp', 'Tim mạch - Não', 'Ích Trí', 'Hộp 60 viên'],
+  ['Dung dịch hỗ trợ phát triển xương răng cho trẻ D3 Drops DAO Nordic Health', 270000, 'Hộp', 'Mẹ và bé', 'DAO Nordic Health', 'Hộp 10ml', 'Na Uy'],
+  ['Siro bổ sung lợi khuẩn cho hệ tiêu hóa Bio Plus Kenko', 560000, 'Hộp', 'Tiêu hóa', 'Kenko', 'Hộp 10 gói x 15g'],
+  ['Siro giảm ho, giảm đờm, đau họng Bổ Phế Lábebé', 75000, 'Hộp', 'Hô hấp', 'Lábebé', 'Hộp 120ml'],
+  ['Viên uống hỗ trợ tim mạch Omega 3 Power DAO Nordic Health', 264000, 'Hộp', 'Tim mạch - Não', 'DAO Nordic Health', 'Hộp 120 viên', 'Na Uy'],
+  ['Viên uống bổ sung canxi, tăng chiều cao cho trẻ NutriGrow Nutrimed', 480000, 'Hộp', 'Xương khớp - Chiều cao', 'Nutrimed', 'Hộp 60 viên'],
+  ['Viên uống bổ sung vitamin và khoáng chất Immuvita Easylife', 410000, 'Hộp', 'Vitamin - Khoáng chất', 'Easylife', 'Hộp 100 viên'],
+  ['Siro bổ sung canxi & vitamin D3, K2 Canxi-D3-K2 Kingphar', 115000, 'Hộp', 'Xương khớp - Chiều cao', 'Kingphar', 'Hộp 6 vỉ x 5 ống x 5ml'],
+  ['Siro bổ sung chất xơ, tăng đề kháng cho trẻ KID GROW Kenko', 480000, 'Hộp', 'Mẹ và bé', 'Kenko', 'Hộp 100ml'],
+  ['Viên uống Omega 3 hỗ trợ não, mắt, tim mạch OMEGA 3 PLUS Kenko', 736000, 'Hộp', 'Tim mạch - Não', 'Kenko', 'Hộp 120 viên'],
+  ['Viên uống tốt cho não và mắt Omexxel 3-6-9 Premium', 453000, 'Hộp', 'Vitamin - Khoáng chất', 'Excelife', 'Hộp 100 viên', 'Mỹ'],
+  ['Viên nhai tăng chiều cao, giảm còi xương Borne Mineral New Nordic', 635000, 'Hộp', 'Xương khớp - Chiều cao', 'New Nordic', 'Hộp 120 viên', 'Đan Mạch'],
+  ['Viên uống cho phụ nữ mang thai và cho con bú Brauer Ultra Pure DHA', 578000, 'Hộp', 'Mẹ và bé', 'Brauer', 'Hộp 60 viên', 'Úc'],
+  ['Viên sủi bổ sung vitamin Kudos Daily Vitamins Plus Biotin & Ginseng', 118000, 'Tuýp', 'Vitamin - Khoáng chất', 'Kudos', 'Tuýp 20 viên'],
+  ['Viên sủi bổ sung vitamin C Kudos Vitamin C 1000mg', 113000, 'Tuýp', 'Đề kháng', 'Kudos', 'Tuýp 20 viên'],
+  ['Viên uống cho phụ nữ mang thai và sau sinh Prenatal One Vitamins For Life', 660000, 'Hộp', 'Mẹ và bé', 'Vitamins For Life', 'Hộp 60 viên', 'Mỹ'],
+]
+
+const SKINCARE_ROWS: ProductRow[] = [
+  ['Nước tắm gội thảo dược cho bé Sachi 250ml', 139000, 'Chai', 'Chăm sóc cơ thể', 'Sachi', 'Chai 250ml'],
+  ['Dầu Mù U M.U.U 10ml', 55000, 'Chai', 'Chăm sóc cơ thể', 'M.U.U', 'Chai 10ml'],
+  ['Dung dịch vệ sinh phụ nữ dạng bọt Daily Lady Soft 100ml', 81750, 'Chai', 'Vệ sinh cá nhân', 'Daily Lady', 'Chai 100ml'],
+  ['Kem bôi dịu da, giảm kích ứng Dr.Ciccarelli S.O.S Pelle 25ml', 176000, 'Tuýp', 'Dưỡng & Serum', 'Dr.Ciccarelli', 'Tuýp 25ml', 'Ý'],
+  ['Dung dịch vệ sinh phụ nữ Saforelle Gentle Soothing 250ml', 235000, 'Chai', 'Vệ sinh cá nhân', 'Saforelle', 'Chai 250ml', 'Pháp'],
+  ['Dung dịch vệ sinh phụ nữ Saforelle Soin Lavant Doux 100ml', 132000, 'Chai', 'Vệ sinh cá nhân', 'Saforelle', 'Chai 100ml', 'Pháp'],
+  ['Gel giảm mụn CeraVe Blemish Control 15ml', 143000, 'Tuýp', 'Trị mụn', 'CeraVe', 'Tuýp 15ml', 'Mỹ'],
+  ['Kem chống nắng nâng tông Sắc Ngọc Khang SPF 50+ PA++++ 50g', 195000, 'Hộp', 'Chống nắng', 'Sắc Ngọc Khang', 'Hộp 50g'],
+  ['Tinh chất dưỡng ẩm, sáng da Pax Moly Blemish Care 30ml', 222000, 'Chai', 'Dưỡng & Serum', 'Pax Moly', 'Chai 30ml', 'Hàn Quốc'],
+  ['Dầu dừa tươi Raw Virgin Coconut Oil Cobote 50ml', 70000, 'Chai', 'Chăm sóc cơ thể', 'Cobote', 'Chai 50ml'],
+  ['Sữa rửa mặt thảo dược sáng da Sắc Ngọc Khang 100g', 85000, 'Tuýp', 'Làm sạch', 'Sắc Ngọc Khang', 'Tuýp 100g'],
+  ['Gel bôi Decumar Advance THC 20g', 105000, 'Tuýp', 'Trị mụn', 'Decumar', 'Tuýp 20g'],
+  ['Gel rửa mặt cho da dầu SVR Sebiaclear Moussant 200ml', 324000, 'Tuýp', 'Làm sạch', 'SVR', 'Tuýp 200ml', 'Pháp'],
+  ['Kem dưỡng trắng da 5 in 1 SPF25 Sắc Ngọc Khang HTP 30g', 295000, 'Hộp', 'Dưỡng & Serum', 'Sắc Ngọc Khang', 'Hộp 30g'],
+  ['Sữa rửa mặt ngừa mụn On:The Body Rice Heartleaf Acne Cleanser 150ml', 132000, 'Tuýp', 'Làm sạch', 'On:The Body', 'Tuýp 150ml', 'Hàn Quốc'],
+  ['Nước tẩy trang cho da mụn JMSolution Derma Care Centella 500ml', 147000, 'Chai', 'Làm sạch', 'JMSolution', 'Chai 500ml', 'Hàn Quốc'],
+  ['Nước tẩy trang JMSolution Water Luminous S.O.S Ringer 500ml', 147000, 'Chai', 'Làm sạch', 'JMSolution', 'Chai 500ml', 'Hàn Quốc'],
+  ['Gel tẩy tế bào chết Rosette Gommage Clear Peel 180g', 177000, 'Tuýp', 'Dưỡng & Serum', 'Rosette', 'Tuýp 180g', 'Nhật Bản'],
+  ['Kem chống nắng nâng tone Reihaku Hatomugi Tone Up UV SPF50+ 70g', 179000, 'Tuýp', 'Chống nắng', 'Hatomugi', 'Tuýp 70g', 'Nhật Bản'],
+  ['Sữa rửa mặt ngừa mụn Reihaku Hatomugi Acne Care 130g', 81750, 'Tuýp', 'Làm sạch', 'Hatomugi', 'Tuýp 130g', 'Nhật Bản'],
+]
+
+const DEVICE_ROWS: ProductRow[] = [
+  ['Nhiệt kế điện tử đo thân nhiệt Fuji DT007', 69000, 'Cái', 'Nhiệt kế', 'Fuji', 'Hộp 1 cái'],
+  ['Nhiệt kế hồng ngoại đo trán Yuwell YT-1C', 472000, 'Cái', 'Nhiệt kế', 'Yuwell', 'Hộp 1 cái', 'Trung Quốc'],
+  ['Máy đo huyết áp bắp tay Yuwell YE680B', 872000, 'Bộ', 'Máy đo huyết áp', 'Yuwell', 'Hộp 1 máy + vòng bít', 'Trung Quốc'],
+  ['Que thử rụng trứng Safefit test (7 cái)', 55000, 'Hộp', 'Que thử', 'Safefit', 'Hộp 7 que'],
+  ['Que thử thai Safefit Test dạng bút', 35000, 'Hộp', 'Que thử', 'Safefit', 'Hộp 1 bút'],
+  ['Que thử thai HCG Safefit', 13000, 'Hộp', 'Que thử', 'Safefit', 'Hộp 1 que'],
+  ['Que thử đường huyết Nipro Premier (25 que)', 205000, 'Hộp', 'Đo đường huyết', 'Nipro', 'Hộp 25 que'],
+  ['Combo que thử đường huyết Easy Max (25 cái) + máy đo', 699000, 'Bộ', 'Đo đường huyết', 'Easy Max', 'Hộp 1 máy + 25 que'],
+  ['Que thử thai Humasis Hello Baby+ dạng bút', 50000, 'Hộp', 'Que thử', 'Humasis', 'Hộp 1 bút', 'Hàn Quốc'],
+  ['Que thử đường huyết Easy Max (25 que)', 169000, 'Hộp', 'Đo đường huyết', 'Easy Max', 'Hộp 25 que'],
+  ['Máy đo huyết áp bắp tay Omron HEM 7120', 940000, 'Bộ', 'Máy đo huyết áp', 'Omron', 'Hộp 1 máy + vòng bít', 'Nhật Bản'],
+  ['Que thử thai HCG Allisa Traphaco', 15000, 'Hộp', 'Que thử', 'Traphaco', 'Hộp 1 que'],
+  ['Gạc răng miệng Sachi cho bé sơ sinh (30 gói)', 110000, 'Hộp', 'Dụng cụ - Vật tư', 'Sachi', 'Hộp 30 gói'],
+  ['Kim lấy máu Lancets Medicleen BL-28 (100 cái)', 32000, 'Hộp', 'Dụng cụ - Vật tư', 'Medicleen', 'Hộp 100 cái'],
+  ['Đầu kim tiểu đường 32G x 4mm Pic insupen (100 cái)', 200000, 'Hộp', 'Dụng cụ - Vật tư', 'Pic Solution', 'Hộp 100 cái', 'Ý'],
+  ['Nước muối sinh lý Fysoline Hypertonique (20 ống x 5ml)', 193000, 'Hộp', 'Xịt mũi - Vệ sinh', 'Fysoline', 'Hộp 20 ống x 5ml', 'Pháp'],
+  ['Xịt mũi nano bạc ion Fujisalt 70ml', 45000, 'Chai', 'Xịt mũi - Vệ sinh', 'Fujisalt', 'Chai 70ml'],
+  ['Xịt mũi trẻ em Otosan Nasal Spray Baby 20ml', 295000, 'Chai', 'Xịt mũi - Vệ sinh', 'Otosan', 'Chai 20ml', 'Ý'],
+  ['Kem bôi giảm đau Voltogel mass 50g', 119000, 'Tuýp', 'Dụng cụ - Vật tư', 'Voltogel', 'Tuýp 50g'],
+  ['Dầu gió khuynh diệp Eagle Brand 25ml', 109000, 'Chai', 'Dụng cụ - Vật tư', 'Eagle Brand', 'Chai 25ml', 'Singapore'],
+]
+
+const MEDICINE_ROWS: ProductRow[] = [
+  ['Thuốc Đại Tràng Trường Phúc', 105000, 'Hộp', 'Tiêu hóa - Gan mật', 'Trường Phúc', 'Hộp 60 viên'],
+  ['Thuốc Bổ Gan Trường Phúc', 99000, 'Hộp', 'Tiêu hóa - Gan mật', 'Trường Phúc', 'Hộp 60 viên'],
+  ['Viên mật nghệ Cholapan OPC', 49000, 'Hộp', 'Tiêu hóa - Gan mật', 'OPC', 'Hộp 5 vỉ x 10 viên'],
+  ['Thuốc Duphalac Abbott', 155000, 'Hộp', 'Tiêu hóa - Gan mật', 'Abbott', 'Hộp 20 gói x 15ml', 'Pháp'],
+  ['Thuốc bột pha hỗn dịch Smecta Ipsen', 51000, 'Hộp', 'Tiêu hóa - Gan mật', 'Ipsen', 'Hộp 30 gói', 'Pháp'],
+  ['Thuốc Boganic Forte Traphaco', 115000, 'Hộp', 'Tiêu hóa - Gan mật', 'Traphaco', 'Hộp 100 viên'],
+  ['Trà Gừng Traphaco', 14000, 'Hộp', 'Tiêu hóa - Gan mật', 'Traphaco', 'Hộp 20 gói'],
+  ['Thuốc chống say tàu xe Momvina Hadiphar', 91000, 'Hộp', 'Thần kinh', 'Hadiphar', 'Hộp 25 vỉ x 4 viên'],
+  ['Gel bôi da Klenzit MS điều trị mụn trứng cá', 72000, 'Tuýp', 'Trị mụn', 'Galderma', 'Tuýp 15g'],
+  ['Viên sủi Berocca bổ sung vitamin và khoáng chất', 195000, 'Tuýp', 'Bổ - Vitamin', 'Bayer', 'Tuýp 10 viên'],
+  ['Thuốc Farzincol Pharmedic điều trị thiếu kẽm', 45000, 'Hộp', 'Bổ - Vitamin', 'Pharmedic', 'Hộp 10 vỉ x 10 viên'],
+  ['Viên sủi Efferalgan 500mg giảm đau, hạ sốt', 72000, 'Hộp', 'Giảm đau - Hạ sốt', 'UPSA', 'Hộp 4 vỉ x 4 viên', 'Pháp'],
+  ['Thuốc Clorpheniramin 4mg DHG điều trị viêm mũi dị ứng', 28000, 'Hộp', 'Dị ứng', 'DHG Pharma', 'Hộp 10 vỉ x 20 viên'],
+  ['Men vi sinh Enterogermina 2 tỷ/5ml', 95000, 'Hộp', 'Tiêu hóa - Gan mật', 'Sanofi', 'Hộp 2 vỉ x 10 ống', 'Ý'],
+  ['Thuốc Telfast HD 180mg Sanofi', 132000, 'Hộp', 'Dị ứng', 'Sanofi', 'Hộp 1 vỉ x 10 viên'],
+  ['Viên nhai Kremil-S United điều trị đau dạ dày', 82000, 'Hộp', 'Tiêu hóa - Gan mật', 'United', 'Hộp 10 vỉ x 10 viên'],
+  ['Thuốc Eugica MEGA We care giảm ho, cảm', 60000, 'Hộp', 'Ho - Cảm', 'Mega We Care', 'Hộp 10 vỉ x 10 viên'],
+  ['Kem Differin Galderma điều trị mụn trứng cá', 320000, 'Tuýp', 'Trị mụn', 'Galderma', 'Tuýp 30g', 'Pháp'],
+  ['Hỗn dịch Gaviscon Dual Action trị trào ngược', 175000, 'Hộp', 'Tiêu hóa - Gan mật', 'Reckitt', 'Hộp 12 gói x 10ml', 'Anh'],
+  ['Thuốc ho Prospan Engelhard', 95000, 'Chai', 'Ho - Cảm', 'Engelhard', 'Chai 100ml', 'Đức'],
+]
+
+const supplementProducts = buildProducts('thuc-pham-chuc-nang', rowsToSeeds(SUPPLEMENT_ROWS))
+const skincareProducts = buildProducts('cham-soc-da', rowsToSeeds(SKINCARE_ROWS))
+const deviceProducts = buildProducts('thiet-bi-y-te', rowsToSeeds(DEVICE_ROWS))
+const medicineProducts = buildProducts('thuoc', rowsToSeeds(MEDICINE_ROWS))
 
 export const categoryNavItems = categoryNavItemSchema.array().parse(CATEGORY_CONFIG)
 export const products = productSchema.array().parse([

@@ -22,7 +22,17 @@ function getDatabaseUrl() {
   return url
 }
 
-const sql = globalThis.__nutrihome_sql__ ?? postgres(getDatabaseUrl(), { prepare: false })
+const sql =
+  globalThis.__nutrihome_sql__ ??
+  postgres(getDatabaseUrl(), {
+    // Supabase transaction pooler (cổng 6543) không hỗ trợ prepared statements.
+    prepare: false,
+    // Giới hạn connection mỗi instance serverless (Vercel) để không cạn pool.
+    max: 5,
+    // Trả connection rảnh về pool nhanh trên môi trường serverless.
+    idle_timeout: 20,
+    connect_timeout: 10,
+  })
 
 if (process.env.NODE_ENV !== 'production') {
   globalThis.__nutrihome_sql__ = sql

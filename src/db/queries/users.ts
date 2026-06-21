@@ -1,6 +1,8 @@
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { db } from '@/db/client'
 import { users, orders, orderItems } from '@/db/schema'
+
+export type UserRole = 'customer' | 'admin' | 'pharmacist'
 
 export async function getUserByEmail(email: string) {
   const result = await db.select().from(users).where(eq(users.email, email)).limit(1)
@@ -17,6 +19,44 @@ export async function createUser(data: {
   passwordHash: string
   fullName: string
   phone?: string
+}) {
+  const result = await db.insert(users).values(data).returning()
+  return result[0]!
+}
+
+/* ── Quản lý user (admin) ── */
+
+export async function listUsers() {
+  return db
+    .select({
+      id: users.id,
+      email: users.email,
+      fullName: users.fullName,
+      phone: users.phone,
+      role: users.role,
+      isActive: users.isActive,
+      emailVerified: users.emailVerified,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .orderBy(desc(users.createdAt))
+    .limit(500)
+}
+
+export async function updateUserRole(id: string, role: UserRole) {
+  await db.update(users).set({ role, updatedAt: new Date() }).where(eq(users.id, id))
+}
+
+export async function setUserActive(id: string, isActive: boolean) {
+  await db.update(users).set({ isActive, updatedAt: new Date() }).where(eq(users.id, id))
+}
+
+export async function createStaffUser(data: {
+  email: string
+  passwordHash: string
+  fullName: string
+  phone?: string
+  role: UserRole
 }) {
   const result = await db.insert(users).values(data).returning()
   return result[0]!

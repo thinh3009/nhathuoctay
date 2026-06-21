@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import type { Product } from '@/lib/schemas'
 import ProductCard from './ProductCard'
 
@@ -26,26 +26,6 @@ export default function RelatedProductsSection({ products }: RelatedProductsSect
       behavior: 'smooth',
     })
   }
-
-  useEffect(() => {
-    const track = trackRef.current
-
-    if (!track || products.length <= 1) {
-      return
-    }
-
-    const interval = window.setInterval(() => {
-      const maxScroll = track.scrollWidth - track.clientWidth
-      const nextLeft = track.scrollLeft + Math.max(track.clientWidth * 0.82, 260)
-
-      track.scrollTo({
-        left: nextLeft >= maxScroll ? 0 : nextLeft,
-        behavior: 'smooth',
-      })
-    }, 4800)
-
-    return () => window.clearInterval(interval)
-  }, [products.length])
 
   return (
     <section className="mt-8 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/60">
@@ -76,7 +56,7 @@ export default function RelatedProductsSection({ products }: RelatedProductsSect
       </div>
 
       <div
-        className="mt-6 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="mt-6 flex snap-x snap-proximity scroll-smooth gap-4 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         ref={trackRef}
       >
         {products.map((product) => (

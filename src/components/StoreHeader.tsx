@@ -144,6 +144,19 @@ function CategoryDrawer({
               </Link>
             )
           })}
+          <Link
+            className={`block rounded-2xl border border-stone-200 bg-stone-50 px-4 py-4 text-sm font-semibold text-stone-800 transition duration-300 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 ${
+              isOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+            }`}
+            href="/bai-viet"
+            onClick={onClose}
+            style={{ transitionDelay: `${CATEGORY_CONFIG.length * 45}ms` }}
+          >
+            <span className="block text-base">Tin tức</span>
+            <span className="mt-1 block text-xs font-medium leading-5 text-stone-500">
+              Bài viết &amp; cẩm nang sức khỏe
+            </span>
+          </Link>
         </nav>
       </aside>
     </div>
@@ -196,6 +209,12 @@ export default function StoreHeader({
                 🏥 Nhà thuốc 16 — Chính hãng, giao nhanh, dược sĩ tư vấn 24/7
               </p>
               <div className="flex shrink-0 items-center gap-2">
+                <Link
+                  className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white transition hover:bg-white/20"
+                  href="/bai-viet"
+                >
+                  Tin tức
+                </Link>
                 {user ? (
                   <Link
                     className="flex items-center gap-1.5 rounded-full bg-emerald-800 px-3 py-1 text-xs font-semibold text-emerald-100 transition hover:bg-emerald-700"
@@ -280,6 +299,12 @@ export default function StoreHeader({
                 </Link>
               )
             })}
+            <Link
+              className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
+              href="/bai-viet"
+            >
+              Tin tức
+            </Link>
           </div>
         </div>
       </header>

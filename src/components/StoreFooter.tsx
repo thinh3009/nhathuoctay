@@ -52,6 +52,12 @@ export default function StoreFooter() {
                   {cat.label}
                 </Link>
               ))}
+              <Link
+                className="block text-sm text-emerald-100/60 transition-colors hover:text-emerald-200"
+                href="/bai-viet"
+              >
+                Bài viết
+              </Link>
             </nav>
           </div>
 
