@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
 :root {
   color: #1f2937;
@@ -99,6 +100,50 @@ a {
 @keyframes floatY {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
+}
+
+/* ── Quầy thuốc 16 storefront ── */
+
+@keyframes qtToast {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes qtModal {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes qtFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.qt-prodcard:hover {
+  box-shadow: 0 8px 22px rgba(28, 122, 69, 0.12);
+  transform: translateY(-2px);
+}
+
+.qt-addbtn:hover {
+  background: #26864c;
+}
+
+.qt-card:hover {
+  box-shadow: 0 8px 22px rgba(28, 122, 69, 0.1);
+}
+
+.qt-root ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.qt-root ::-webkit-scrollbar-thumb {
+  background: #cfe0d6;
+  border-radius: 6px;
+}
+
+.qt-root input::placeholder {
+  color: #9aa8a0;
 }
 
 /* ── Animation utility classes ── */
