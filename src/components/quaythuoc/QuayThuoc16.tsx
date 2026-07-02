@@ -29,7 +29,6 @@ type State = {
   selected: string
   articleId: string
   cart: CartLine[]
-  variant: 'a' | 'b' | 'c'
   detailQty: number
   showRx: boolean
   rxName: string
@@ -49,7 +48,6 @@ const INITIAL: State = {
   selected: 't1',
   articleId: 'n1',
   cart: [],
-  variant: 'a',
   detailQty: 1,
   showRx: false,
   rxName: '',
@@ -167,7 +165,6 @@ export default function QuayThuoc16() {
   const toggleUse = (u: string) =>
     set({ uses: state.uses.includes(u) ? state.uses.filter((x) => x !== u) : state.uses.concat(u) })
   const setSort = (so: string) => set({ sort: so })
-  const setVariant = (v: 'a' | 'b' | 'c') => set({ variant: v })
   const detailInc = () => set({ detailQty: state.detailQty + 1 })
   const detailDec = () => set({ detailQty: Math.max(1, state.detailQty - 1) })
   const doSearch = () => {
@@ -288,16 +285,6 @@ export default function QuayThuoc16() {
     { icon: '🚚', title: 'Giao nhanh 2 giờ', desc: 'Nội thành TP.HCM' },
     { icon: '↩️', title: 'Đổi trả dễ dàng', desc: 'Trong vòng 7 ngày' },
   ]
-  const heroChips = ['Giảm đau, hạ sốt', 'Cảm cúm', 'Tiêu hóa', 'Vitamin C', 'Khẩu trang', 'Đo huyết áp'].map((l) => ({
-    label: l,
-    onClick: () => set({ query: l, screen: 'search' }),
-  }))
-  const variantBtns = ([{ k: 'a', l: 'Mẫu A' }, { k: 'b', l: 'Mẫu B' }, { k: 'c', l: 'Mẫu C' }] as { k: 'a' | 'b' | 'c'; l: string }[]).map((v) => ({
-    label: v.l,
-    onClick: () => setVariant(v.k),
-    style: chip(sst.variant === v.k),
-  }))
-
   const navLinks = [
     { label: 'Trang chủ', onClick: goHome, style: navStyle(sst.screen === 'home') },
     { label: 'Thuốc', onClick: () => goCatScreen('thuoc'), style: navStyle(sst.screen === 'category' && sst.cat === 'thuoc' && !sst.dealsOnly) },
@@ -484,20 +471,8 @@ export default function QuayThuoc16() {
         {/* ============ HOME ============ */}
         {sst.screen === 'home' ? (
           <div>
-            {/* variant switcher */}
-            <div style={s('max-width:1180px;margin:18px auto 0;padding:0 24px;width:100%;display:flex;align-items:center;gap:10px')}>
-              <span style={s('font-size:13px;color:#8a948e;font-weight:600')}>Mẫu trang chủ:</span>
-              {variantBtns.map((v, i) => (
-                <button key={i} onClick={v.onClick} style={v.style}>
-                  {v.label}
-                </button>
-              ))}
-              <span style={s('font-size:12px;color:#b0bbb4;margin-left:6px')}>Bấm để xem các phương án bố cục trang chủ</span>
-            </div>
-
             {/* HERO A */}
-            {sst.variant === 'a' ? (
-              <div style={s('max-width:1180px;margin:16px auto 0;padding:0 24px;width:100%')}>
+            <div style={s('max-width:1180px;margin:16px auto 0;padding:0 24px;width:100%')}>
                 <div style={s('background:#eaf7ef;border-radius:22px;padding:48px 52px;display:flex;align-items:center;gap:40px;overflow:hidden')}>
                   <div style={s('flex:1;min-width:0')}>
                     <div style={s('display:inline-block;background:#fff;color:#1c7a45;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:20px;margin-bottom:16px')}>Nhà thuốc trực tuyến · Chính hãng 100%</div>
@@ -524,62 +499,6 @@ export default function QuayThuoc16() {
                   </div>
                 </div>
               </div>
-            ) : null}
-
-            {/* HERO B */}
-            {sst.variant === 'b' ? (
-              <div style={s('max-width:1180px;margin:16px auto 0;padding:0 24px;width:100%')}>
-                <div style={s('background:#14532d;border-radius:22px;padding:54px 40px;text-align:center;color:#fff')}>
-                  <h1 style={s('font-size:38px;font-weight:800;margin:0 0 10px')}>Bạn cần tìm thuốc gì hôm nay?</h1>
-                  <p style={s('font-size:15.5px;color:#bfe6cd;margin:0 0 26px')}>Nhập tên thuốc hoặc triệu chứng — dược sĩ sẽ hỗ trợ bạn ngay</p>
-                  <div style={s('max-width:620px;margin:0 auto;display:flex;background:#fff;border-radius:14px;padding:6px;gap:6px')}>
-                    <input value={sst.query} onChange={(e) => set({ query: e.target.value })} onKeyDown={onQueryKey} placeholder="Ví dụ: paracetamol, đau đầu, vitamin C..." style={s('flex:1;border:none;outline:none;padding:14px 16px;font-size:15px;background:transparent')} />
-                    <button onClick={doSearch} style={s('background:#2e9e5b;color:#fff;border:none;padding:0 30px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer')}>Tìm kiếm</button>
-                  </div>
-                  <div style={s('display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:18px')}>
-                    {heroChips.map((c, i) => (
-                      <button key={i} onClick={c.onClick} style={s('background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);color:#eafff1;padding:7px 15px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer')}>{c.label}</button>
-                    ))}
-                  </div>
-                  <div style={s('display:flex;gap:14px;justify-content:center;margin-top:26px;flex-wrap:wrap')}>
-                    <div onClick={openRx} style={s('background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:16px 22px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left')}><span style={s('font-size:24px')}>📋</span><div><div style={s('font-weight:700;font-size:14.5px')}>Đặt thuốc theo toa</div><div style={s('font-size:12px;color:#bfe6cd')}>Chụp toa, nhận thuốc tận nhà</div></div></div>
-                    <div onClick={openRx} style={s('background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:16px 22px;cursor:pointer;display:flex;align-items:center;gap:12px;text-align:left')}><span style={s('font-size:24px')}>💬</span><div><div style={s('font-weight:700;font-size:14.5px')}>Tư vấn dược sĩ</div><div style={s('font-size:12px;color:#bfe6cd')}>Miễn phí, phản hồi trong 5 phút</div></div></div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {/* HERO C */}
-            {sst.variant === 'c' ? (
-              <div style={s('max-width:1180px;margin:16px auto 0;padding:0 24px;width:100%')}>
-                <div style={s('display:grid;grid-template-columns:1fr 1fr;gap:24px')}>
-                  <div style={s('background:#fff;border:1px solid #e7efe9;border-radius:22px;padding:42px')}>
-                    <h1 style={s('font-size:34px;line-height:1.15;font-weight:800;color:#14532d;margin:0 0 14px')}>
-                      Nhà thuốc của
-                      <br />
-                      gia đình Việt
-                    </h1>
-                    <p style={s('font-size:15px;color:#4a564e;margin:0 0 24px;line-height:1.6')}>Chọn mua theo nhu cầu sức khỏe của bạn. Sản phẩm chính hãng, tư vấn bởi dược sĩ giàu kinh nghiệm.</p>
-                    <div style={s('display:grid;grid-template-columns:1fr 1fr;gap:12px')}>
-                      {trustBadges.map((t, i) => (
-                        <div key={i} style={s('display:flex;align-items:center;gap:10px')}>
-                          <div style={s('width:34px;height:34px;background:#eaf6ef;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#2e9e5b;font-size:15px;flex-shrink:0')}>{t.icon}</div>
-                          <div style={s('font-size:13px;font-weight:600;color:#2a352e')}>{t.title}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div style={s('display:grid;grid-template-rows:1fr 1fr;gap:16px')}>
-                    <div onClick={() => goCatScreen('thuoc')} style={s('background:#e8f6ee;border-radius:18px;padding:26px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between')}><div style={s('font-size:13px;font-weight:600;color:#2e9e5b')}>Mua nhiều nhất</div><div><div style={s('font-size:22px;font-weight:800;color:#14532d')}>Thuốc thiết yếu</div><div style={s('font-size:13px;color:#5a8a6e')}>Giảm đau, cảm cúm, tiêu hóa →</div></div></div>
-                    <div style={s('display:grid;grid-template-columns:1fr 1fr;gap:16px')}>
-                      <div onClick={() => goCatScreen('tpcn')} style={s('background:#fff1e3;border-radius:18px;padding:22px;cursor:pointer')}><div style={s('font-size:18px;font-weight:800;color:#8a4a12')}>TPCN</div><div style={s('font-size:12.5px;color:#b07a3a;margin-top:4px')}>Vitamin & bổ sung →</div></div>
-                      <div onClick={() => goCatScreen('thietbi')} style={s('background:#e9f0fb;border-radius:18px;padding:22px;cursor:pointer')}><div style={s('font-size:18px;font-weight:800;color:#1d4e9a;line-height:1.15')}>Thiết bị y tế</div><div style={s('font-size:12.5px;color:#5a7bb5;margin-top:4px')}>Đo, theo dõi →</div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
             {/* category cards */}
             <div style={s('max-width:1180px;margin:46px auto 0;padding:0 24px;width:100%')}>
               <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0 0 18px')}>Danh mục sản phẩm</h2>
