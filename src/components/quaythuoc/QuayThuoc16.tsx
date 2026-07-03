@@ -138,6 +138,20 @@ export default function QuayThuoc16({
     }))
   }, [])
 
+  // Drawer bộ lọc mobile: khóa cuộn nền + đóng bằng phím Escape (chuẩn a11y).
+  useEffect(() => {
+    if (!mobileFilter) return
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileFilter(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [mobileFilter])
+
   const toastMsg = (m: string) => setState((prev) => ({ ...prev, toast: m, toastSeq: prev.toastSeq + 1 }))
 
   const goHome = () => {
