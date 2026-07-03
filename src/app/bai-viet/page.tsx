@@ -5,6 +5,9 @@ import StoreFooter from '@/components/StoreFooter'
 import StoreHeader from '@/components/StoreHeader'
 import { getServerCartCount } from '@/lib/cart'
 
+// Render theo từng request (không prerender lúc build) để build không cần DB.
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Bài viết sức khỏe',
   description: 'Tin tức, cẩm nang dùng thuốc và chăm sóc sức khỏe từ nhà thuốc.',

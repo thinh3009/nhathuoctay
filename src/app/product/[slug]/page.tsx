@@ -10,6 +10,9 @@ import StoreHeader from '@/components/StoreHeader'
 import { getServerCartCount } from '@/lib/cart'
 import type { Product } from '@/lib/schemas'
 
+// Render theo từng request (không prerender lúc build) để build không cần DB.
+export const dynamic = 'force-dynamic'
+
 // Khối "sản phẩm liên quan" tự truy vấn DB riêng và được stream qua Suspense,
 // để phần thông tin sản phẩm chính (hero + đánh giá) hiện trước, không phải chờ.
 async function RelatedProducts({ product }: { product: Product }) {

@@ -10,6 +10,9 @@ import StoreHeader from '@/components/StoreHeader'
 import { commitments } from '@/lib/catalog'
 import { getServerCartCount } from '@/lib/cart'
 
+// Render theo từng request (không prerender lúc build) để build không cần DB.
+export const dynamic = 'force-dynamic'
+
 type CategoryPageProps = {
   params: Promise<{
     categorySlug: string

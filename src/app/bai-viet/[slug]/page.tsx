@@ -7,6 +7,9 @@ import StoreFooter from '@/components/StoreFooter'
 import StoreHeader from '@/components/StoreHeader'
 import { getServerCartCount } from '@/lib/cart'
 
+// Render theo từng request (không prerender lúc build) để build không cần DB.
+export const dynamic = 'force-dynamic'
+
 type ArticlePageProps = {
   params: Promise<{ slug: string }>
 }
