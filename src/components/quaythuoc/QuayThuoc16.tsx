@@ -1,10 +1,12 @@
 'use client'
 
 import { type CSSProperties, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import AuthMenu from '@/components/AuthMenu'
 import ProductCard, { type CardVM } from './ProductCard'
 import {
   type Cat,
+  type NewsArticle,
   type Product,
   catLabel,
   fmt,
@@ -83,9 +85,18 @@ function genOrderCode(): string {
   return 'QT16-' + Math.floor(100000 + Math.random() * 900000)
 }
 
-export default function QuayThuoc16({ products: productsProp }: { products?: Product[] }) {
+export default function QuayThuoc16({
+  products: productsProp,
+  news: newsProp,
+}: {
+  products?: Product[]
+  news?: NewsArticle[]
+}) {
+  const router = useRouter()
   // Dùng sản phẩm từ DB nếu có, fallback dữ liệu tĩnh khi rỗng.
   const products = productsProp && productsProp.length > 0 ? productsProp : staticProducts
+  // Tin tức từ DB nếu có, fallback dữ liệu tĩnh khi rỗng.
+  const news = newsProp && newsProp.length > 0 ? newsProp : newsData
   const get = (id: string): Product => products.find((p) => p.id === id) ?? products[0]!
 
   const [state, setState] = useState<State>(INITIAL)
@@ -132,10 +143,8 @@ export default function QuayThuoc16({ products: productsProp }: { products?: Pro
     set({ screen: 'news' })
     top()
   }
-  const openArticle = (id: string) => {
-    set({ screen: 'article', articleId: id })
-    top()
-  }
+  // Mở bài viết thật (trang /bai-viet/[slug]) thay vì màn hình bài viết trong SPA.
+  const openArticle = (slug: string) => router.push(`/bai-viet/${slug}`)
 
   const cartCount = () => state.cart.reduce((a, c) => a + c.qty, 0)
 
@@ -223,20 +232,26 @@ export default function QuayThuoc16({ products: productsProp }: { products?: Pro
   const sst = state
   const cc = cartCount()
   const sel = get(sst.selected)
-  const byId = (ids: string[]) => ids.map((id) => cardVM(get(id)))
-  const bestSellers = byId(['t10', 't9', 't5', 's5', 'd2', 't1', 'd4']).slice(0, 5)
-  const supps = byId(['s1', 's5', 's3', 's2', 's7'])
-  const devices = byId(['d1', 'd2', 'd4', 'd6', 'd5'])
-  const skincare = byId(['k1', 'k2', 'k3', 'k5', 'k6'])
+  // Các section trang chủ lấy từ sản phẩm DB thật (theo danh mục / lượt đánh giá).
+  const topByCat = (c: Cat, n: number) =>
+    products.filter((p) => p.cat === c).sort((a, b) => b.reviews - a.reviews).slice(0, n).map(cardVM)
+  const bestSellers = products
+    .slice()
+    .sort((a, b) => b.reviews - a.reviews)
+    .slice(0, 5)
+    .map(cardVM)
+  const supps = topByCat('tpcn', 5)
+  const devices = topByCat('thietbi', 5)
+  const skincare = topByCat('skincare', 5)
 
-  const newsVM = (a: (typeof newsData)[number], i: number) => {
+  const newsVM = (a: NewsArticle, i: number) => {
     const c = palette[i % palette.length]!
     return { ...a, tintBg: c[0], tintFg: c[1], onClick: () => openArticle(a.id) }
   }
-  const newsHome = newsData.slice(0, 3).map(newsVM)
-  const newsList = newsData.map(newsVM)
-  const art = newsData.find((a) => a.id === sst.articleId) ?? newsData[0]!
-  const ac = palette[newsData.indexOf(art) % palette.length]!
+  const newsHome = news.slice(0, 3).map(newsVM)
+  const newsList = news.map(newsVM)
+  const art = news.find((a) => a.id === sst.articleId) ?? news[0]!
+  const ac = palette[news.indexOf(art) % palette.length]!
   const article = {
     tag: art.tag,
     title: art.title,
@@ -256,7 +271,8 @@ export default function QuayThuoc16({ products: productsProp }: { products?: Pro
     { tag: 'Tiêu hóa', title: 'Combo tiêu hóa khỏe mạnh', ids: ['t5', 's4', 't7'], items: ['Berberin Mekophar', 'Men vi sinh Probio', 'Oresol bù điện giải'] },
     { tag: 'Người lớn tuổi', title: 'Combo chăm sóc sức khỏe', ids: ['d1', 's1', 's2'], items: ['Máy đo huyết áp Omron', 'Dầu cá Omega-3', 'Canxi Corbiere'] },
   ].map((k) => {
-    const sum = k.ids.reduce((a, id) => a + get(id).price, 0)
+    // Combo là nội dung demo (tên cố định) → tính giá theo dữ liệu tĩnh tương ứng.
+    const sum = k.ids.reduce((a, id) => a + (staticProducts.find((p) => p.id === id) ?? staticProducts[0]!).price, 0)
     const price = Math.round((sum * 0.85) / 1000) * 1000
     return {
       tag: k.tag,

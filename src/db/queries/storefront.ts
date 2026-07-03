@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../client'
 import { products as productsTable } from '../schema'
-import type { Cat, Product } from '@/components/quaythuoc/data'
+import { listPublishedArticles } from './articles'
+import type { Cat, NewsArticle, Product } from '@/components/quaythuoc/data'
 
 // Map slug danh mục trong DB → enum `cat` mà storefront trang chủ dùng.
 const CATEGORY_TO_CAT: Record<string, Cat> = {
@@ -32,5 +33,19 @@ export async function getStorefrontProducts(): Promise<Product[]> {
     reviews: row.reviewCount,
     unit: row.unit,
     badge: row.badge || undefined,
+  }))
+}
+
+// Lấy bài viết đã đăng từ DB, map sang shape tin tức của trang chủ (QuayThuoc16).
+// `id` = slug để trang chủ điều hướng sang /bai-viet/[slug].
+export async function getStorefrontNews(): Promise<NewsArticle[]> {
+  const rows = await listPublishedArticles()
+
+  return rows.map((row) => ({
+    id: row.slug,
+    tag: row.category,
+    title: row.title,
+    date: row.publishedAt ? new Date(row.publishedAt).toLocaleDateString('vi-VN') : '',
+    excerpt: row.excerpt,
   }))
 }

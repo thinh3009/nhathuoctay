@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import QuayThuoc16 from '@/components/quaythuoc/QuayThuoc16'
-import { getStorefrontProducts } from '@/db/queries/storefront'
+import { getStorefrontProducts, getStorefrontNews } from '@/db/queries/storefront'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
 // ISR: cache HTML trang chủ, tự làm mới mỗi 60s. Khi admin thêm/sửa sản phẩm,
@@ -25,6 +25,6 @@ export const metadata: Metadata = {
 }
 
 export default async function LandingPage() {
-  const products = await getStorefrontProducts()
-  return <QuayThuoc16 products={products} />
+  const [products, news] = await Promise.all([getStorefrontProducts(), getStorefrontNews()])
+  return <QuayThuoc16 products={products} news={news} />
 }
