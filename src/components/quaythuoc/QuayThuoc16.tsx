@@ -117,6 +117,22 @@ export default function QuayThuoc16({
     return () => clearTimeout(id)
   }, [state.toastSeq, state.toast])
 
+  // Nhận param từ SiteHeader ở các trang khác: ?q= mở màn tìm kiếm, ?rx=1 mở modal toa.
+  // Dùng window.location để không cần useSearchParams (giữ trang chủ render tĩnh/ISR).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const q = params.get('q')
+    const rx = params.get('rx')
+    if (!q && !rx) return
+    // Đọc param URL một lần khi mount (init từ hệ thống bên ngoài — cố ý).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setState((prev) => ({
+      ...prev,
+      ...(q ? { query: q, screen: 'search' as const } : {}),
+      ...(rx ? { showRx: true } : {}),
+    }))
+  }, [])
+
   const toastMsg = (m: string) => setState((prev) => ({ ...prev, toast: m, toastSeq: prev.toastSeq + 1 }))
 
   const goHome = () => {

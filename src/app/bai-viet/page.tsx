@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { listPublishedArticles } from '@/db/queries/articles'
-import StoreFooter from '@/components/StoreFooter'
-import StoreHeader from '@/components/StoreHeader'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
 
 // Render theo từng request (không prerender lúc build) để build không cần DB.
@@ -24,11 +24,11 @@ export default async function BlogPage() {
   ])
 
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
-      <div className="mx-auto max-w-5xl">
-        <StoreHeader cartCount={cartCount} />
+    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+      <SiteHeader activeCategorySlug="" cartCount={cartCount} />
 
-        <header className="mt-6">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+        <header>
           <h1 className="text-3xl font-black text-stone-900">Bài viết sức khỏe</h1>
           <p className="mt-1 text-stone-500">
             Tin tức, cẩm nang dùng thuốc và chăm sóc sức khỏe từ nhà thuốc.
@@ -80,9 +80,9 @@ export default async function BlogPage() {
             ))}
           </div>
         )}
+      </main>
 
-        <StoreFooter />
-      </div>
-    </main>
+      <SiteFooter />
+    </div>
   )
 }

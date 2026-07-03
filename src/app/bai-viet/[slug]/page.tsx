@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPublishedArticleBySlug } from '@/db/queries/articles'
 import MarkdownContent from '@/components/MarkdownContent'
-import StoreFooter from '@/components/StoreFooter'
-import StoreHeader from '@/components/StoreHeader'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
 
 // Render theo từng request (không prerender lúc build) để build không cần DB.
@@ -35,11 +35,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
-      <div className="mx-auto max-w-3xl">
-        <StoreHeader cartCount={cartCount} />
+    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+      <SiteHeader activeCategorySlug="" cartCount={cartCount} />
 
-        <div className="mt-6">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
+        <div>
           <Link className="text-sm font-semibold text-emerald-700 hover:text-emerald-800" href="/bai-viet">
             ← Tất cả bài viết
           </Link>
@@ -70,9 +70,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <MarkdownContent>{article.content}</MarkdownContent>
           </div>
         </article>
+      </main>
 
-        <StoreFooter />
-      </div>
-    </main>
+      <SiteFooter />
+    </div>
   )
 }

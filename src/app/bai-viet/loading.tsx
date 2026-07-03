@@ -1,13 +1,20 @@
 // Skeleton cho trang danh sách bài viết trong lúc tải từ DB.
 export default function ArticlesLoading() {
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
-      <div className="mx-auto max-w-5xl animate-pulse">
-        {/* Header */}
-        <div className="h-28 rounded-[24px] bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-600 opacity-70" />
+    <div className="min-h-screen bg-[#f6faf7] text-stone-900">
+      {/* Header (khớp SiteHeader) */}
+      <div className="h-8 bg-[#14532d]" />
+      <div className="border-b border-stone-100 bg-white">
+        <div className="mx-auto flex h-16 max-w-[1180px] animate-pulse items-center gap-4 px-6">
+          <div className="h-10 w-40 rounded bg-stone-100" />
+          <div className="h-10 flex-1 rounded-xl bg-stone-100" />
+          <div className="h-9 w-24 rounded bg-stone-100" />
+        </div>
+      </div>
 
+      <div className="mx-auto max-w-5xl animate-pulse px-4 py-8">
         {/* Tiêu đề */}
-        <div className="mt-8 h-8 w-64 rounded bg-stone-200" />
+        <div className="h-8 w-64 rounded bg-stone-200" />
         <div className="mt-2 h-4 w-80 rounded bg-stone-100" />
 
         {/* Danh sách bài viết */}
@@ -24,6 +31,6 @@ export default function ArticlesLoading() {
           ))}
         </div>
       </div>
-    </main>
+    </div>
   )
 }
