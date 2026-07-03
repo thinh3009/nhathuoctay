@@ -4,13 +4,16 @@ import { db } from '@/db/client'
 import { products, categories } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { requireAdmin } from '@/lib/auth'
 
 async function updateProduct(id: string, formData: FormData) {
   'use server'
+  await requireAdmin()
 
+  const categorySlug = formData.get('categorySlug') as string
   await db.update(products).set({
     name: formData.get('name') as string,
-    categorySlug: formData.get('categorySlug') as string,
+    categorySlug,
     subCategory: formData.get('subCategory') as string,
     benefit: formData.get('benefit') as string,
     shortDescription: formData.get('shortDescription') as string,
@@ -28,6 +31,8 @@ async function updateProduct(id: string, formData: FormData) {
   }).where(eq(products.id, id))
 
   revalidatePath('/admin/products')
+  revalidatePath('/') // trang chủ (ISR) cập nhật ngay
+  revalidatePath(`/category/${categorySlug}`)
   redirect('/admin/products')
 }
 

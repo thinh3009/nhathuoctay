@@ -3,8 +3,9 @@ import QuayThuoc16 from '@/components/quaythuoc/QuayThuoc16'
 import { getStorefrontProducts } from '@/db/queries/storefront'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
-// Luôn đọc sản phẩm mới nhất từ DB (sản phẩm admin thêm hiện ngay).
-export const dynamic = 'force-dynamic'
+// ISR: cache HTML trang chủ, tự làm mới mỗi 60s. Khi admin thêm/sửa sản phẩm,
+// action gọi revalidatePath('/') nên sản phẩm mới hiện ngay lập tức.
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Quầy thuốc 16 — Nhà thuốc trực tuyến chính hãng',

@@ -3,9 +3,11 @@ import { db } from '@/db/client'
 import { categories } from '@/db/schema'
 import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
+import { requireAdmin } from '@/lib/auth'
 
 async function createCategory(formData: FormData) {
   'use server'
+  await requireAdmin()
   const label = formData.get('label') as string
   const slug = formData.get('slug') as string
   const heroTitle = formData.get('heroTitle') as string

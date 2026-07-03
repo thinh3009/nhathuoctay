@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { db } from '@/db/client'
 import { products, categories } from '@/db/schema'
 import { revalidatePath } from 'next/cache'
+import { requireAdmin } from '@/lib/auth'
 
 async function getCategories() {
   return db.select({ slug: categories.slug, label: categories.label }).from(categories)
@@ -10,6 +11,7 @@ async function getCategories() {
 
 async function createProduct(formData: FormData) {
   'use server'
+  await requireAdmin()
 
   const name = formData.get('name') as string
   const slug = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -51,6 +53,8 @@ async function createProduct(formData: FormData) {
   })
 
   revalidatePath('/admin/products')
+  revalidatePath('/') // trang chủ (ISR) hiển thị sản phẩm mới ngay
+  revalidatePath(`/category/${categorySlug}`)
   redirect('/admin/products')
 }
 
