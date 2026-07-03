@@ -100,6 +100,11 @@ export default function QuayThuoc16({
   const get = (id: string): Product => products.find((p) => p.id === id) ?? products[0]!
 
   const [state, setState] = useState<State>(INITIAL)
+  // Drawer bộ lọc trên mobile (màn hình danh mục)
+  const [mobileFilter, setMobileFilter] = useState(false)
+  // Header mobile: mở ô tìm kiếm / menu 3 mục
+  const [mobSearch, setMobSearch] = useState(false)
+  const [mobMenu, setMobMenu] = useState(false)
 
   const set = (patch: Partial<State>) => setState((prev) => ({ ...prev, ...patch }))
   const top = () => {
@@ -446,16 +451,16 @@ export default function QuayThuoc16({
     <div className="qt-root" style={s("font-family:'Be Vietnam Pro',system-ui,sans-serif;background:#f6faf7;color:#1f2a24;min-height:100vh;display:flex;flex-direction:column")}>
       {/* ============ HEADER ============ */}
       <div style={s('background:#14532d;color:#cdeed8;font-size:12.5px')}>
-        <div style={s('max-width:1180px;margin:0 auto;padding:7px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%')}>
+        <div className="qt-topstrip" style={s('max-width:1180px;margin:0 auto;padding:7px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%')}>
           <span>Tận tâm, tận lòng · Giao nhanh trong 2 giờ nội thành</span>
           <span style={s('display:flex;gap:18px')}>
             <span>Hotline: 1900 16 16</span>
-            <span>Theo dõi đơn hàng</span>
+            <span className="qt-hide-mobile-inline">Theo dõi đơn hàng</span>
           </span>
         </div>
       </div>
       <header style={s('position:sticky;top:0;z-index:30;background:#fff;box-shadow:0 1px 0 #e4ece7')}>
-        <div style={s('max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:22px;width:100%')}>
+        <div className="qt-hrow" style={s('max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:22px;width:100%')}>
           <div onClick={goHome} style={s('display:flex;align-items:center;gap:11px;cursor:pointer;flex-shrink:0')}>
             <div style={s('width:42px;height:42px;background:#2e9e5b;border-radius:12px;position:relative;flex-shrink:0')}>
               <div style={s('position:absolute;left:38%;top:20%;width:24%;height:60%;background:#fff;border-radius:4px')} />
@@ -468,7 +473,7 @@ export default function QuayThuoc16({
               <div style={s('font-size:11px;color:#8a948e;font-weight:500')}>Tận tâm, tận lòng</div>
             </div>
           </div>
-          <div style={s('flex:1;display:flex;align-items:center;background:#f1f6f3;border:1.5px solid #e0ebe4;border-radius:12px;padding:0 6px 0 14px;max-width:560px')}>
+          <div className="qt-search-full" style={s('flex:1;display:flex;align-items:center;background:#f1f6f3;border:1.5px solid #e0ebe4;border-radius:12px;padding:0 6px 0 14px;max-width:560px')}>
             <span style={s('color:#8a948e;font-size:16px')}>⌕</span>
             <input
               value={sst.query}
@@ -481,21 +486,53 @@ export default function QuayThuoc16({
               Tìm
             </button>
           </div>
-          <button onClick={openRx} style={s('display:flex;align-items:center;gap:7px;border:1.5px solid #2e9e5b;background:#fff;color:#1c7a45;padding:9px 14px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;flex-shrink:0')}>
-            📋 Đặt thuốc theo toa
-          </button>
-          <button onClick={goCart} style={s('position:relative;display:flex;align-items:center;gap:8px;background:#eaf6ef;border:none;color:#14532d;padding:9px 15px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;flex-shrink:0')}>
-            <span style={s('font-size:17px')}>🛒</span> Giỏ hàng
-            {cc > 0 ? (
-              <span style={s('position:absolute;top:-6px;right:-6px;background:#e8654e;color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:11px;display:flex;align-items:center;justify-content:center;padding:0 5px')}>{cc}</span>
-            ) : null}
-          </button>
-          <AuthMenu variant="light" />
+          <div className="qt-hactions" style={s('display:flex;align-items:center;gap:14px')}>
+            <button onClick={openRx} style={s('display:flex;align-items:center;gap:7px;border:1.5px solid #2e9e5b;background:#fff;color:#1c7a45;padding:9px 14px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;flex-shrink:0')}>
+              📋 Đặt thuốc theo toa
+            </button>
+            <button onClick={goCart} style={s('position:relative;display:flex;align-items:center;gap:8px;background:#eaf6ef;border:none;color:#14532d;padding:9px 15px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;flex-shrink:0')}>
+              <span style={s('font-size:17px')}>🛒</span> Giỏ hàng
+              {cc > 0 ? (
+                <span style={s('position:absolute;top:-6px;right:-6px;background:#e8654e;color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:11px;display:flex;align-items:center;justify-content:center;padding:0 5px')}>{cc}</span>
+              ) : null}
+            </button>
+            <AuthMenu variant="light" />
+          </div>
+          {/* Icon mobile: tìm kiếm + menu */}
+          <div className="qt-hmobile" style={s('align-items:center;gap:8px;margin-left:auto')}>
+            <button aria-label="Tìm kiếm" onClick={() => { setMobSearch((v) => !v); setMobMenu(false) }} style={s('display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1.5px solid #e0ebe4;background:#f1f6f3;border-radius:11px;font-size:18px;cursor:pointer;color:#1c7a45')}>⌕</button>
+            <button aria-label="Giỏ hàng" onClick={goCart} style={s('position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;background:#eaf6ef;border-radius:11px;font-size:18px;cursor:pointer')}>🛒{cc > 0 ? (<span style={s('position:absolute;top:-5px;right:-5px;background:#e8654e;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 4px')}>{cc}</span>) : null}</button>
+            <button aria-label="Menu" onClick={() => { setMobMenu((v) => !v); setMobSearch(false) }} style={s('display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1.5px solid #e0ebe4;background:#f1f6f3;border-radius:11px;font-size:18px;cursor:pointer;color:#14532d')}>☰</button>
+          </div>
         </div>
+
+        {/* Ô tìm kiếm mở trên mobile */}
+        {mobSearch ? (
+          <div className="qt-msearch" style={s('padding:0 16px 12px;display:flex;gap:8px')}>
+            <input
+              value={sst.query}
+              onChange={(e) => set({ query: e.target.value })}
+              onKeyDown={onQueryKey}
+              placeholder="Tìm thuốc, TPCN, thiết bị y tế..."
+              style={s('flex:1;border:1.5px solid #e0ebe4;background:#f1f6f3;border-radius:11px;outline:none;padding:11px 14px;font-size:14px;color:#1f2a24')}
+            />
+            <button onClick={() => { doSearch(); setMobSearch(false) }} style={s('border:none;background:#2e9e5b;color:#fff;padding:0 18px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer')}>Tìm</button>
+          </div>
+        ) : null}
+
+        {/* Menu 3 mục mở trên mobile */}
+        {mobMenu ? (
+          <div className="qt-mmenu" style={s('padding:0 16px 14px;display:flex;flex-direction:column;gap:8px')}>
+            <button onClick={() => { openRx(); setMobMenu(false) }} style={s('display:flex;align-items:center;gap:9px;border:1.5px solid #2e9e5b;background:#fff;color:#1c7a45;padding:12px 14px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;text-align:left')}>📋 Đặt thuốc theo toa</button>
+            <button onClick={() => { goCart(); setMobMenu(false) }} style={s('display:flex;align-items:center;gap:9px;background:#eaf6ef;color:#14532d;border:none;padding:12px 14px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;text-align:left')}>🛒 Giỏ hàng{cc > 0 ? ` (${cc})` : ''}</button>
+            <div onClick={() => setMobMenu(false)}><AuthMenu variant="light" /></div>
+          </div>
+        ) : null}
+
         <nav style={s('border-top:1px solid #eef3f0')}>
-          <div style={s('max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:26px;width:100%')}>
+          <div className="qt-nav-inner" style={s('max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:26px;width:100%;overflow-x:auto')}>
             {navLinks.map((n, i) => (
-              <div key={i} onClick={n.onClick} style={n.style}>
+              <div key={i} onClick={n.onClick} style={{ ...n.style, whiteSpace: 'nowrap' }}>
                 {n.label}
               </div>
             ))}
@@ -506,10 +543,10 @@ export default function QuayThuoc16({
       <main style={s('flex:1')}>
         {/* ============ HOME ============ */}
         {sst.screen === 'home' ? (
-          <div>
+          <div className="qt-home">
             {/* HERO A */}
             <div style={s('max-width:1180px;margin:16px auto 0;padding:0 24px;width:100%')}>
-                <div style={s('background:#eaf7ef;border-radius:22px;padding:48px 52px;display:flex;align-items:center;gap:40px;overflow:hidden')}>
+                <div className="qt-hero" style={s('background:#eaf7ef;border-radius:22px;padding:48px 52px;display:flex;align-items:center;gap:40px;overflow:hidden')}>
                   <div style={s('flex:1;min-width:0')}>
                     <div style={s('display:inline-block;background:#fff;color:#1c7a45;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:20px;margin-bottom:16px')}>Nhà thuốc trực tuyến · Chính hãng 100%</div>
                     <h1 style={s('font-size:42px;line-height:1.12;font-weight:800;color:#14532d;margin:0 0 14px')}>
@@ -528,7 +565,7 @@ export default function QuayThuoc16({
                       <div><div style={s('font-size:22px;font-weight:800;color:#14532d')}>24/7</div><div style={s('font-size:12.5px;color:#8a948e')}>Dược sĩ tư vấn</div></div>
                     </div>
                   </div>
-                  <div style={s('width:340px;flex-shrink:0;background:repeating-linear-gradient(135deg,#d7eede,#d7eede 11px,#cde7d6 11px,#cde7d6 22px);border-radius:18px;height:300px;display:flex;align-items:center;justify-content:center;color:#5a8a6e;font:600 12px ui-monospace,monospace;text-align:center')}>
+                  <div className="qt-hero-img" style={s('width:340px;flex-shrink:0;background:repeating-linear-gradient(135deg,#d7eede,#d7eede 11px,#cde7d6 11px,#cde7d6 22px);border-radius:18px;height:300px;display:flex;align-items:center;justify-content:center;color:#5a8a6e;font:600 12px ui-monospace,monospace;text-align:center')}>
                     ảnh hero
                     <br />
                     (sản phẩm / dược sĩ)
@@ -536,7 +573,7 @@ export default function QuayThuoc16({
                 </div>
               </div>
             {/* category cards */}
-            <div style={s('max-width:1180px;margin:46px auto 0;padding:0 24px;width:100%')}>
+            <div className="qt-hide-mobile" style={s('max-width:1180px;margin:46px auto 0;padding:0 24px;width:100%')}>
               <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0 0 18px')}>Danh mục sản phẩm</h2>
               <div style={s('display:grid;grid-template-columns:repeat(4,1fr);gap:14px')}>
                 {catCards.map((c, i) => (
@@ -561,7 +598,7 @@ export default function QuayThuoc16({
                 <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0')}>🔥 Bán chạy nhất</h2>
                 <span onClick={() => goCatScreen('thuoc')} style={s('font-size:13.5px;color:#2e9e5b;font-weight:600;cursor:pointer')}>Xem tất cả →</span>
               </div>
-              <div style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
+              <div className="qt-slider" style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
                 {bestSellers.map((c, i) => (
                   <ProductCard key={i} p={c.p} onView={c.onView} onAdd={c.onAdd} />
                 ))}
@@ -571,7 +608,7 @@ export default function QuayThuoc16({
             {/* combos */}
             <div style={s('max-width:1180px;margin:44px auto 0;padding:0 24px;width:100%')}>
               <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0 0 18px')}>💚 Combo tiết kiệm</h2>
-              <div style={s('display:grid;grid-template-columns:repeat(3,1fr);gap:18px')}>
+              <div className="qt-slider" style={s('display:grid;grid-template-columns:repeat(3,1fr);gap:18px')}>
                 {combos.map((k, i) => (
                   <div key={i} style={s('background:#fff;border:1px solid #e7efe9;border-radius:18px;overflow:hidden;display:flex;flex-direction:column')}>
                     <div style={s('background:#2e9e5b;color:#fff;padding:9px 18px;font-size:13px;font-weight:600;display:flex;justify-content:space-between')}><span>{k.tag}</span><span>{k.saveText}</span></div>
@@ -598,7 +635,7 @@ export default function QuayThuoc16({
                 <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0')}>Thực phẩm chức năng nổi bật</h2>
                 <span onClick={() => goCatScreen('tpcn')} style={s('font-size:13.5px;color:#2e9e5b;font-weight:600;cursor:pointer')}>Xem tất cả →</span>
               </div>
-              <div style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
+              <div className="qt-slider" style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
                 {supps.map((c, i) => (
                   <ProductCard key={i} p={c.p} onView={c.onView} onAdd={c.onAdd} />
                 ))}
@@ -611,7 +648,7 @@ export default function QuayThuoc16({
                 <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0')}>✨ Chăm sóc da</h2>
                 <span onClick={() => goCatScreen('skincare')} style={s('font-size:13.5px;color:#2e9e5b;font-weight:600;cursor:pointer')}>Xem tất cả →</span>
               </div>
-              <div style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
+              <div className="qt-slider" style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
                 {skincare.map((c, i) => (
                   <ProductCard key={i} p={c.p} onView={c.onView} onAdd={c.onAdd} />
                 ))}
@@ -620,7 +657,7 @@ export default function QuayThuoc16({
 
             {/* prescription band */}
             <div style={s('max-width:1180px;margin:44px auto 0;padding:0 24px;width:100%')}>
-              <div style={s('background:#eaf7ef;border-radius:20px;padding:36px 44px;display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap')}>
+              <div className="qt-band" style={s('background:#eaf7ef;border-radius:20px;padding:36px 44px;display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap')}>
                 <div style={s('display:flex;align-items:center;gap:22px')}>
                   <div style={s('font-size:46px')}>📋</div>
                   <div><div style={s('font-size:24px;font-weight:800;color:#14532d')}>Có toa của bác sĩ?</div><div style={s('font-size:15px;color:#4a564e;margin-top:6px')}>Chụp ảnh toa thuốc, dược sĩ soạn đơn và giao tận nhà cho bạn.</div></div>
@@ -635,7 +672,7 @@ export default function QuayThuoc16({
                 <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0')}>Thiết bị y tế</h2>
                 <span onClick={() => goCatScreen('thietbi')} style={s('font-size:13.5px;color:#2e9e5b;font-weight:600;cursor:pointer')}>Xem tất cả →</span>
               </div>
-              <div style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
+              <div className="qt-slider" style={s('display:grid;grid-template-columns:repeat(5,1fr);gap:16px')}>
                 {devices.map((c, i) => (
                   <ProductCard key={i} p={c.p} onView={c.onView} onAdd={c.onAdd} />
                 ))}
@@ -648,7 +685,7 @@ export default function QuayThuoc16({
                 <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0')}>📰 Tin tức sức khỏe</h2>
                 <span onClick={goNews} style={s('font-size:13.5px;color:#2e9e5b;font-weight:600;cursor:pointer')}>Xem tất cả →</span>
               </div>
-              <div style={s('display:grid;grid-template-columns:repeat(3,1fr);gap:18px')}>
+              <div className="qt-slider" style={s('display:grid;grid-template-columns:repeat(3,1fr);gap:18px')}>
                 {newsHome.map((a, i) => (
                   <div key={i} onClick={a.onClick} className="qt-card" style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column')}>
                     <div style={{ ...s('aspect-ratio:16 / 9;position:relative;display:flex;align-items:center;justify-content:center'), background: a.tintBg }}>
@@ -667,7 +704,7 @@ export default function QuayThuoc16({
 
             {/* trust strip */}
             <div style={s('max-width:1180px;margin:44px auto 0;padding:0 24px;width:100%')}>
-              <div style={s('background:#fff;border:1px solid #e7efe9;border-radius:18px;padding:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px')}>
+              <div className="qt-grid2" style={s('background:#fff;border:1px solid #e7efe9;border-radius:18px;padding:26px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px')}>
                 {trustBadges.map((t, i) => (
                   <div key={i} style={s('display:flex;align-items:center;gap:13px')}>
                     <div style={s('width:46px;height:46px;background:#eaf6ef;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#2e9e5b;font-size:20px;flex-shrink:0')}>{t.icon}</div>
@@ -685,8 +722,24 @@ export default function QuayThuoc16({
             <div style={s('font-size:13px;color:#8a948e;margin-bottom:14px')}><span onClick={goHome} style={s('cursor:pointer;color:#2e9e5b')}>Trang chủ</span> / {catTitle}</div>
             <h1 style={s('font-size:28px;font-weight:800;color:#14532d;margin:0 0 6px')}>{catTitle}</h1>
             <div style={s('font-size:14px;color:#8a948e;margin-bottom:22px')}>{results.length} sản phẩm</div>
-            <div style={s('display:grid;grid-template-columns:240px 1fr;gap:26px;align-items:start')}>
-              <aside style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;padding:20px;position:sticky;top:140px')}>
+            {/* Nút mở bộ lọc (chỉ hiện trên mobile) */}
+            <button
+              className="qt-filter-btn"
+              onClick={() => setMobileFilter(true)}
+              style={s('align-items:center;gap:8px;background:#fff;border:1.5px solid #cfe6da;color:#1c7a45;padding:10px 16px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;margin-bottom:16px')}
+            >
+              ⚙ Bộ lọc &amp; danh mục
+            </button>
+            {/* Overlay cho drawer bộ lọc */}
+            {mobileFilter ? (
+              <div className="qt-filter-overlay" onClick={() => setMobileFilter(false)} />
+            ) : null}
+            <div className="qt-catlayout" style={s('display:grid;grid-template-columns:240px 1fr;gap:26px;align-items:start')}>
+              <aside className={`qt-filter${mobileFilter ? ' qt-filter-open' : ''}`} style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;padding:20px;position:sticky;top:140px')}>
+                <div className="qt-filter-close" style={s('display:none;align-items:center;justify-content:space-between;margin-bottom:14px')}>
+                  <span style={s('font-size:16px;font-weight:800;color:#14532d')}>Bộ lọc</span>
+                  <button onClick={() => setMobileFilter(false)} style={s('border:none;background:#f1f6f3;width:32px;height:32px;border-radius:9px;font-size:16px;cursor:pointer;color:#8a948e')}>✕</button>
+                </div>
                 <div style={s('font-size:14px;font-weight:700;color:#14532d;margin-bottom:12px')}>Danh mục</div>
                 <div style={s('display:flex;flex-direction:column;gap:7px;margin-bottom:22px')}>
                   {catTabs.map((t, i) => (
@@ -708,7 +761,7 @@ export default function QuayThuoc16({
                   ))}
                 </div>
                 {results.length > 0 ? (
-                  <div style={s('display:grid;grid-template-columns:repeat(4,1fr);gap:16px')}>
+                  <div className="qt-grid2" style={s('display:grid;grid-template-columns:repeat(4,1fr);gap:16px')}>
                     {results.map((c, i) => (
                       <ProductCard key={i} p={c.p} onView={c.onView} onAdd={c.onAdd} />
                     ))}

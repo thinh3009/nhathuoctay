@@ -146,6 +146,87 @@ a {
   color: #9aa8a0;
 }
 
+/* ── Mobile responsive (storefront) ──
+   Inline style thắng class thường, nên các override mobile phải dùng !important. */
+
+/* Phần tử chỉ dành cho mobile: ẩn mặc định trên desktop */
+.qt-hmobile { display: none; }
+.qt-filter-btn { display: none; }
+.qt-filter-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 40, 30, 0.45);
+  z-index: 79;
+}
+
+@media (max-width: 768px) {
+  /* Header — thanh thông tin trên cùng: gọn lại, vẫn giữ hotline */
+  .qt-topstrip { padding: 6px 14px !important; font-size: 11px !important; gap: 8px !important; }
+  .qt-hide-mobile-inline { display: none !important; }
+
+  /* Header — hàng chính: chỉ còn logo + icon tìm kiếm/giỏ/menu */
+  .qt-hrow { padding: 10px 14px !important; gap: 10px !important; }
+  .qt-search-full { display: none !important; }
+  .qt-hactions { display: none !important; }
+  .qt-hmobile { display: flex !important; }
+  .qt-nav-inner { padding: 0 14px !important; gap: 18px !important; }
+
+  /* SiteHeader (trang con) */
+  .qt-header-row { padding: 10px 14px !important; gap: 10px !important; flex-wrap: wrap !important; }
+  .qt-header-search { order: 3; flex: 1 0 100% !important; max-width: 100% !important; }
+  .qt-header-rx { display: none !important; }
+
+  /* Section trang chủ: giảm padding hai bên + khoảng cách */
+  .qt-home > div { padding-left: 14px !important; padding-right: 14px !important; margin-top: 26px !important; }
+  .qt-hide-mobile { display: none !important; }
+
+  /* Banner hero: xếp dọc, thu nhỏ */
+  .qt-hero { flex-direction: column !important; padding: 24px 20px !important; gap: 18px !important; }
+  .qt-hero h1 { font-size: 26px !important; line-height: 1.2 !important; }
+  .qt-hero-img { width: 100% !important; height: 150px !important; }
+
+  /* Các dãy sản phẩm/combo/tin tức: cuộn ngang */
+  .qt-slider {
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    gap: 12px !important;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .qt-slider > * { flex: 0 0 46% !important; scroll-snap-align: start; }
+
+  /* Lưới 4 cột → 2 cột */
+  .qt-grid2 { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+
+  /* Dải "đặt thuốc theo toa": xếp dọc */
+  .qt-band { flex-direction: column !important; align-items: flex-start !important; padding: 22px !important; gap: 16px !important; }
+
+  /* Trang danh mục: 1 cột + bộ lọc dạng drawer trượt từ trái */
+  .qt-catlayout { grid-template-columns: 1fr !important; }
+  .qt-filter-btn { display: flex !important; }
+  .qt-filter {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 82% !important;
+    max-width: 320px !important;
+    z-index: 80 !important;
+    border-radius: 0 16px 16px 0 !important;
+    transform: translateX(-105%);
+    transition: transform 0.28s ease;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  }
+  .qt-filter.qt-filter-open { transform: translateX(0); }
+  .qt-filter-close { display: flex !important; }
+
+  /* Footer: 2 cột */
+  .qt-footer-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 24px !important; }
+}
+
 /* ── Animation utility classes ── */
 
 .anim-fade-up {
