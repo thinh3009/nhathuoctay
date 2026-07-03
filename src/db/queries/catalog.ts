@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../client'
 import { categories, productReviews, products as productsTable } from '../schema'
-import { products as catalogProducts } from '@/lib/catalog'
 import {
   ALL_SUBCATEGORY_LABEL,
   DEFAULT_CATEGORY_SLUG,
@@ -20,8 +19,6 @@ import {
   type ProductSearchParams,
   type Review,
 } from '@/lib/schemas'
-
-const activeProductSlugs = new Set(catalogProducts.map((product) => product.slug))
 
 type ProductRow = typeof productsTable.$inferSelect & {
   category: typeof categories.$inferSelect
@@ -80,7 +77,7 @@ async function getProductsByCategorySlug(categorySlug: string) {
     },
   })
 
-  return rows.filter((row) => activeProductSlugs.has(row.slug))
+  return rows.filter((row) => row.isActive)
 }
 
 export async function getCategoryNavItems() {
@@ -118,10 +115,6 @@ export async function getCategoryBySlug(slug: string) {
 }
 
 export async function getProductBySlug(slug: string) {
-  if (!activeProductSlugs.has(slug)) {
-    return null
-  }
-
   const row = await db.query.products.findFirst({
     where: eq(productsTable.slug, slug),
     with: {
@@ -130,7 +123,11 @@ export async function getProductBySlug(slug: string) {
     },
   })
 
-  return row ? mapProduct(row) : null
+  if (!row || !row.isActive) {
+    return null
+  }
+
+  return mapProduct(row)
 }
 
 export async function getRelatedProducts(product: Product, limit = 4) {

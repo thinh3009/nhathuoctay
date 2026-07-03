@@ -10,7 +10,7 @@ import {
   fmt,
   newsData,
   palette,
-  products,
+  products as staticProducts,
   reviewData,
   s,
   tint,
@@ -58,8 +58,6 @@ const INITIAL: State = {
   form: { name: '', phone: '', address: '', note: '', pay: 'cod' },
 }
 
-const get = (id: string): Product => products.find((p) => p.id === id) ?? products[0]!
-
 function chip(active: boolean): CSSProperties {
   return active
     ? s('padding:8px 15px;border-radius:22px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #2e9e5b;background:#2e9e5b;color:#fff;white-space:nowrap')
@@ -85,7 +83,11 @@ function genOrderCode(): string {
   return 'QT16-' + Math.floor(100000 + Math.random() * 900000)
 }
 
-export default function QuayThuoc16() {
+export default function QuayThuoc16({ products: productsProp }: { products?: Product[] }) {
+  // Dùng sản phẩm từ DB nếu có, fallback dữ liệu tĩnh khi rỗng.
+  const products = productsProp && productsProp.length > 0 ? productsProp : staticProducts
+  const get = (id: string): Product => products.find((p) => p.id === id) ?? products[0]!
+
   const [state, setState] = useState<State>(INITIAL)
 
   const set = (patch: Partial<State>) => setState((prev) => ({ ...prev, ...patch }))

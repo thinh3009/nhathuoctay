@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import QuayThuoc16 from '@/components/quaythuoc/QuayThuoc16'
+import { getStorefrontProducts } from '@/db/queries/storefront'
 import { SITE_NAME, SITE_URL } from '@/config/site'
+
+// Luôn đọc sản phẩm mới nhất từ DB (sản phẩm admin thêm hiện ngay).
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Quầy thuốc 16 — Nhà thuốc trực tuyến chính hãng',
@@ -19,6 +23,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default function LandingPage() {
-  return <QuayThuoc16 />
+export default async function LandingPage() {
+  const products = await getStorefrontProducts()
+  return <QuayThuoc16 products={products} />
 }
