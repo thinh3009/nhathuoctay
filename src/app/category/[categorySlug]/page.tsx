@@ -5,8 +5,8 @@ import { listProducts } from '@/db/queries/catalog'
 import CategoryFilters from '@/components/CategoryFilters'
 import PaginationControls from '@/components/PaginationControls'
 import ProductCard from '@/components/ProductCard'
-import StoreFooter from '@/components/StoreFooter'
-import StoreHeader from '@/components/StoreHeader'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 import { commitments } from '@/lib/catalog'
 import { getServerCartCount } from '@/lib/cart'
 
@@ -50,11 +50,11 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   }
 
   return (
-    <main className="min-h-screen bg-[#f6fbf4] text-stone-900">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <StoreHeader activeCategorySlug={result.category.slug} cartCount={cartCount} />
+    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+      <SiteHeader activeCategorySlug={result.category.slug} cartCount={cartCount} />
 
-        <section className="mt-6 rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/70">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+        <section className="rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/70">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="flex flex-wrap items-center gap-2 text-sm text-stone-500">
@@ -159,9 +159,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             </div>
           </aside>
         </section>
+      </main>
 
-        <StoreFooter />
-      </div>
-    </main>
+      <SiteFooter />
+    </div>
   )
 }

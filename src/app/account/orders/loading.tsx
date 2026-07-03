@@ -1,10 +1,15 @@
 // Skeleton cho trang "Đơn hàng của tôi" trong lúc tải lịch sử đơn từ DB.
 export default function AccountOrdersLoading() {
   return (
-    <main className="min-h-screen bg-[#f6fbf4] text-stone-900">
-      {/* Thanh header */}
-      <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-600 px-4 py-5">
-        <div className="mx-auto h-8 max-w-3xl rounded bg-white/20" />
+    <div className="min-h-screen bg-[#f6faf7] text-stone-900">
+      {/* Header (khớp SiteHeader) */}
+      <div className="h-8 bg-[#14532d]" />
+      <div className="border-b border-stone-100 bg-white">
+        <div className="mx-auto flex h-16 max-w-[1180px] animate-pulse items-center gap-4 px-6">
+          <div className="h-10 w-40 rounded bg-stone-100" />
+          <div className="h-10 flex-1 rounded-xl bg-stone-100" />
+          <div className="h-9 w-24 rounded bg-stone-100" />
+        </div>
       </div>
 
       <div className="mx-auto max-w-3xl animate-pulse px-4 py-8">
@@ -21,11 +26,10 @@ export default function AccountOrdersLoading() {
                 <div className="h-4 w-full rounded bg-stone-100" />
                 <div className="h-4 w-2/3 rounded bg-stone-100" />
               </div>
-              <div className="mt-4 h-5 w-40 rounded bg-emerald-100" />
             </div>
           ))}
         </div>
       </div>
-    </main>
+    </div>
   )
 }

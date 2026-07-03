@@ -1,7 +1,7 @@
 ﻿import Link from 'next/link'
 import CartItemControls from '@/components/CartItemControls'
-import StoreFooter from '@/components/StoreFooter'
-import StoreHeader from '@/components/StoreHeader'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 import { getExistingCart } from '@/db/queries/cart'
 import { formatPrice } from '@/lib/catalog'
 import { DEFAULT_CATEGORY_SLUG } from '@/lib/constants'
@@ -13,11 +13,11 @@ export default async function CartPage() {
   const cartCount = await getServerCartCount()
 
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
-      <div className="mx-auto max-w-7xl">
-        <StoreHeader cartCount={cartCount} />
+    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+      <SiteHeader cartCount={cartCount} />
 
-        <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
+        <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/60">
             <div className="flex flex-col gap-2 border-b border-stone-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
@@ -107,9 +107,9 @@ export default async function CartPage() {
             </Link>
           </aside>
         </section>
+      </main>
 
-        <StoreFooter />
-      </div>
-    </main>
+      <SiteFooter />
+    </div>
   )
 }

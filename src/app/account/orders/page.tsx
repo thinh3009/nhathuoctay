@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 import { getOrdersByUserId } from '@/db/queries/users'
 import { formatPrice } from '@/lib/catalog'
-import { SITE_NAME } from '@/config/site'
+import { getServerCartCount } from '@/lib/cart'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Chờ xác nhận',
@@ -29,19 +31,16 @@ export default async function AccountOrdersPage() {
   const user = await getAuthUser()
   if (!user) redirect('/auth/login')
 
-  const orders = await getOrdersByUserId(user.userId)
+  const [orders, cartCount] = await Promise.all([
+    getOrdersByUserId(user.userId),
+    getServerCartCount(),
+  ])
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      <header className="border-b border-stone-200 bg-white px-4 py-4">
-        <div className="mx-auto flex max-w-3xl items-center gap-3">
-          <Link className="text-xl font-black text-emerald-900" href="/">{SITE_NAME}</Link>
-          <span className="text-stone-300">/</span>
-          <span className="text-stone-600">Đơn hàng của tôi</span>
-        </div>
-      </header>
+    <div className="flex min-h-screen flex-col bg-[#f6faf7]">
+      <SiteHeader cartCount={cartCount} />
 
-      <div className="mx-auto max-w-3xl px-4 py-8">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-black text-stone-900">Đơn hàng của tôi</h1>
           <p className="mt-1 text-stone-500">{orders.length} đơn hàng</p>
@@ -90,7 +89,9 @@ export default async function AccountOrdersPage() {
             ))}
           </div>
         )}
-      </div>
+      </main>
+
+      <SiteFooter />
     </div>
   )
 }

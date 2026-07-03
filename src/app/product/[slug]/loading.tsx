@@ -3,13 +3,20 @@
 // Suspense fallback cho route /product/[slug].
 export default function ProductLoading() {
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
-      <div className="mx-auto max-w-7xl animate-pulse">
-        {/* Thanh header */}
-        <div className="h-16 rounded-2xl bg-emerald-100/60" />
+    <div className="min-h-screen bg-[#f6faf7] text-stone-900">
+      {/* Header (khớp SiteHeader) */}
+      <div className="h-8 bg-[#14532d]" />
+      <div className="border-b border-stone-100 bg-white">
+        <div className="mx-auto flex h-16 max-w-[1180px] animate-pulse items-center gap-4 px-6">
+          <div className="h-10 w-40 rounded bg-stone-100" />
+          <div className="h-10 flex-1 rounded-xl bg-stone-100" />
+          <div className="h-9 w-24 rounded bg-stone-100" />
+        </div>
+      </div>
 
+      <div className="mx-auto max-w-7xl animate-pulse px-4 py-8">
         {/* Link quay lại */}
-        <div className="mt-6 h-4 w-40 rounded bg-emerald-100" />
+        <div className="h-4 w-40 rounded bg-emerald-100" />
 
         {/* Khung chi tiết sản phẩm */}
         <section className="mt-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
@@ -64,6 +71,6 @@ export default function ProductLoading() {
           </div>
         </section>
       </div>
-    </main>
+    </div>
   )
 }

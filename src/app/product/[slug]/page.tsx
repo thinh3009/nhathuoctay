@@ -5,8 +5,8 @@ import { getProductBySlug, getRelatedProducts } from '@/db/queries/catalog'
 import ProductDetailHero from '@/components/ProductDetailHero'
 import RelatedProductsSection from '@/components/RelatedProductsSection'
 import ReviewSection from '@/components/ReviewSection'
-import StoreFooter from '@/components/StoreFooter'
-import StoreHeader from '@/components/StoreHeader'
+import SiteFooter from '@/components/SiteFooter'
+import SiteHeader from '@/components/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
 import type { Product } from '@/lib/schemas'
 
@@ -52,10 +52,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
-      <div className="mx-auto max-w-7xl">
-        <StoreHeader activeCategorySlug={product.topCategorySlug} cartCount={cartCount} />
-        <div className="mt-6">
+    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+      <SiteHeader activeCategorySlug={product.topCategorySlug} cartCount={cartCount} />
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
+        <div>
           <Link
             className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
             href={`/category/${product.topCategorySlug}`}
@@ -68,8 +68,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <RelatedProducts product={product} />
         </Suspense>
         <ReviewSection product={product} />
-        <StoreFooter />
-      </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
   )
 }

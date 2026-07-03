@@ -1,12 +1,19 @@
 // Skeleton cho trang giỏ hàng trong lúc tải dữ liệu giỏ từ DB.
 export default function CartLoading() {
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
-      <div className="mx-auto max-w-7xl animate-pulse">
-        {/* Header */}
-        <div className="h-28 rounded-[24px] bg-gradient-to-r from-emerald-900 via-emerald-800 to-green-600 opacity-70" />
+    <div className="min-h-screen bg-[#f6faf7] text-stone-900">
+      {/* Header (khớp SiteHeader) */}
+      <div className="h-8 bg-[#14532d]" />
+      <div className="border-b border-stone-100 bg-white">
+        <div className="mx-auto flex h-16 max-w-[1180px] animate-pulse items-center gap-4 px-6">
+          <div className="h-10 w-40 rounded bg-stone-100" />
+          <div className="h-10 flex-1 rounded-xl bg-stone-100" />
+          <div className="h-9 w-24 rounded bg-stone-100" />
+        </div>
+      </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+      <div className="mx-auto max-w-7xl animate-pulse px-4 py-8">
+        <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
           {/* Danh sách sản phẩm trong giỏ */}
           <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
             <div className="h-6 w-48 rounded bg-stone-200" />
@@ -36,6 +43,6 @@ export default function CartLoading() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
