@@ -59,7 +59,9 @@ src/
 │   ├── bai-viet/             # Blog/tin sức khỏe (list + [slug])
 │   ├── admin/                # Khu quản trị (CMS)
 │   └── api/                  # API routes nội bộ (REST)
-├── components/               # Component dùng chung (Header, Footer, ProductCard…)
+├── components/               # Component dùng chung (ProductCard, ReviewSection…)
+│   ├── SiteHeader.tsx        # Header dùng chung (khớp trang chủ, điều hướng route thật)
+│   ├── SiteFooter.tsx        # Footer dùng chung (khớp trang chủ)
 │   ├── AuthMenu.tsx          # Menu tài khoản dùng chung (gọi /api/auth/me, login/logout)
 │   ├── quaythuoc/            # Storefront trang chủ (QuayThuoc16 – client SPA)
 │   └── DrugChatbot.tsx       # Widget chatbot (client) gọi same-origin /api/chat
@@ -141,9 +143,13 @@ Các bảng chính và quan hệ:
 - **Tài khoản** `account/orders` — xem lịch sử đơn của mình.
 - **Blog** `bai-viet/` và `bai-viet/[slug]` — tin sức khỏe viết bằng Markdown.
 - **Chatbot** `DrugChatbot.tsx` — widget nổi gọi same-origin `/api/chat` để tra cứu sản phẩm.
-- **Đăng nhập/tài khoản** — `AuthMenu` gắn trên header trang chủ (`QuayThuoc16`) và
-  `StoreHeader`: chưa đăng nhập hiện "Đăng nhập" (`/auth/login`); đã đăng nhập hiện
-  dropdown (Đơn hàng, Trang quản trị nếu là admin, Đăng xuất).
+- **Header/Footer đồng bộ** — mọi trang storefront (category, product, cart, bài viết,
+  account/orders) dùng chung `SiteHeader`/`SiteFooter` khớp giao diện trang chủ
+  (`QuayThuoc16`). `StoreHeader`/`StoreFooter` cũ (thương hiệu "NutriHome") đã bị gỡ bỏ.
+  Checkout giữ header tối giản riêng để tập trung luồng thanh toán.
+- **Đăng nhập/tài khoản** — `AuthMenu` gắn trên `SiteHeader` và header trang chủ:
+  chưa đăng nhập hiện "Đăng nhập" (`/auth/login`); đã đăng nhập hiện dropdown
+  (Đơn hàng, Trang quản trị nếu là admin, Đăng xuất).
 
 ### 4.2 Khu quản trị (`/admin`)
 
