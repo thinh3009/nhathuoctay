@@ -13,7 +13,8 @@ y tế, kèm trợ lý chatbot tra cứu thuốc bằng AI.
 | Web framework | **Next.js 16** (App Router, React 19, Server Components) |
 | Ngôn ngữ | TypeScript |
 | Giao diện | Tailwind CSS 4 |
-| Cơ sở dữ liệu | **PostgreSQL** truy cập qua **Drizzle ORM** (driver `postgres`) |
+| Cơ sở dữ liệu | **PostgreSQL trên Supabase** truy cập qua **Drizzle ORM** (driver `postgres`, `prepare:false` để tương thích transaction pooler) |
+| Hosting | **Vercel** (Next.js) + **Supabase** (Postgres, Storage ảnh sản phẩm) |
 | Xác thực | JWT (`jose`) lưu trong cookie `httpOnly`, mật khẩu băm bằng `bcryptjs` |
 | Validation | `zod` |
 | Nội dung bài viết | Markdown render bằng `react-markdown` + `remark-gfm` |
@@ -59,7 +60,9 @@ src/
 │   ├── admin/                # Khu quản trị (CMS)
 │   └── api/                  # API routes nội bộ (REST)
 ├── components/               # Component dùng chung (Header, Footer, ProductCard…)
-│   └── DrugChatbot.tsx       # Widget chatbot (client) gọi sang FastAPI
+│   ├── AuthMenu.tsx          # Menu tài khoản dùng chung (gọi /api/auth/me, login/logout)
+│   ├── quaythuoc/            # Storefront trang chủ (QuayThuoc16 – client SPA)
+│   └── DrugChatbot.tsx       # Widget chatbot (client) gọi same-origin /api/chat
 ├── db/                       # Schema, client, queries, seed/bootstrap scripts
 │   ├── schema.ts             # Định nghĩa toàn bộ bảng + quan hệ (Drizzle)
 │   └── queries/              # Hàm truy vấn theo domain
@@ -103,6 +106,13 @@ Các bảng chính và quan hệ:
   khi giá sản phẩm thay đổi.
 - Giỏ hàng dùng `cart_token` (cookie) nên **khách vãng lai vẫn thêm vào giỏ được**;
   `userId` nullable, gắn khi đăng nhập.
+- `products` có thêm `sale_price` (giá giảm, nullable), `is_active` (ẩn/hiện),
+  `stock_quantity`, `prescription_required`.
+- **DB là nguồn dữ liệu chính cho sản phẩm.** Trang danh mục/chi tiết đọc qua
+  `db/queries/catalog.ts`, **lọc theo `is_active`** (đã bỏ cơ chế allowlist slug tĩnh
+  cũ). Trang chủ đọc qua `db/queries/storefront.ts`. `productSchema` (`lib/schemas.ts`)
+  đã được **nới lỏng** cho các field mô tả (cho phép rỗng) để sản phẩm admin nhập tối
+  thiểu vẫn hiển thị được.
 
 ---
 
@@ -110,8 +120,16 @@ Các bảng chính và quan hệ:
 
 ### 4.1 Storefront (khách hàng)
 
-- **Trang chủ** `(landing)/` — hero, promo strip, shortcut grid, các section sản phẩm
-  nổi bật; có `opengraph-image`, `sitemap`, `robots` cho SEO.
+- **Trang chủ** `(landing)/` — storefront SPA `QuayThuoc16` (client component: home,
+  category, search, product, cart demo). **Đọc sản phẩm từ DB** qua
+  `getStorefrontProducts()` (`db/queries/storefront.ts`) rồi truyền vào qua prop; map
+  `category_slug` → enum `cat` và `salePrice` → giá gạch. Có `opengraph-image`,
+  `sitemap`, `robots` cho SEO.
+  > ⚠️ Hiện đặt `export const dynamic = 'force-dynamic'` để sản phẩm admin thêm hiện
+  > ngay — mỗi request query lại DB. Nên đổi sang `revalidate = 60` + `revalidatePath('/')`
+  > trong action tạo/sửa sản phẩm để cache HTML mà vẫn tươi.
+  > **Lưu ý:** `sitemap.ts` vẫn dùng danh sách sản phẩm tĩnh (`@/lib/catalog`) → sản phẩm
+  > admin thêm chưa vào sitemap; nên chuyển sang query DB.
 - **Danh mục** `category/[categorySlug]` — danh sách sản phẩm với **lọc** (sub-category,
   khoảng giá) và **sắp xếp** (`featured`, giá tăng/giảm, tên, rating); phân trang
   `PRODUCTS_PER_PAGE = 10`.
@@ -122,7 +140,10 @@ Các bảng chính và quan hệ:
   / `momo` / `vnpay`), tạo đơn → trang `checkout/success`.
 - **Tài khoản** `account/orders` — xem lịch sử đơn của mình.
 - **Blog** `bai-viet/` và `bai-viet/[slug]` — tin sức khỏe viết bằng Markdown.
-- **Chatbot** `DrugChatbot.tsx` — widget nổi gọi sang FastAPI để tra cứu sản phẩm.
+- **Chatbot** `DrugChatbot.tsx` — widget nổi gọi same-origin `/api/chat` để tra cứu sản phẩm.
+- **Đăng nhập/tài khoản** — `AuthMenu` gắn trên header trang chủ (`QuayThuoc16`) và
+  `StoreHeader`: chưa đăng nhập hiện "Đăng nhập" (`/auth/login`); đã đăng nhập hiện
+  dropdown (Đơn hàng, Trang quản trị nếu là admin, Đăng xuất).
 
 ### 4.2 Khu quản trị (`/admin`)
 
@@ -171,13 +192,41 @@ thì `redirect('/')`.
   server action/API.
 - **Phân quyền hiện thực thi ở tầng layout/route (server)**, không qua middleware.
 
-> ⚠️ **Lưu ý kỹ thuật / nợ kỹ thuật cần xử lý trước production:**
+### 5.1 Bảo mật tầng database — Supabase RLS
+
+App kết nối Postgres **trực tiếp bằng role `postgres`** (connection string), role này
+**bypass RLS** nên toàn quyền đọc/ghi. App **không** dùng `supabase-js` / Data API.
+
+Vì Supabase tự expose một **REST Data API công khai** (PostgREST) mở bằng **anon key**
+(anon key là public, nằm trong `NEXT_PUBLIC_SUPABASE_ANON_KEY`), nếu **RLS tắt** thì bất
+kỳ ai cũng đọc/ghi được mọi bảng qua API đó — kể cả `users` (email + `password_hash`),
+`orders`, `user_addresses`.
+
+✅ **Đã bật RLS trên toàn bộ 11 bảng** (`alter table … enable row level security`), **không
+thêm policy nào** → Data API công khai bị chặn hoàn toàn (trả 0 dòng), còn app vẫn chạy
+bình thường vì role `postgres` bypass RLS. Đã kiểm chứng: anon key không đọc được dữ liệu,
+app đọc `products`/`users` bình thường.
+
+> ⚠️ **Nợ kỹ thuật / cần xử lý trước production:**
 > - `middleware.ts` đang **tắt auth middleware**, chỉ còn xử lý redirect; việc bảo vệ
 >   `/admin` và `/account` dựa hoàn toàn vào kiểm tra trong layout/route.
-> - `JWT_SECRET` có **giá trị mặc định hard-code** — bắt buộc đặt biến môi trường
->   `JWT_SECRET` riêng khi deploy.
-> - Khóa `ANTHROPIC_API_KEY` trong `chatbot-api/.env` đã từng bị lộ (theo README) —
->   cần **revoke và thay mới**.
+> - Server action ghi dữ liệu của admin (vd `createProduct` trong `admin/products/new`)
+>   **chưa gọi `requireAdmin()`** — chỉ layout chặn truy cập trang; nên thêm kiểm tra
+>   quyền ngay trong mỗi action.
+> - `JWT_SECRET` có **giá trị mặc định hard-code** (`lib/auth.ts`) — bắt buộc đặt biến
+>   môi trường `JWT_SECRET` riêng khi deploy (có thể tái dùng `SUPABASE_JWT_SECRET`).
+> - Khóa nhạy cảm (`ANTHROPIC_API_KEY`, DB password, `SUPABASE_SERVICE_ROLE_KEY`) nếu đã
+>   lộ cần **revoke và thay mới**.
+
+### 5.2 Biến môi trường (Vercel + local)
+
+| Biến | Dùng ở | Ghi chú |
+|------|--------|---------|
+| `DATABASE_URL` | runtime app | Transaction pooler **cổng 6543** (`prepare:false`) |
+| `POSTGRES_URL_NON_POOLING` | migrate/seed local | Direct connection **cổng 5432** (không cần trên Vercel) |
+| `JWT_SECRET` | auth | **Phải đặt** trên Vercel; tránh dùng giá trị mặc định |
+| `ANTHROPIC_API_KEY` | `/api/chat` | Chatbot |
+| `NEXT_PUBLIC_SUPABASE_*` | (không dùng trong code) | Do tích hợp Supabase↔Vercel thêm; app không cần |
 
 ---
 
@@ -239,3 +288,7 @@ DrugChatbot (client) → POST /api/chat (same-origin)
 
 *Tài liệu này phản ánh trạng thái hiện tại của mã nguồn (Phase 1 MVP). Khi bật lại auth
 middleware, thay khóa bí mật, hoặc nâng cấp chatbot lên RAG, hãy cập nhật các mục tương ứng.*
+
+*Cập nhật gần nhất (07/2026): kết nối Supabase + deploy Vercel; trang chủ đọc sản phẩm
+từ DB; thêm menu đăng nhập (`AuthMenu`); sửa hiển thị sản phẩm do admin tạo (bỏ allowlist
+tĩnh, lọc `is_active`, nới `productSchema`); **bật RLS toàn bộ bảng** để chặn Data API công khai.*
