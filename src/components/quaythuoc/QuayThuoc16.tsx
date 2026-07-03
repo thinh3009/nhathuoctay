@@ -1,6 +1,7 @@
 'use client'
 
 import { type CSSProperties, useEffect, useState } from 'react'
+import AuthMenu from '@/components/AuthMenu'
 import ProductCard, { type CardVM } from './ProductCard'
 import {
   type Cat,
@@ -455,6 +456,7 @@ export default function QuayThuoc16() {
               <span style={s('position:absolute;top:-6px;right:-6px;background:#e8654e;color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:11px;display:flex;align-items:center;justify-content:center;padding:0 5px')}>{cc}</span>
             ) : null}
           </button>
+          <AuthMenu variant="light" />
         </div>
         <nav style={s('border-top:1px solid #eef3f0')}>
           <div style={s('max-width:1180px;margin:0 auto;padding:0 24px;display:flex;gap:26px;width:100%')}>

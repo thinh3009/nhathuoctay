@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { CATEGORY_CONFIG } from '@/lib/constants'
+import AuthMenu from '@/components/AuthMenu'
 
 type AuthUser = { userId: string; email: string; role: string } | null
 
@@ -305,6 +306,9 @@ export default function StoreHeader({
             >
               Tin tức
             </Link>
+            <div className="ml-auto">
+              <AuthMenu variant="dark" />
+            </div>
           </div>
         </div>
       </header>
