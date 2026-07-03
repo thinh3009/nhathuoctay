@@ -171,11 +171,6 @@ a {
   .qt-hmobile { display: flex !important; }
   .qt-nav-inner { padding: 0 14px !important; gap: 18px !important; }
 
-  /* SiteHeader (trang con) */
-  .qt-header-row { padding: 10px 14px !important; gap: 10px !important; flex-wrap: wrap !important; }
-  .qt-header-search { order: 3; flex: 1 0 100% !important; max-width: 100% !important; }
-  .qt-header-rx { display: none !important; }
-
   /* Section trang chủ: giảm padding hai bên + khoảng cách */
   .qt-home > div { padding-left: 14px !important; padding-right: 14px !important; margin-top: 26px !important; }
   .qt-hide-mobile { display: none !important; }
