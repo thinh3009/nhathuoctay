@@ -30,7 +30,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
   return (
     <section className="mt-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/70 sm:p-6">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
+        <div className="min-w-0">
           <div className="overflow-hidden rounded-[1.75rem] border border-emerald-100 bg-white shadow-sm shadow-emerald-100/60">
             <div className="flex items-center justify-between border-b border-stone-200 bg-emerald-50 px-4 py-4 sm:px-5">
               <div className="min-w-0">
@@ -132,7 +132,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
           </div>
         </div>
 
-        <div>
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
               Chính hãng

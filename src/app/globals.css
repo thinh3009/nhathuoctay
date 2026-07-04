@@ -220,6 +220,14 @@ a {
 
   /* Footer: 2 cột */
   .qt-footer-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 24px !important; }
+
+  /* Bố cục 2 cột cố định (chi tiết sản phẩm / giỏ / thanh toán) → xếp dọc 1 cột */
+  .qt-stack { grid-template-columns: 1fr !important; gap: 20px !important; }
+
+  /* Dòng sản phẩm trong giỏ: xuống hàng — hàng 1 là ảnh + tên, hàng 2 là số lượng + thành tiền + xóa */
+  .qt-cartrow { flex-wrap: wrap !important; gap: 10px !important; }
+  .qt-cart-info { flex: 1 1 calc(100% - 92px) !important; }
+  .qt-cart-total { width: auto !important; margin-left: auto !important; }
 }
 
 /* ── Animation utility classes ── */
