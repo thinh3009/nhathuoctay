@@ -141,7 +141,7 @@ export default function SiteHeader({
           <div className="qt-mmenu" style={s('padding:0 16px 14px;display:flex;flex-direction:column;gap:8px')}>
             <Link href="/?rx=1" onClick={() => setMobMenu(false)} style={s('display:flex;align-items:center;gap:9px;border:1.5px solid #2e9e5b;background:#fff;color:#1c7a45;padding:12px 14px;border-radius:11px;font-weight:600;font-size:14px;text-decoration:none')}>📋 Đặt thuốc theo toa</Link>
             <Link href="/cart" onClick={() => setMobMenu(false)} style={s('display:flex;align-items:center;gap:9px;background:#eaf6ef;color:#14532d;padding:12px 14px;border-radius:11px;font-weight:600;font-size:14px;text-decoration:none')}>🛒 Giỏ hàng{cartCount > 0 ? ` (${cartCount})` : ''}</Link>
-            <div onClick={() => setMobMenu(false)}><AuthMenu variant="light" /></div>
+            <AuthMenu variant="light" onNavigate={() => setMobMenu(false)} />
           </div>
         ) : null}
 

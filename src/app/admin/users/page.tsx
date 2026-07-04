@@ -48,7 +48,7 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-black text-stone-900">Người dùng</h1>
           <p className="mt-1 text-stone-500">{rows.length} tài khoản</p>

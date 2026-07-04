@@ -13,7 +13,16 @@ type AuthUser = {
 
 // Menu tài khoản dùng chung cho các header (client-side).
 // Tự gọi /api/auth/me để biết trạng thái đăng nhập, không cần truyền prop từ server.
-export default function AuthMenu({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
+// onNavigate: gọi khi người dùng thực sự điều hướng (bấm 1 mục / đăng nhập / đăng xuất),
+// KHÔNG gọi khi chỉ mở/đóng dropdown — để header mobile đóng menu đúng lúc, tránh
+// việc bấm nút tài khoản lại làm sập luôn cả menu mobile (khiến không vào được trang quản trị).
+export default function AuthMenu({
+  variant = 'light',
+  onNavigate,
+}: {
+  variant?: 'light' | 'dark'
+  onNavigate?: () => void
+}) {
   const router = useRouter()
   const [user, setUser] = useState<AuthUser>(null)
   const [loading, setLoading] = useState(true)
@@ -49,6 +58,7 @@ export default function AuthMenu({ variant = 'light' }: { variant?: 'light' | 'd
     await fetch('/api/auth/logout', { method: 'POST' })
     setUser(null)
     setOpen(false)
+    onNavigate?.()
     router.refresh()
   }
 
@@ -66,6 +76,7 @@ export default function AuthMenu({ variant = 'light' }: { variant?: 'light' | 'd
       <Link
         className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${triggerClass}`}
         href="/auth/login"
+        onClick={() => onNavigate?.()}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24">
           <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
@@ -104,7 +115,10 @@ export default function AuthMenu({ variant = 'light' }: { variant?: 'light' | 'd
             <Link
               className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-stone-700 transition hover:bg-emerald-50 hover:text-emerald-800"
               href="/account/orders"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false)
+                onNavigate?.()
+              }}
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24">
                 <path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" stroke="currentColor" strokeWidth="1.6" />
@@ -116,7 +130,10 @@ export default function AuthMenu({ variant = 'light' }: { variant?: 'light' | 'd
               <Link
                 className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-amber-700 transition hover:bg-amber-50"
                 href="/admin"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false)
+                  onNavigate?.()
+                }}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24">
                   <path d="m12 3 7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4Z" stroke="currentColor" strokeWidth="1.6" />

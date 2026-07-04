@@ -87,7 +87,7 @@ export default function HomeHeader({ hub }: { hub: StorefrontHub }) {
         <div className="qt-mmenu" style={s('padding:0 16px 14px;display:flex;flex-direction:column;gap:8px')}>
           <button onClick={() => { openRx(); setMobMenu(false) }} style={s('display:flex;align-items:center;gap:9px;border:1.5px solid #2e9e5b;background:#fff;color:#1c7a45;padding:12px 14px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;text-align:left')}>📋 Đặt thuốc theo toa</button>
           <button onClick={() => { goCart(); setMobMenu(false) }} style={s('display:flex;align-items:center;gap:9px;background:#eaf6ef;color:#14532d;border:none;padding:12px 14px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;text-align:left')}>🛒 Giỏ hàng{cc > 0 ? ` (${cc})` : ''}</button>
-          <div onClick={() => setMobMenu(false)}><AuthMenu variant="light" /></div>
+          <AuthMenu variant="light" onNavigate={() => setMobMenu(false)} />
         </div>
       ) : null}
 
