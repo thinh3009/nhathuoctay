@@ -1,4 +1,4 @@
-# Kiến trúc chức năng — Website Nhà thuốc 16
+3# Kiến trúc chức năng — Website Nhà thuốc 16
 
 Tài liệu mô tả kiến trúc chức năng của website thương mại điện tử **Nhà thuốc 16** —
 một nhà thuốc online bán thuốc, thực phẩm chức năng, sản phẩm chăm sóc da và thiết bị

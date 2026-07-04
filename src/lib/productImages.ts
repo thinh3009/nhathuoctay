@@ -376,6 +376,49 @@ export function getProductImageAssets(productSlug: string) {
   return productImageAssets[productSlug] ?? []
 }
 
+// Nhãn + kind cho 3 khe ảnh mà admin nhập tay (theo thứ tự).
+const ADMIN_IMAGE_SLOTS: Array<{ kind: ProductImageKind; label: string }> = [
+  { kind: 'front', label: 'Ảnh chính' },
+  { kind: 'angle', label: 'Góc nghiêng' },
+  { kind: 'info', label: 'Thông tin' },
+]
+
+// Đánh dấu ảnh admin dán URL bằng storagePath 'external-*' để normalize giữ nguyên src.
+export const EXTERNAL_IMAGE_PREFIX = 'external'
+
+function isExternalImage(image: ProductImage) {
+  return image.storagePath.startsWith(EXTERNAL_IMAGE_PREFIX)
+}
+
+// Tạo ProductImage[] từ danh sách URL admin nhập (bỏ ô trống). Tối đa 3 ảnh.
+export function buildExternalProductImages(urls: Array<string | null | undefined>): ProductImage[] {
+  return urls
+    .map((url) => (typeof url === 'string' ? url.trim() : ''))
+    .filter((url) => url.length > 0)
+    .slice(0, ADMIN_IMAGE_SLOTS.length)
+    .map((url, index) => {
+      const slot = ADMIN_IMAGE_SLOTS[index]
+      return productImageSchema.parse({
+        kind: slot.kind,
+        label: slot.label,
+        storagePath: `${EXTERNAL_IMAGE_PREFIX}-${index}`,
+        fallbackSrc: url,
+        src: url,
+      })
+    })
+}
+
+// Lấy lại danh sách URL admin đã nhập (để prefill form sửa). Trả mảng 3 phần tử.
+export function getExternalImageUrls(rawImages: unknown): string[] {
+  const rawList = Array.isArray(rawImages) ? rawImages : []
+  const urls = rawList
+    .map((raw) => productImageSchema.safeParse(raw))
+    .filter((parsed) => parsed.success && isExternalImage(parsed.data))
+    .map((parsed) => (parsed.success ? parsed.data.src : ''))
+
+  return [urls[0] ?? '', urls[1] ?? '', urls[2] ?? '']
+}
+
 export function buildProductImages(categorySlug: CategorySlug, productSlug: string): ProductImage[] {
   const assets = getProductImageAssets(productSlug)
   // Chỉ sản phẩm có ảnh được khai báo (đã upload lên Supabase) mới dùng URL remote.
@@ -425,6 +468,11 @@ export function normalizeProductImages(
     const parsed = productImageSchema.safeParse(rawImage)
 
     if (parsed.success) {
+      // Ảnh admin dán URL: giữ nguyên src, không dựng lại từ Supabase storage.
+      if (isExternalImage(parsed.data)) {
+        return parsed.data
+      }
+
       const remoteSrc = usingFallback ? null : buildPublicProductImageUrl(parsed.data.storagePath)
 
       return productImageSchema.parse({

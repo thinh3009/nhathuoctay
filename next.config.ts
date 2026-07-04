@@ -6,17 +6,22 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  images: supabaseHostname
-    ? {
-        remotePatterns: [
-          {
-            protocol: 'https',
-            hostname: supabaseHostname,
-            pathname: '/storage/v1/object/public/**',
-          },
-        ],
-      }
-    : undefined,
+  images: {
+    remotePatterns: [
+      // Ảnh trên Supabase Storage (bucket public).
+      ...(supabaseHostname
+        ? [
+            {
+              protocol: 'https' as const,
+              hostname: supabaseHostname,
+              pathname: '/storage/v1/object/public/**',
+            },
+          ]
+        : []),
+      // Ảnh admin dán URL từ web/CDN bất kỳ (chỉ https).
+      { protocol: 'https' as const, hostname: '**' },
+    ],
+  },
 }
 
 export default nextConfig
