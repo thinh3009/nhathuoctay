@@ -4,7 +4,8 @@ import { db } from '@/db/client'
 import { products, categories } from '@/db/schema'
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/auth'
-import { buildExternalProductImages } from '@/lib/productImages'
+import { parseProductImagesJson } from '@/lib/productImages'
+import ProductImageManager from '@/components/admin/ProductImageManager'
 
 async function getCategories() {
   return db.select({ slug: categories.slug, label: categories.label }).from(categories)
@@ -21,12 +22,8 @@ async function createProduct(formData: FormData) {
   const salePriceRaw = formData.get('salePrice') as string
   const salePrice = salePriceRaw ? parseInt(salePriceRaw, 10) : null
 
-  // Admin có thể dán tối đa 3 URL ảnh. Để trống hết → dùng ảnh demo theo danh mục.
-  const images = buildExternalProductImages([
-    formData.get('imageUrl1') as string,
-    formData.get('imageUrl2') as string,
-    formData.get('imageUrl3') as string,
-  ])
+  // Ảnh admin đã upload lên Storage (JSON từ ProductImageManager). Trống → dùng ảnh demo.
+  const images = parseProductImagesJson(formData.get('images'))
 
   await db.insert(products).values({
     slug: `${slug}-${Date.now()}`,
@@ -147,15 +144,8 @@ export default async function AdminNewProductPage() {
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6">
-          <h2 className="mb-1 font-bold text-stone-900">Hình ảnh sản phẩm</h2>
-          <p className="mb-4 text-sm text-stone-500">
-            Dán tối đa 3 đường link ảnh (https). Ảnh đầu tiên là ảnh chính. Để trống sẽ dùng ảnh mặc định theo danh mục.
-          </p>
-          <div className="grid gap-4">
-            <Field label="Ảnh 1 (ảnh chính)" name="imageUrl1" placeholder="https://.../anh-chinh.jpg" type="url" />
-            <Field label="Ảnh 2" name="imageUrl2" placeholder="https://.../anh-2.jpg" type="url" />
-            <Field label="Ảnh 3" name="imageUrl3" placeholder="https://.../anh-3.jpg" type="url" />
-          </div>
+          <h2 className="mb-4 font-bold text-stone-900">Hình ảnh sản phẩm</h2>
+          <ProductImageManager productKey="new" />
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6">

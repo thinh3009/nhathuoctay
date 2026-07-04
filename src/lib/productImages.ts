@@ -376,47 +376,43 @@ export function getProductImageAssets(productSlug: string) {
   return productImageAssets[productSlug] ?? []
 }
 
-// Nhãn + kind cho 3 khe ảnh mà admin nhập tay (theo thứ tự).
+// Tiền tố thư mục cho ảnh admin tải lên Supabase Storage (client-safe hằng số dùng chung).
+export const UPLOAD_PREFIX = 'uploads'
+
+// Nhãn + kind gợi ý cho từng khe ảnh admin tải lên (theo thứ tự upload).
 const ADMIN_IMAGE_SLOTS: Array<{ kind: ProductImageKind; label: string }> = [
   { kind: 'front', label: 'Ảnh chính' },
   { kind: 'angle', label: 'Góc nghiêng' },
   { kind: 'info', label: 'Thông tin' },
 ]
 
-// Đánh dấu ảnh admin dán URL bằng storagePath 'external-*' để normalize giữ nguyên src.
-export const EXTERNAL_IMAGE_PREFIX = 'external'
-
-function isExternalImage(image: ProductImage) {
-  return image.storagePath.startsWith(EXTERNAL_IMAGE_PREFIX)
+export function isUploadedImage(image: ProductImage) {
+  return image.storagePath.startsWith(`${UPLOAD_PREFIX}/`)
 }
 
-// Tạo ProductImage[] từ danh sách URL admin nhập (bỏ ô trống). Tối đa 3 ảnh.
-export function buildExternalProductImages(urls: Array<string | null | undefined>): ProductImage[] {
-  return urls
-    .map((url) => (typeof url === 'string' ? url.trim() : ''))
-    .filter((url) => url.length > 0)
-    .slice(0, ADMIN_IMAGE_SLOTS.length)
-    .map((url, index) => {
-      const slot = ADMIN_IMAGE_SLOTS[index]
-      return productImageSchema.parse({
-        kind: slot.kind,
-        label: slot.label,
-        storagePath: `${EXTERNAL_IMAGE_PREFIX}-${index}`,
-        fallbackSrc: url,
-        src: url,
-      })
-    })
+// Nhãn/kind cho ảnh thứ index (dùng khi admin thêm ảnh mới trong trình quản lý ảnh).
+export function getAdminImageSlot(index: number) {
+  const slot = ADMIN_IMAGE_SLOTS[index] ?? {
+    kind: 'info' as ProductImageKind,
+    label: `Ảnh ${index + 1}`,
+  }
+  return slot
 }
 
-// Lấy lại danh sách URL admin đã nhập (để prefill form sửa). Trả mảng 3 phần tử.
-export function getExternalImageUrls(rawImages: unknown): string[] {
-  const rawList = Array.isArray(rawImages) ? rawImages : []
-  const urls = rawList
-    .map((raw) => productImageSchema.safeParse(raw))
-    .filter((parsed) => parsed.success && isExternalImage(parsed.data))
-    .map((parsed) => (parsed.success ? parsed.data.src : ''))
-
-  return [urls[0] ?? '', urls[1] ?? '', urls[2] ?? '']
+// Dựng ProductImage cho ảnh vừa upload lên Storage.
+export function buildUploadedProductImage(
+  storagePath: string,
+  publicUrl: string,
+  index: number,
+): ProductImage {
+  const slot = getAdminImageSlot(index)
+  return productImageSchema.parse({
+    kind: slot.kind,
+    label: slot.label,
+    storagePath,
+    fallbackSrc: publicUrl,
+    src: publicUrl,
+  })
 }
 
 export function buildProductImages(categorySlug: CategorySlug, productSlug: string): ProductImage[] {
@@ -439,6 +435,19 @@ export function buildProductImages(categorySlug: CategorySlug, productSlug: stri
       src: remoteSrc ?? fallbackSrc,
     })
   })
+}
+
+// Parse chuỗi JSON ảnh từ input ẩn của ProductImageManager (dùng trong server action).
+export function parseProductImagesJson(raw: unknown): ProductImage[] {
+  if (typeof raw !== 'string' || raw.trim() === '') {
+    return []
+  }
+  try {
+    const parsed = productImageSchema.array().safeParse(JSON.parse(raw))
+    return parsed.success ? parsed.data : []
+  } catch {
+    return []
+  }
 }
 
 export function normalizeProductImages(
@@ -468,9 +477,13 @@ export function normalizeProductImages(
     const parsed = productImageSchema.safeParse(rawImage)
 
     if (parsed.success) {
-      // Ảnh admin dán URL: giữ nguyên src, không dựng lại từ Supabase storage.
-      if (isExternalImage(parsed.data)) {
-        return parsed.data
+      // Ảnh admin tải lên Storage: luôn dựng public URL từ storagePath (bất kể fallback).
+      if (isUploadedImage(parsed.data)) {
+        const publicUrl = buildPublicProductImageUrl(parsed.data.storagePath)
+        return productImageSchema.parse({
+          ...parsed.data,
+          src: publicUrl ?? parsed.data.src,
+        })
       }
 
       const remoteSrc = usingFallback ? null : buildPublicProductImageUrl(parsed.data.storagePath)

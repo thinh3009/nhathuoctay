@@ -5,7 +5,9 @@ import { products, categories } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/auth'
-import { buildExternalProductImages, getExternalImageUrls } from '@/lib/productImages'
+import { isUploadedImage, normalizeProductImages, parseProductImagesJson } from '@/lib/productImages'
+import ProductImageManager from '@/components/admin/ProductImageManager'
+import type { CategorySlug } from '@/lib/constants'
 
 async function updateProduct(id: string, formData: FormData) {
   'use server'
@@ -13,12 +15,8 @@ async function updateProduct(id: string, formData: FormData) {
 
   const categorySlug = formData.get('categorySlug') as string
 
-  // Cập nhật ảnh: dán URL mới, để trống hết → quay lại ảnh mặc định theo danh mục.
-  const images = buildExternalProductImages([
-    formData.get('imageUrl1') as string,
-    formData.get('imageUrl2') as string,
-    formData.get('imageUrl3') as string,
-  ])
+  // Ảnh admin đã upload (JSON từ ProductImageManager). Trống → dùng ảnh demo theo danh mục.
+  const images = parseProductImagesJson(formData.get('images'))
 
   await db.update(products).set({
     name: formData.get('name') as string,
@@ -57,7 +55,12 @@ export default async function AdminEditProductPage({ params }: { params: Promise
   if (!product) notFound()
 
   const action = updateProduct.bind(null, id)
-  const [imageUrl1, imageUrl2, imageUrl3] = getExternalImageUrls(product.images)
+  // Chỉ prefill ảnh admin đã upload (ảnh demo fallback không đưa vào để tránh xoá nhầm).
+  const initialImages = normalizeProductImages(
+    product.categorySlug as CategorySlug,
+    product.slug,
+    product.images,
+  ).filter(isUploadedImage)
 
   return (
     <div>
@@ -162,24 +165,8 @@ export default async function AdminEditProductPage({ params }: { params: Promise
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6">
-          <h2 className="mb-1 font-bold text-stone-900">Hình ảnh sản phẩm</h2>
-          <p className="mb-4 text-sm text-stone-500">
-            Dán tối đa 3 đường link ảnh (https). Ảnh đầu tiên là ảnh chính. Để trống hết sẽ dùng ảnh mặc định theo danh mục.
-          </p>
-          <div className="grid gap-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-700">Ảnh 1 (ảnh chính)</label>
-              <input className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" defaultValue={imageUrl1} name="imageUrl1" placeholder="https://.../anh-chinh.jpg" type="url" />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-700">Ảnh 2</label>
-              <input className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" defaultValue={imageUrl2} name="imageUrl2" placeholder="https://.../anh-2.jpg" type="url" />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-700">Ảnh 3</label>
-              <input className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" defaultValue={imageUrl3} name="imageUrl3" placeholder="https://.../anh-3.jpg" type="url" />
-            </div>
-          </div>
+          <h2 className="mb-4 font-bold text-stone-900">Hình ảnh sản phẩm</h2>
+          <ProductImageManager initialImages={initialImages} productKey={id} />
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6">

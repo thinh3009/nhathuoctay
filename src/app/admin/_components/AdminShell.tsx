@@ -9,6 +9,7 @@ import AdminLogoutButton from './AdminLogoutButton'
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: 'grid' },
   { href: '/admin/products', label: 'Sản phẩm', icon: 'box' },
+  { href: '/admin/images', label: 'Quản lý ảnh', icon: 'image' },
   { href: '/admin/categories', label: 'Danh mục', icon: 'tag' },
   { href: '/admin/orders', label: 'Đơn hàng', icon: 'receipt' },
   { href: '/admin/articles', label: 'Bài viết', icon: 'pen' },
@@ -41,6 +42,13 @@ function NavIcon({ name }: { name: string }) {
       <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.8" />
       <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.8" />
       <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  )
+  if (name === 'image') return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <rect height="18" rx="2" stroke="currentColor" strokeWidth="1.8" width="18" x="3" y="3" />
+      <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="1.8" />
+      <path d="m21 15-5-5L5 21" stroke="currentColor" strokeWidth="1.8" />
     </svg>
   )
   if (name === 'pen') return (
