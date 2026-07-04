@@ -1,7 +1,10 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { ACCEPTED_IMAGE_MIME, EXTENSION_BY_MIME, MAX_UPLOAD_BYTES } from '@/lib/productImages'
 import type { ProductImage } from '@/lib/schemas'
+
+const MAX_UPLOAD_MB = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)
 
 type ProductImageManagerProps = {
   productKey: string
@@ -35,11 +38,25 @@ export default function ProductImageManager({
     const added: ProductImage[] = []
 
     try {
-      for (const [offset, file] of files.entries()) {
+      // Chặn sớm ở client (định dạng + dung lượng) để không tốn thời gian upload
+      // rồi mới bị server từ chối — quan trọng với ảnh chụp từ điện thoại (HEIC, file lớn).
+      for (const file of files) {
+        if (!(file.type in EXTENSION_BY_MIME)) {
+          throw new Error(
+            `"${file.name}" không đúng định dạng (chỉ JPG, PNG, WebP, GIF, AVIF). Nếu chụp bằng iPhone, hãy chọn định dạng "Tương thích nhất" trong Cài đặt máy ảnh.`,
+          )
+        }
+        if (file.size > MAX_UPLOAD_BYTES) {
+          throw new Error(`"${file.name}" vượt quá ${MAX_UPLOAD_MB}MB.`)
+        }
+      }
+
+      for (const file of files) {
         const formData = new FormData()
         formData.append('file', file)
         formData.append('productKey', productKey)
-        formData.append('index', String(images.length + added.length + offset))
+        // added.length = số ảnh đã upload xong trong loạt này → index không bị đếm trùng.
+        formData.append('index', String(images.length + added.length))
 
         const response = await fetch('/api/admin/product-images', {
           method: 'POST',
@@ -62,6 +79,13 @@ export default function ProductImageManager({
   }
 
   async function handleDelete(image: ProductImage) {
+    // Xóa có hiệu lực NGAY (xóa file Storage + gỡ khỏi dữ liệu), không đợi bấm Lưu —
+    // nên bắt buộc xác nhận để tránh mất ảnh oan khi lỡ tay rồi bấm Hủy form.
+    const confirmed = window.confirm(
+      `Xoá "${image.label}"? Ảnh sẽ bị xoá vĩnh viễn khỏi Storage ngay lập tức, kể cả khi bạn không lưu form.`,
+    )
+    if (!confirmed) return
+
     setError(null)
     setBusy(true)
     try {
@@ -137,9 +161,10 @@ export default function ProductImageManager({
         ) : null}
       </div>
 
-      {/* accept="image/*" cho phép chọn từ thư viện/folder hoặc mở camera trên điện thoại. */}
+      {/* Liệt kê MIME cụ thể (khớp whitelist server) — vẫn cho chọn từ thư viện
+          hoặc mở camera trên điện thoại, nhưng picker sẽ ưu tiên định dạng hợp lệ. */}
       <input
-        accept="image/*"
+        accept={ACCEPTED_IMAGE_MIME}
         className="hidden"
         multiple
         onChange={(event) => handleFiles(event.target.files)}
@@ -148,8 +173,8 @@ export default function ProductImageManager({
       />
 
       <p className="mt-3 text-sm text-stone-500">
-        Tối đa {max} ảnh. Ảnh đầu tiên là ảnh chính. Trên điện thoại có thể chọn ảnh có sẵn hoặc chụp trực tiếp.
-        Để trống sẽ dùng ảnh mặc định theo danh mục.
+        Tối đa {max} ảnh (JPG/PNG/WebP/GIF/AVIF, mỗi ảnh ≤ {MAX_UPLOAD_MB}MB). Ảnh đầu tiên là ảnh chính.
+        Trên điện thoại có thể chọn ảnh có sẵn hoặc chụp trực tiếp. Để trống sẽ dùng ảnh mặc định theo danh mục.
       </p>
       {error ? <p className="mt-2 text-sm font-semibold text-red-600">{error}</p> : null}
     </div>

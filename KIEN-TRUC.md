@@ -1,4 +1,4 @@
-3# Kiến trúc chức năng — Website Nhà thuốc 16
+# Kiến trúc chức năng — Website Nhà thuốc 16
 
 Tài liệu mô tả kiến trúc chức năng của website thương mại điện tử **Nhà thuốc 16** —
 một nhà thuốc online bán thuốc, thực phẩm chức năng, sản phẩm chăm sóc da và thiết bị
@@ -158,7 +158,8 @@ Dashboard CMS, sidebar điều hướng (`src/app/admin/layout.tsx`):
 | Mục | Chức năng |
 |-----|-----------|
 | Dashboard | Tổng quan |
-| Sản phẩm | CRUD sản phẩm (`new`, `[id]/edit`) |
+| Sản phẩm | CRUD sản phẩm (`new`, `[id]/edit`) + **upload ảnh** (`ProductImageManager`: chọn file/chụp trên điện thoại, tối đa 6 ảnh, lưu Supabase Storage) |
+| Quản lý ảnh | `/admin/images` — 2 tab: danh sách ảnh trong bucket (xóa được ảnh `uploads/`) + bar chart dung lượng theo thư mục (đọc `storage.objects`) |
 | Danh mục | Quản lý category |
 | Đơn hàng | Danh sách + chi tiết `[id]`, **cập nhật trạng thái** đơn |
 | Bài viết | CRUD bài viết (dùng server actions trong `articles/actions.ts`) |
@@ -232,7 +233,9 @@ app đọc `products`/`users` bình thường.
 | `POSTGRES_URL_NON_POOLING` | migrate/seed local | Direct connection **cổng 5432** (không cần trên Vercel) |
 | `JWT_SECRET` | auth | **Phải đặt** trên Vercel; tránh dùng giá trị mặc định |
 | `ANTHROPIC_API_KEY` | `/api/chat` | Chatbot |
-| `NEXT_PUBLIC_SUPABASE_*` | (không dùng trong code) | Do tích hợp Supabase↔Vercel thêm; app không cần |
+| `NEXT_PUBLIC_SUPABASE_URL` | ảnh sản phẩm | Dựng public URL ảnh Storage (`getPublicUrl`, `buildPublicProductImageUrl`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | upload/xóa ảnh | **Bắt buộc** cho `/api/admin/product-images` (ghi/xóa Storage); trang `/admin/images` chỉ đọc, không cần |
+| `NEXT_PUBLIC_STORAGE_LIMIT_GB` | `/admin/images` | Hạn mức Storage cho thanh % (mặc định 1GB — đặt lại khi lên gói Supabase trả phí) |
 
 ---
 
@@ -246,6 +249,7 @@ app đọc `products`/`users` bình thường.
 | Checkout | `checkout` | Tạo đơn từ giỏ (validate `zod`, tính phí ship) |
 | Auth | `auth/login`, `auth/register`, `auth/logout`, `auth/me` | Phiên đăng nhập |
 | Admin | `admin/orders/[id]/status`, `admin/users` | Cập nhật đơn, quản lý user |
+| Admin ảnh | `admin/product-images` (POST/DELETE) | Upload ảnh lên Supabase Storage; xóa ảnh = xóa file Storage **và** gỡ khỏi `products.images` |
 
 **Logic nghiệp vụ tiêu biểu — `api/checkout`:**
 1. Validate payload bằng `zod` (địa chỉ, phương thức thanh toán).
@@ -297,4 +301,6 @@ middleware, thay khóa bí mật, hoặc nâng cấp chatbot lên RAG, hãy cậ
 
 *Cập nhật gần nhất (07/2026): kết nối Supabase + deploy Vercel; trang chủ đọc sản phẩm
 từ DB; thêm menu đăng nhập (`AuthMenu`); sửa hiển thị sản phẩm do admin tạo (bỏ allowlist
-tĩnh, lọc `is_active`, nới `productSchema`); **bật RLS toàn bộ bảng** để chặn Data API công khai.*
+tĩnh, lọc `is_active`, nới `productSchema`); **bật RLS toàn bộ bảng** để chặn Data API công khai;
+**upload ảnh sản phẩm** lên Supabase Storage (form thêm/sửa) + mục **Quản lý ảnh** `/admin/images`
+(danh sách + bar chart dung lượng đọc từ `storage.objects`).*

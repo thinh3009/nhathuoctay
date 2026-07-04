@@ -1,6 +1,6 @@
 'use client'
 
-import { type CSSProperties, useState } from 'react'
+import { type CSSProperties, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import AuthMenu from '@/components/AuthMenu'
@@ -22,6 +22,26 @@ export default function SiteHeader({
   const [query, setQuery] = useState('')
   const [mobSearch, setMobSearch] = useState(false)
   const [mobMenu, setMobMenu] = useState(false)
+  // Danh mục hiển thị trên nav: khởi tạo bằng config tĩnh (ổn định khi SSR),
+  // sau đó đồng bộ từ DB qua /api/categories — danh mục admin đã ẩn sẽ biến mất.
+  const [navCategories, setNavCategories] = useState<{ slug: string; label: string }[]>(
+    CATEGORY_CONFIG.map((c) => ({ slug: c.slug, label: c.label })),
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/categories')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.items)) {
+          setNavCategories(data.items.map((item: { slug: string; label: string }) => ({ slug: item.slug, label: item.label })))
+        }
+      })
+      .catch(() => {}) // lỗi mạng → giữ danh sách tĩnh
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function submitSearch() {
     const q = query.trim()
@@ -30,7 +50,7 @@ export default function SiteHeader({
   }
 
   const navItems: { label: string; href: string; active: boolean }[] = [
-    ...CATEGORY_CONFIG.map((c) => ({
+    ...navCategories.map((c) => ({
       label: c.label,
       href: `/category/${c.slug}`,
       active: activeCategorySlug === c.slug,

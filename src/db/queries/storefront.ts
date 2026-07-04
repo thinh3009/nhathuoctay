@@ -1,6 +1,6 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { db } from '../client'
-import { products as productsTable } from '../schema'
+import { categories as categoriesTable, products as productsTable } from '../schema'
 import { listPublishedArticles } from './articles'
 import type { Cat, NewsArticle, Product } from '@/components/quaythuoc/data'
 
@@ -13,11 +13,14 @@ const CATEGORY_TO_CAT: Record<string, Cat> = {
 }
 
 // Lấy toàn bộ sản phẩm đang bán từ DB, map sang shape của trang chủ (QuayThuoc16).
+// Loại cả sản phẩm thuộc danh mục đã ẩn (admin ngừng bán loại hàng đó).
 export async function getStorefrontProducts(): Promise<Product[]> {
   const rows = await db
-    .select()
+    .select({ product: productsTable })
     .from(productsTable)
-    .where(eq(productsTable.isActive, true))
+    .innerJoin(categoriesTable, eq(productsTable.categorySlug, categoriesTable.slug))
+    .where(and(eq(productsTable.isActive, true), eq(categoriesTable.isActive, true)))
+    .then((result) => result.map((item) => item.product))
 
   return rows.map((row) => ({
     id: row.slug,

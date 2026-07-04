@@ -1,24 +1,30 @@
 import { randomUUID } from 'node:crypto'
-import { PRODUCT_IMAGE_BUCKET, UPLOAD_PREFIX } from './productImages'
+import {
+  EXTENSION_BY_MIME,
+  MAX_UPLOAD_BYTES,
+  PRODUCT_IMAGE_BUCKET,
+  UPLOAD_PREFIX,
+} from './productImages'
 
-// Loại ảnh được phép upload + phần mở rộng tương ứng.
-const EXTENSION_BY_MIME: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-  'image/avif': 'avif',
-}
+export { MAX_UPLOAD_BYTES }
 
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024 // 5MB / ảnh
-
-function getStorageConfig() {
+// Public URL chỉ cần base URL của Supabase — KHÔNG đòi service key,
+// để trang chỉ-đọc (/admin/images) không sập khi thiếu SUPABASE_SERVICE_ROLE_KEY.
+function getSupabaseUrl() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl) {
     throw new Error('NEXT_PUBLIC_SUPABASE_URL (hoặc SUPABASE_URL) chưa được cấu hình.')
   }
+
+  return supabaseUrl
+}
+
+// Config đầy đủ cho thao tác ghi/xóa (upload, delete) — cần service role key.
+function getStorageConfig() {
+  const supabaseUrl = getSupabaseUrl()
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
   if (!serviceRoleKey) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY chưa được cấu hình.')
   }
@@ -27,8 +33,7 @@ function getStorageConfig() {
 }
 
 export function getPublicUrl(storagePath: string) {
-  const { supabaseUrl } = getStorageConfig()
-  return `${supabaseUrl}/storage/v1/object/public/${PRODUCT_IMAGE_BUCKET}/${storagePath}`
+  return `${getSupabaseUrl()}/storage/v1/object/public/${PRODUCT_IMAGE_BUCKET}/${storagePath}`
 }
 
 export function isValidImageType(mimeType: string) {

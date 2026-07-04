@@ -26,9 +26,6 @@ type Usage = {
   totalFiles: number
 }
 
-// Dung lượng gói Supabase free để tham chiếu mức sử dụng.
-const STORAGE_LIMIT_BYTES = 1024 * 1024 * 1024 // 1GB
-
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`
   const kb = bytes / 1024
@@ -42,9 +39,12 @@ const BAR_COLORS = ['#047857', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#647
 
 export default function ImageManagerClient({
   images,
+  storageLimitBytes,
   usage,
 }: {
   images: ManagedImage[]
+  // Hạn mức Storage (bytes) — server truyền xuống từ env, không hard-code theo gói free.
+  storageLimitBytes: number
   usage: Usage
 }) {
   const [tab, setTab] = useState<'list' | 'usage'>('list')
@@ -79,7 +79,7 @@ export default function ImageManagerClient({
     }
   }
 
-  const usagePercent = Math.min(100, (usage.totalBytes / STORAGE_LIMIT_BYTES) * 100)
+  const usagePercent = Math.min(100, (usage.totalBytes / storageLimitBytes) * 100)
 
   return (
     <div>
@@ -102,7 +102,7 @@ export default function ImageManagerClient({
       {tab === 'list' ? (
         <ImageList deleting={deleting} images={images} onDelete={handleDelete} />
       ) : (
-        <UsageChart limitBytes={STORAGE_LIMIT_BYTES} usage={usage} usagePercent={usagePercent} />
+        <UsageChart limitBytes={storageLimitBytes} usage={usage} usagePercent={usagePercent} />
       )}
     </div>
   )

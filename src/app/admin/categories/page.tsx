@@ -18,6 +18,22 @@ async function createCategory(formData: FormData) {
   redirect('/admin/categories')
 }
 
+// Bật/tắt hiển thị danh mục trên storefront. Khi ẩn: nav, trang danh mục,
+// trang chủ và trang chi tiết sản phẩm thuộc danh mục đều không truy cập được.
+async function toggleCategoryActive(slug: string, nextActive: boolean) {
+  'use server'
+  await requireAdmin()
+
+  await db
+    .update(categories)
+    .set({ isActive: nextActive, updatedAt: new Date() })
+    .where(eq(categories.slug, slug))
+
+  revalidatePath('/admin/categories')
+  revalidatePath('/') // trang chủ (ISR) cập nhật danh sách sản phẩm ngay
+  revalidatePath(`/category/${slug}`)
+}
+
 export default async function AdminCategoriesPage() {
   const cats = await db.select().from(categories).orderBy(categories.label)
 
@@ -32,17 +48,43 @@ export default async function AdminCategoriesPage() {
         {/* List */}
         <div className="space-y-3">
           {cats.map((cat) => (
-            <div className="rounded-2xl border border-stone-200 bg-white p-4" key={cat.slug}>
+            <div
+              className={`rounded-2xl border bg-white p-4 ${cat.isActive ? 'border-stone-200' : 'border-stone-200 opacity-70'}`}
+              key={cat.slug}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-bold text-stone-900">{cat.label}</p>
                   <p className="mt-0.5 font-mono text-xs text-stone-400">{cat.slug}</p>
                   <p className="mt-1 text-sm text-stone-500">{cat.heroDescription}</p>
                 </div>
-                <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                  Active
-                </span>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      cat.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-500'
+                    }`}
+                  >
+                    {cat.isActive ? 'Đang hiện' : 'Đã ẩn'}
+                  </span>
+                  <form action={toggleCategoryActive.bind(null, cat.slug, !cat.isActive)}>
+                    <button
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                        cat.isActive
+                          ? 'bg-stone-100 text-stone-600 hover:bg-red-100 hover:text-red-700'
+                          : 'bg-emerald-700 text-white hover:bg-emerald-800'
+                      }`}
+                      type="submit"
+                    >
+                      {cat.isActive ? 'Ẩn danh mục' : 'Hiện lại'}
+                    </button>
+                  </form>
+                </div>
               </div>
+              {!cat.isActive ? (
+                <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                  Khách không xem được danh mục này và mọi sản phẩm thuộc nó (nav, trang chủ, trang danh mục, trang chi tiết).
+                </p>
+              ) : null}
             </div>
           ))}
         </div>

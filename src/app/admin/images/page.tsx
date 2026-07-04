@@ -1,7 +1,7 @@
 import { db } from '@/db/client'
 import { products } from '@/db/schema'
 import { requireAdmin } from '@/lib/auth'
-import { isUploadedImage } from '@/lib/productImages'
+import { isUploadedImage, isUploadedPath } from '@/lib/productImages'
 import type { ProductImage } from '@/lib/schemas'
 import { listStorageObjects, summarizeStorageUsage } from '@/db/queries/storage'
 import ImageManagerClient, { type ManagedImage } from './ImageManagerClient'
@@ -33,11 +33,15 @@ export default async function AdminImagesPage() {
     mimeType: object.mimeType,
     updatedAt: object.updatedAt,
     publicUrl: object.publicUrl,
-    deletable: object.name.startsWith('uploads/'),
+    deletable: isUploadedPath(object.name),
     usedByProduct: usageByPath.get(object.name) ?? null,
   }))
 
   const usage = summarizeStorageUsage(objects)
 
-  return <ImageManagerClient images={images} usage={usage} />
+  // Hạn mức Storage của gói Supabase (GB) — đặt NEXT_PUBLIC_STORAGE_LIMIT_GB khi lên gói trả phí.
+  const limitGb = Number.parseFloat(process.env.NEXT_PUBLIC_STORAGE_LIMIT_GB ?? '1')
+  const storageLimitBytes = (Number.isFinite(limitGb) && limitGb > 0 ? limitGb : 1) * 1024 * 1024 * 1024
+
+  return <ImageManagerClient images={images} storageLimitBytes={storageLimitBytes} usage={usage} />
 }

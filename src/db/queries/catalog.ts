@@ -87,6 +87,7 @@ export async function getCategoryNavItems() {
     .array()
     .parse(
       rows
+        .filter((row) => row.isActive) // danh mục ẩn không xuất hiện trên nav/API công khai
         .map((row) => ({
           slug: row.slug,
           label: row.label,
@@ -102,7 +103,8 @@ export async function getCategoryBySlug(slug: string) {
     where: eq(categories.slug, slug),
   })
 
-  if (!row) {
+  // Danh mục ẩn coi như không tồn tại với storefront → trang /category/[slug] trả 404.
+  if (!row || !row.isActive) {
     return null
   }
 
@@ -123,7 +125,8 @@ export async function getProductBySlug(slug: string) {
     },
   })
 
-  if (!row || !row.isActive) {
+  // Sản phẩm ẩn, hoặc thuộc danh mục đã ẩn → không xem được.
+  if (!row || !row.isActive || !row.category.isActive) {
     return null
   }
 

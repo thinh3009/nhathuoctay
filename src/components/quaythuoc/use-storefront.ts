@@ -337,6 +337,8 @@ export function useStorefront({
   })
 
   const cnt = (c: Cat) => products.filter((p) => p.cat === c).length
+  // Danh mục không còn sản phẩm nào (vd: admin ẩn danh mục — server đã lọc hết
+  // sản phẩm thuộc nó) thì ẩn khỏi thẻ danh mục + nav trang chủ.
   const catCards = (
     [
       { key: 'thuoc', label: 'Thuốc', desc: 'Giảm đau, cảm cúm, tiêu hóa, hô hấp' },
@@ -344,10 +346,12 @@ export function useStorefront({
       { key: 'skincare', label: 'Chăm sóc da', desc: 'Chống nắng, dưỡng ẩm, trị mụn' },
       { key: 'thietbi', label: 'Thiết bị y tế', desc: 'Máy đo, nhiệt kế, vật tư y tế' },
     ] as { key: Cat; label: string; desc: string }[]
-  ).map((c) => {
-    const t = tint(c.key)
-    return { label: c.label, desc: c.desc, countText: cnt(c.key) + ' sản phẩm', tintBg: t.bg, tintFg: t.fg, onClick: () => goCatScreen(c.key) }
-  })
+  )
+    .filter((c) => cnt(c.key) > 0)
+    .map((c) => {
+      const t = tint(c.key)
+      return { label: c.label, desc: c.desc, countText: cnt(c.key) + ' sản phẩm', tintBg: t.bg, tintFg: t.fg, onClick: () => goCatScreen(c.key) }
+    })
 
   const trustBadges = [
     { icon: '🛡️', title: 'Chính hãng 100%', desc: 'Nguồn gốc rõ ràng' },
@@ -355,12 +359,24 @@ export function useStorefront({
     { icon: '🚚', title: 'Giao nhanh 2 giờ', desc: 'Nội thành TP.HCM' },
     { icon: '↩️', title: 'Đổi trả dễ dàng', desc: 'Trong vòng 7 ngày' },
   ]
+  const catNavLinks = (
+    [
+      { key: 'thuoc', label: 'Thuốc' },
+      { key: 'tpcn', label: 'Thực phẩm chức năng' },
+      { key: 'thietbi', label: 'Thiết bị y tế' },
+      { key: 'skincare', label: 'Chăm sóc da' },
+    ] as { key: Cat; label: string }[]
+  )
+    .filter((c) => cnt(c.key) > 0)
+    .map((c) => ({
+      label: c.label,
+      onClick: () => goCatScreen(c.key),
+      style: navStyle(sst.screen === 'category' && sst.cat === c.key && !sst.dealsOnly),
+    }))
+
   const navLinks = [
     { label: 'Trang chủ', onClick: goHome, style: navStyle(sst.screen === 'home') },
-    { label: 'Thuốc', onClick: () => goCatScreen('thuoc'), style: navStyle(sst.screen === 'category' && sst.cat === 'thuoc' && !sst.dealsOnly) },
-    { label: 'Thực phẩm chức năng', onClick: () => goCatScreen('tpcn'), style: navStyle(sst.screen === 'category' && sst.cat === 'tpcn' && !sst.dealsOnly) },
-    { label: 'Thiết bị y tế', onClick: () => goCatScreen('thietbi'), style: navStyle(sst.screen === 'category' && sst.cat === 'thietbi' && !sst.dealsOnly) },
-    { label: 'Chăm sóc da', onClick: () => goCatScreen('skincare'), style: navStyle(sst.screen === 'category' && sst.cat === 'skincare' && !sst.dealsOnly) },
+    ...catNavLinks,
     { label: 'Khuyến mãi', onClick: goDeals, style: navStyle(sst.dealsOnly) },
     { label: 'Tin tức', onClick: goNews, style: navStyle(sst.screen === 'news' || sst.screen === 'article') },
   ]

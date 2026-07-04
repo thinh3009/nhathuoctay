@@ -379,6 +379,26 @@ export function getProductImageAssets(productSlug: string) {
 // Tiền tố thư mục cho ảnh admin tải lên Supabase Storage (client-safe hằng số dùng chung).
 export const UPLOAD_PREFIX = 'uploads'
 
+// Loại ảnh được phép upload + phần mở rộng tương ứng (dùng chung client & server:
+// client build `accept` + chặn sớm, server validate lại).
+export const EXTENSION_BY_MIME: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+  'image/avif': 'avif',
+}
+
+export const ACCEPTED_IMAGE_MIME = Object.keys(EXTENSION_BY_MIME).join(',')
+
+export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024 // 5MB / ảnh
+
+// Kiểm tra một đường dẫn trong bucket có phải ảnh admin tải lên không.
+// Dùng chung cho isUploadedImage, cờ deletable ở /admin/images và validate DELETE route.
+export function isUploadedPath(storagePath: string) {
+  return storagePath.startsWith(`${UPLOAD_PREFIX}/`)
+}
+
 // Nhãn + kind gợi ý cho từng khe ảnh admin tải lên (theo thứ tự upload).
 const ADMIN_IMAGE_SLOTS: Array<{ kind: ProductImageKind; label: string }> = [
   { kind: 'front', label: 'Ảnh chính' },
@@ -387,7 +407,7 @@ const ADMIN_IMAGE_SLOTS: Array<{ kind: ProductImageKind; label: string }> = [
 ]
 
 export function isUploadedImage(image: ProductImage) {
-  return image.storagePath.startsWith(`${UPLOAD_PREFIX}/`)
+  return isUploadedPath(image.storagePath)
 }
 
 // Nhãn/kind cho ảnh thứ index (dùng khi admin thêm ảnh mới trong trình quản lý ảnh).

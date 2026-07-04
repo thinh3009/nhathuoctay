@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { db } from '@/db/client'
 import { products } from '@/db/schema'
 import { getAuthUser } from '@/lib/auth'
-import { buildUploadedProductImage, isUploadedImage, UPLOAD_PREFIX } from '@/lib/productImages'
+import { buildUploadedProductImage, isUploadedPath } from '@/lib/productImages'
 import {
   deleteProductImage,
   isValidImageType,
@@ -65,7 +65,7 @@ export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url)
   const storagePath = searchParams.get('path')?.trim()
 
-  if (!storagePath || !storagePath.startsWith(`${UPLOAD_PREFIX}/`)) {
+  if (!storagePath || !isUploadedPath(storagePath)) {
     return NextResponse.json({ error: 'Đường dẫn ảnh không hợp lệ.' }, { status: 400 })
   }
 
@@ -80,20 +80,29 @@ export async function DELETE(request: Request) {
 }
 
 // Gỡ ảnh có storagePath tương ứng khỏi cột images của mọi sản phẩm đang dùng nó.
+// Lọc ngay bằng SQL (images::text LIKE) để không quét toàn bộ bảng mỗi lần xóa.
 async function removeImageFromProducts(storagePath: string) {
   const rows = await db
     .select({ id: products.id, images: products.images })
     .from(products)
+    .where(sql`${products.images}::text like ${`%${storagePath}%`}`)
 
   for (const row of rows) {
-    const images = (row.images ?? []) as ProductImage[]
-    if (!images.some((image) => isUploadedImage(image) && image.storagePath === storagePath)) {
+    // safeParse từng phần tử: hàng legacy (string[]/dữ liệu lệch schema) được giữ nguyên
+    // thay vì làm crash cả request.
+    const rawList = Array.isArray(row.images) ? (row.images as unknown[]) : []
+    const next = rawList.filter((raw) => {
+      const parsed = productImageSchema.safeParse(raw)
+      return !(parsed.success && parsed.data.storagePath === storagePath)
+    })
+
+    if (next.length === rawList.length) {
       continue
     }
-    const next = images.filter((image) => image.storagePath !== storagePath)
+
     await db
       .update(products)
-      .set({ images: productImageSchema.array().parse(next), updatedAt: new Date() })
+      .set({ images: next as ProductImage[], updatedAt: new Date() })
       .where(eq(products.id, row.id))
   }
 }

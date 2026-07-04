@@ -47,6 +47,9 @@ export const categories = pgTable('categories', {
   label: text('label').notNull(),
   heroTitle: text('hero_title').notNull(),
   heroDescription: text('hero_description').notNull(),
+  // Ẩn danh mục khỏi storefront (nav, trang danh mục, trang chủ, trang sản phẩm)
+  // khi ngừng bán loại hàng đó; admin vẫn thấy và bật lại được.
+  isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
