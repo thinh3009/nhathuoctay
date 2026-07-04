@@ -51,6 +51,19 @@ export async function setUserActive(id: string, isActive: boolean) {
   await db.update(users).set({ isActive, updatedAt: new Date() }).where(eq(users.id, id))
 }
 
+export async function updateUserProfile(
+  id: string,
+  data: { fullName?: string; phone?: string | null; passwordHash?: string },
+) {
+  await db.update(users).set({ ...data, updatedAt: new Date() }).where(eq(users.id, id))
+}
+
+// Xóa cứng người dùng. Các khóa ngoại tham chiếu users đã được cấu hình an toàn:
+// đơn hàng/giỏ/bài viết → set null (giữ lịch sử), địa chỉ/wishlist → cascade.
+export async function deleteUser(id: string) {
+  await db.delete(users).where(eq(users.id, id))
+}
+
 export async function createStaffUser(data: {
   email: string
   passwordHash: string

@@ -1,7 +1,17 @@
 import { revalidatePath } from 'next/cache'
-import { listUsers, setUserActive, updateUserRole, type UserRole } from '@/db/queries/users'
+import {
+  deleteUser,
+  listUsers,
+  setUserActive,
+  updateUserProfile,
+  updateUserRole,
+  type UserRole,
+} from '@/db/queries/users'
 import { requireAdmin } from '@/lib/auth'
+import { hashPassword } from '@/lib/password'
 import CreateUserForm from './_components/CreateUserForm'
+import DeleteUserButton from './_components/DeleteUserButton'
+import EditUserButton from './_components/EditUserButton'
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Quản trị viên',
@@ -40,6 +50,47 @@ async function toggleActive(formData: FormData) {
     return
   }
   await setUserActive(id, next)
+  revalidatePath('/admin/users')
+}
+
+async function editUser(formData: FormData) {
+  'use server'
+  const admin = await requireAdmin()
+  const id = String(formData.get('id') ?? '')
+  // Không cho tự sửa qua bảng này (giữ nhất quán với các thao tác khác).
+  if (!id || id === admin.userId) {
+    return
+  }
+  const fullName = String(formData.get('fullName') ?? '').trim()
+  const phone = String(formData.get('phone') ?? '').trim()
+  const password = String(formData.get('password') ?? '')
+  if (fullName.length < 2) {
+    return
+  }
+  const patch: { fullName: string; phone: string | null; passwordHash?: string } = {
+    fullName,
+    phone: phone || null,
+  }
+  // Chỉ đổi mật khẩu khi có nhập và đủ độ dài.
+  if (password) {
+    if (password.length < 6) {
+      return
+    }
+    patch.passwordHash = await hashPassword(password)
+  }
+  await updateUserProfile(id, patch)
+  revalidatePath('/admin/users')
+}
+
+async function removeUser(formData: FormData) {
+  'use server'
+  const admin = await requireAdmin()
+  const id = String(formData.get('id') ?? '')
+  // Không cho tự xóa tài khoản của chính mình.
+  if (!id || id === admin.userId) {
+    return
+  }
+  await deleteUser(id)
   revalidatePath('/admin/users')
 }
 
@@ -145,6 +196,13 @@ export default async function AdminUsersPage() {
                               {user.isActive ? 'Khóa' : 'Mở khóa'}
                             </button>
                           </form>
+
+                          <EditUserButton
+                            action={editUser}
+                            user={{ id: user.id, fullName: user.fullName, phone: user.phone, email: user.email }}
+                          />
+
+                          <DeleteUserButton action={removeUser} userId={user.id} />
                         </div>
                       )}
                     </td>

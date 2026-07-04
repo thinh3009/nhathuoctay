@@ -64,7 +64,7 @@ export default function HomeScreen({ hub }: { hub: StorefrontHub }) {
       {/* combos */}
       <div style={s('max-width:1180px;margin:44px auto 0;padding:0 24px;width:100%')}>
         <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0 0 18px')}>💚 Combo tiết kiệm</h2>
-        <div className="qt-slider" style={s('display:grid;grid-template-columns:repeat(3,1fr);gap:18px')}>
+        <div className="qt-slider qt-combos" style={s('display:grid;grid-template-columns:repeat(3,1fr);gap:18px')}>
           {combos.map((k, i) => (
             <div key={i} style={s('background:#fff;border:1px solid #e7efe9;border-radius:18px;overflow:hidden;display:flex;flex-direction:column')}>
               <div style={s('background:#2e9e5b;color:#fff;padding:9px 18px;font-size:13px;font-weight:600;display:flex;justify-content:space-between')}><span>{k.tag}</span><span>{k.saveText}</span></div>
@@ -75,9 +75,9 @@ export default function HomeScreen({ hub }: { hub: StorefrontHub }) {
                     <div key={j} style={s('font-size:13.5px;color:#4a564e;display:flex;gap:8px')}><span style={s('color:#2e9e5b')}>✓</span>{it}</div>
                   ))}
                 </div>
-                <div style={s('display:flex;align-items:flex-end;justify-content:space-between;margin-top:6px')}>
+                <div className="qt-combo-foot" style={s('display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:6px')}>
                   <div><div style={s('font-size:20px;font-weight:800;color:#1c7a45')}>{k.priceText}</div><div style={s('font-size:12.5px;color:#b3bdb6;text-decoration:line-through')}>{k.oldPriceText}</div></div>
-                  <button onClick={k.onAdd} style={s('background:#eaf6ef;color:#1c7a45;border:none;padding:11px 18px;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer')}>Mua combo</button>
+                  <button className="qt-combo-btn" onClick={k.onAdd} style={s('background:#eaf6ef;color:#1c7a45;border:none;padding:11px 18px;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer;white-space:nowrap;flex-shrink:0')}>Mua combo</button>
                 </div>
               </div>
             </div>
