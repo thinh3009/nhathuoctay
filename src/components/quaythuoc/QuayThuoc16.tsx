@@ -5,7 +5,7 @@ import HomeFooter from './HomeFooter'
 import HomeHeader from './HomeHeader'
 import RxModal from './RxModal'
 import Toast from './Toast'
-import { useStorefront } from './use-storefront'
+import { useStorefront, type StorefrontInitialParams } from './use-storefront'
 import ArticleScreen from './screens/ArticleScreen'
 import CartScreen from './screens/CartScreen'
 import CategoryScreen from './screens/CategoryScreen'
@@ -24,11 +24,13 @@ import SearchScreen from './screens/SearchScreen'
 export default function QuayThuoc16({
   products,
   news,
+  initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
+  initialParams?: StorefrontInitialParams
 }) {
-  const hub = useStorefront({ products, news })
+  const hub = useStorefront({ products, news, initialParams })
   const { screen } = hub.sst
 
   return (

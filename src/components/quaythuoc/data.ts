@@ -16,6 +16,8 @@ export type Product = {
   reviews: number
   unit: string
   badge?: string
+  // URL ảnh chính (Supabase Storage hoặc ảnh demo). Trống → vẽ hình trang trí theo danh mục.
+  image?: string
 }
 
 export const products: Product[] = [

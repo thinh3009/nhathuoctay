@@ -3,9 +3,9 @@ import QuayThuoc16 from '@/components/quaythuoc/QuayThuoc16'
 import { getStorefrontProducts, getStorefrontNews } from '@/db/queries/storefront'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
-// ISR: cache HTML trang chủ, tự làm mới mỗi 60s. Khi admin thêm/sửa sản phẩm,
-// action gọi revalidatePath('/') nên sản phẩm mới hiện ngay lập tức.
-export const revalidate = 60
+// Trang đọc searchParams (?screen=, ?cat=…) để server render đúng màn SPA đang xem —
+// F5 giữ nguyên màn danh mục/sản phẩm, không nháy về trang chủ. Đọc searchParams
+// khiến trang render động mỗi request (không còn cache ISR như trước).
 
 export const metadata: Metadata = {
   title: 'Quầy thuốc 16 — Nhà thuốc trực tuyến chính hãng',
@@ -24,7 +24,30 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function LandingPage() {
-  const [products, news] = await Promise.all([getStorefrontProducts(), getStorefrontNews()])
-  return <QuayThuoc16 products={products} news={news} />
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const [products, news, params] = await Promise.all([
+    getStorefrontProducts(),
+    getStorefrontNews(),
+    searchParams,
+  ])
+  const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
+
+  return (
+    <QuayThuoc16
+      initialParams={{
+        screen: first(params.screen),
+        cat: first(params.cat),
+        deals: first(params.deals),
+        p: first(params.p),
+        q: first(params.q),
+        rx: first(params.rx),
+      }}
+      news={news}
+      products={products}
+    />
+  )
 }

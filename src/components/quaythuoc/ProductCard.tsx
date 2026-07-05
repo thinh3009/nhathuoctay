@@ -4,6 +4,7 @@ import { s } from './data'
 
 export type CardVM = {
   name: string
+  image: string
   catLabel: string
   priceText: string
   oldPriceText: string
@@ -30,13 +31,18 @@ export default function ProductCard({ p, onView, onAdd }: Props) {
         onClick={onView}
         style={{ ...s('position:relative;cursor:pointer;border-radius:10px;aspect-ratio:1 / 1;display:flex;align-items:center;justify-content:center;overflow:hidden'), background: p.tintBg }}
       >
+        {p.image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt={p.name} loading="lazy" src={p.image} style={s('width:100%;height:100%;object-fit:cover')} />
+        ) : (
+          <div style={s('width:38%;height:38%;position:relative;opacity:.92')}>
+            <div style={{ ...s('position:absolute;left:36%;top:0;width:28%;height:100%;border-radius:7px'), background: p.tintFg }} />
+            <div style={{ ...s('position:absolute;top:36%;left:0;height:28%;width:100%;border-radius:7px'), background: p.tintFg }} />
+          </div>
+        )}
         {p.badge ? (
           <div style={s('position:absolute;top:8px;left:8px;background:#e8654e;color:#fff;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.2px')}>{p.badge}</div>
         ) : null}
-        <div style={s('width:38%;height:38%;position:relative;opacity:.92')}>
-          <div style={{ ...s('position:absolute;left:36%;top:0;width:28%;height:100%;border-radius:7px'), background: p.tintFg }} />
-          <div style={{ ...s('position:absolute;top:36%;left:0;height:28%;width:100%;border-radius:7px'), background: p.tintFg }} />
-        </div>
       </div>
       <div style={{ ...s('font-size:11px;font-weight:600;letter-spacing:.2px'), color: p.tintFg }}>{p.catLabel}</div>
       <div

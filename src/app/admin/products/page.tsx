@@ -1,10 +1,17 @@
 import Link from 'next/link'
 import { db } from '@/db/client'
 import { products, categories } from '@/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, ilike, or } from 'drizzle-orm'
 import { formatPrice } from '@/lib/catalog'
 
-export default async function AdminProductsPage() {
+export default async function AdminProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q } = await searchParams
+  const query = q?.trim() ?? ''
+
   const rows = await db
     .select({
       id: products.id,
@@ -22,6 +29,7 @@ export default async function AdminProductsPage() {
     })
     .from(products)
     .leftJoin(categories, eq(products.categorySlug, categories.slug))
+    .where(query ? or(ilike(products.name, `%${query}%`), ilike(products.sku, `%${query}%`)) : undefined)
     .orderBy(products.name)
     .limit(200)
 
@@ -39,6 +47,33 @@ export default async function AdminProductsPage() {
           + Thêm sản phẩm
         </Link>
       </div>
+
+      <form action="/admin/products" className="mb-4 flex flex-wrap items-center gap-2" method="get">
+        <input
+          className="w-full max-w-md rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+          defaultValue={query}
+          name="q"
+          placeholder="Tìm theo tên sản phẩm hoặc SKU…"
+          type="search"
+        />
+        <button
+          className="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
+          type="submit"
+        >
+          Tìm kiếm
+        </button>
+        {query ? (
+          <Link className="text-sm font-semibold text-stone-500 hover:text-stone-700" href="/admin/products">
+            Xóa lọc
+          </Link>
+        ) : null}
+      </form>
+
+      {query && rows.length === 0 ? (
+        <p className="mb-4 text-sm text-stone-500">
+          Không tìm thấy sản phẩm nào khớp “{query}”.
+        </p>
+      ) : null}
 
       <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
         <div className="overflow-x-auto">

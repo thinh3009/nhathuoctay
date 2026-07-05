@@ -27,8 +27,20 @@ export type Screen =
   | 'done'
   | 'news'
   | 'article'
-export type Form = { name: string; phone: string; address: string; note: string; pay: string }
+export type Form = { name: string; phone: string; address: string; city: string; note: string; pay: string }
 type CartLine = { id: string; qty: number }
+
+// Ngưỡng nghiệp vụ đơn hàng — khớp server (`/api/checkout`) để tổng tiền hiển thị
+// bằng đúng tổng tiền ghi vào đơn.
+const FREE_SHIP_THRESHOLD = 500000
+const SHIPPING_FEE = 30000
+
+// Map phương thức thanh toán của storefront → enum server chấp nhận.
+const PAYMENT_METHOD_MAP: Record<string, 'cod' | 'bank_transfer' | 'momo'> = {
+  cod: 'cod',
+  bank: 'bank_transfer',
+  momo: 'momo',
+}
 
 /** View-model chung cho một thẻ sản phẩm (ProductCard). */
 export type ProductCardVM = { p: CardVM; onView: () => void; onAdd: () => void }
@@ -49,6 +61,7 @@ type State = {
   toast: string
   toastSeq: number
   ordered: string | null
+  placingOrder: boolean
   form: Form
 }
 
@@ -68,7 +81,46 @@ const INITIAL: State = {
   toast: '',
   toastSeq: 0,
   ordered: null,
-  form: { name: '', phone: '', address: '', note: '', pay: 'cod' },
+  placingOrder: false,
+  form: { name: '', phone: '', address: '', city: '', note: '', pay: 'cod' },
+}
+
+/** Query param trang chủ nhận từ server (?screen=, ?q=, ?rx=…) để dựng đúng màn SPA. */
+export type StorefrontInitialParams = {
+  screen?: string
+  cat?: string
+  deals?: string
+  p?: string
+  q?: string
+  rx?: string
+}
+
+const VALID_CATS: readonly Cat[] = ['thuoc', 'tpcn', 'thietbi', 'skincare']
+
+// Dựng state khởi tạo từ searchParams do server truyền xuống. Chạy ngay trong lần
+// render đầu (cả server lẫn hydrate) nên F5 giữ nguyên màn đang xem, không nháy
+// về trang chủ như khi khôi phục bằng effect sau hydration.
+function initialStateFromParams(params: StorefrontInitialParams | undefined, products: Product[]): State {
+  if (!params) return INITIAL
+  const patch: Partial<State> = {}
+  if (params.q) {
+    patch.query = params.q
+    patch.screen = 'search'
+  }
+  if (params.rx) patch.showRx = true
+  if (params.screen === 'category') {
+    patch.screen = 'category'
+    patch.cat = params.cat && VALID_CATS.includes(params.cat as Cat) ? (params.cat as Cat) : 'all'
+    patch.dealsOnly = params.deals === '1'
+  } else if (params.screen === 'product') {
+    if (params.p && products.some((item) => item.id === params.p)) {
+      patch.screen = 'product'
+      patch.selected = params.p
+    }
+  } else if (params.screen === 'news') {
+    patch.screen = 'news'
+  }
+  return { ...INITIAL, ...patch }
 }
 
 function chip(active: boolean): CSSProperties {
@@ -104,9 +156,11 @@ function genOrderCode(): string {
 export function useStorefront({
   products: productsProp,
   news: newsProp,
+  initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
+  initialParams?: StorefrontInitialParams
 }) {
   const router = useRouter()
   // Dùng sản phẩm từ DB nếu có, fallback dữ liệu tĩnh khi rỗng.
@@ -115,7 +169,7 @@ export function useStorefront({
   const news = newsProp && newsProp.length > 0 ? newsProp : newsData
   const get = (id: string): Product => products.find((p) => p.id === id) ?? products[0]!
 
-  const [state, setState] = useState<State>(INITIAL)
+  const [state, setState] = useState<State>(() => initialStateFromParams(initialParams, products))
   // Drawer bộ lọc trên mobile (màn hình danh mục)
   const [mobileFilter, setMobileFilter] = useState(false)
   // Header mobile: mở ô tìm kiếm / menu 3 mục
@@ -138,21 +192,25 @@ export function useStorefront({
     return () => clearTimeout(id)
   }, [state.toastSeq, state.toast])
 
-  // Nhận param từ SiteHeader ở các trang khác: ?q= mở màn tìm kiếm, ?rx=1 mở modal toa.
-  // Dùng window.location để không cần useSearchParams (giữ trang chủ render tĩnh/ISR).
+  // Ghi màn hình hiện tại lên URL bằng replaceState (không điều hướng, không re-render)
+  // để F5 giữ nguyên màn danh mục/sản phẩm/tin tức đang xem thay vì về trang chủ.
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const q = params.get('q')
-    const rx = params.get('rx')
-    if (!q && !rx) return
-    // Đọc param URL một lần khi mount (init từ hệ thống bên ngoài — cố ý).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState((prev) => ({
-      ...prev,
-      ...(q ? { query: q, screen: 'search' as const } : {}),
-      ...(rx ? { showRx: true } : {}),
-    }))
-  }, [])
+    const keep = new URLSearchParams()
+    if (state.screen === 'category') {
+      keep.set('screen', 'category')
+      if (state.cat !== 'all') keep.set('cat', state.cat)
+      if (state.dealsOnly) keep.set('deals', '1')
+    } else if (state.screen === 'product') {
+      keep.set('screen', 'product')
+      keep.set('p', state.selected)
+    } else if (state.screen === 'news') {
+      keep.set('screen', 'news')
+    } else if (state.screen === 'search' && state.query.trim()) {
+      keep.set('q', state.query)
+    }
+    const qs = keep.toString()
+    window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname)
+  }, [state.screen, state.cat, state.dealsOnly, state.selected, state.query])
 
   // Drawer bộ lọc mobile: khóa cuộn nền + đóng bằng phím Escape (chuẩn a11y).
   useEffect(() => {
@@ -249,15 +307,72 @@ export function useStorefront({
     set({ showRx: false, rxName: '' })
     toastMsg('Đã gửi toa, dược sĩ sẽ liên hệ với bạn')
   }
-  const placeOrder = () => {
+  const placeOrder = async () => {
+    if (state.placingOrder) return
     const f = state.form
-    if (!f.name.trim() || !f.phone.trim() || !f.address.trim()) {
-      toastMsg('Vui lòng nhập đầy đủ thông tin')
+
+    // Validate khớp ràng buộc server để báo lỗi thân thiện, tránh 400 khó hiểu.
+    if (f.name.trim().length < 2) return toastMsg('Vui lòng nhập họ tên (tối thiểu 2 ký tự)')
+    if (f.phone.trim().length < 9) return toastMsg('Số điện thoại chưa hợp lệ')
+    if (f.address.trim().length < 5) return toastMsg('Vui lòng nhập địa chỉ chi tiết')
+    if (f.city.trim().length < 2) return toastMsg('Vui lòng nhập tỉnh/thành phố')
+
+    // Chỉ đặt các dòng là sản phẩm thật (có slug trong danh sách DB) — combo/dữ liệu
+    // demo với id không hợp lệ bị loại để đơn không bị server từ chối.
+    const items = state.cart
+      .filter((line) => products.some((p) => p.id === line.id))
+      .map((line) => ({ slug: line.id, quantity: line.qty }))
+
+    if (items.length === 0) {
+      toastMsg('Giỏ hàng trống hoặc sản phẩm không khả dụng')
       return
     }
-    const code = genOrderCode()
-    set({ screen: 'done', ordered: code, cart: [] })
-    top()
+
+    set({ placingOrder: true })
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shippingAddress: {
+            fullName: f.name.trim(),
+            phone: f.phone.trim(),
+            addressLine: f.address.trim(),
+            city: f.city.trim(),
+          },
+          paymentMethod: PAYMENT_METHOD_MAP[f.pay] ?? 'cod',
+          note: f.note.trim() || undefined,
+          items,
+        }),
+      })
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        setState((prev) => ({
+          ...prev,
+          placingOrder: false,
+          toast: (data && data.error) || 'Đặt hàng thất bại, vui lòng thử lại',
+          toastSeq: prev.toastSeq + 1,
+        }))
+        return
+      }
+
+      setState((prev) => ({
+        ...prev,
+        placingOrder: false,
+        screen: 'done',
+        ordered: data?.orderNumber ?? genOrderCode(),
+        cart: [],
+      }))
+      top()
+    } catch {
+      setState((prev) => ({
+        ...prev,
+        placingOrder: false,
+        toast: 'Lỗi kết nối, vui lòng thử lại',
+        toastSeq: prev.toastSeq + 1,
+      }))
+    }
   }
 
   const cardVM = (p: Product): ProductCardVM => {
@@ -265,6 +380,7 @@ export function useStorefront({
     return {
       p: {
         name: p.name,
+        image: p.image ?? '',
         catLabel: catLabel(p.cat),
         priceText: fmt(p.price),
         oldPriceText: p.oldPrice ? fmt(p.oldPrice) : '',
@@ -317,24 +433,32 @@ export function useStorefront({
     ],
   }
 
-  const combos = [
-    { tag: 'Mùa mưa', title: 'Combo cảm cúm gia đình', ids: ['t4', 't9', 'd4'], items: ['Decolgen Forte', 'Vitamin C 1000mg sủi', 'Khẩu trang y tế 4 lớp'] },
-    { tag: 'Tiêu hóa', title: 'Combo tiêu hóa khỏe mạnh', ids: ['t5', 's4', 't7'], items: ['Berberin Mekophar', 'Men vi sinh Probio', 'Oresol bù điện giải'] },
-    { tag: 'Người lớn tuổi', title: 'Combo chăm sóc sức khỏe', ids: ['d1', 's1', 's2'], items: ['Máy đo huyết áp Omron', 'Dầu cá Omega-3', 'Canxi Corbiere'] },
-  ].map((k) => {
-    // Combo là nội dung demo (tên cố định) → tính giá theo dữ liệu tĩnh tương ứng.
-    const sum = k.ids.reduce((a, id) => a + (staticProducts.find((p) => p.id === id) ?? staticProducts[0]!).price, 0)
-    const price = Math.round((sum * 0.85) / 1000) * 1000
-    return {
-      tag: k.tag,
-      title: k.title,
-      items: k.items,
-      priceText: fmt(price),
-      oldPriceText: fmt(sum),
-      saveText: 'Tiết kiệm ' + fmt(sum - price),
-      onAdd: () => addCombo(k.ids),
-    }
-  })
+  // Combo dựng từ SẢN PHẨM THẬT (DB) — mỗi combo gom 3 sản phẩm bán chạy, giá ưu đãi
+  // 85%. Dùng slug thật nên combo thêm vào giỏ và đặt hàng được như sản phẩm thường.
+  const comboMeta = [
+    { tag: 'Tiết kiệm', title: 'Combo chăm sóc gia đình' },
+    { tag: 'Bán chạy', title: 'Combo sức khỏe mỗi ngày' },
+    { tag: 'Ưu đãi', title: 'Combo tiết kiệm cuối tuần' },
+  ]
+  const comboBase = products.slice().sort((a, b) => b.reviews - a.reviews)
+  const combos = comboMeta
+    .map((meta, ci) => {
+      const picks = comboBase.slice(ci * 3, ci * 3 + 3)
+      if (picks.length < 3) return null
+      const ids = picks.map((p) => p.id)
+      const sum = picks.reduce((a, p) => a + p.price, 0)
+      const price = Math.round((sum * 0.85) / 1000) * 1000
+      return {
+        tag: meta.tag,
+        title: meta.title,
+        items: picks.map((p) => p.name),
+        priceText: fmt(price),
+        oldPriceText: fmt(sum),
+        saveText: 'Tiết kiệm ' + fmt(sum - price),
+        onAdd: () => addCombo(ids),
+      }
+    })
+    .filter((c): c is NonNullable<typeof c> => c !== null)
 
   const cnt = (c: Cat) => products.filter((p) => p.cat === c).length
   // Danh mục không còn sản phẩm nào (vd: admin ẩn danh mục — server đã lọc hết
@@ -390,11 +514,15 @@ export function useStorefront({
   else if (sst.sort === 'price-desc') list.sort((a, b) => b.price - a.price)
   else list.sort((a, b) => b.reviews - a.reviews)
   const results = list.map((p) => cardVM(p))
-  const catTabs = ([{ k: 'all', l: 'Tất cả' }, { k: 'thuoc', l: 'Thuốc' }, { k: 'tpcn', l: 'Thực phẩm chức năng' }, { k: 'skincare', l: 'Chăm sóc da' }, { k: 'thietbi', l: 'Thiết bị y tế' }] as { k: 'all' | Cat; l: string }[]).map((t) => ({
-    label: t.l,
-    onClick: () => set({ cat: t.k, uses: [] }),
-    style: tab(sst.cat === t.k),
-  }))
+  // Danh mục không còn sản phẩm (admin ẩn) cũng bị loại khỏi tab/drawer bộ lọc,
+  // đồng bộ với nav — tránh dẫn khách vào màn "0 sản phẩm".
+  const catTabs = ([{ k: 'all', l: 'Tất cả' }, { k: 'thuoc', l: 'Thuốc' }, { k: 'tpcn', l: 'Thực phẩm chức năng' }, { k: 'skincare', l: 'Chăm sóc da' }, { k: 'thietbi', l: 'Thiết bị y tế' }] as { k: 'all' | Cat; l: string }[])
+    .filter((t) => t.k === 'all' || cnt(t.k) > 0)
+    .map((t) => ({
+      label: t.l,
+      onClick: () => set({ cat: t.k, uses: [] }),
+      style: tab(sst.cat === t.k),
+    }))
   const allUses = ['Giảm đau, hạ sốt', 'Cảm cúm', 'Tiêu hóa', 'Hô hấp', 'Vitamin & khoáng chất', 'Xương khớp', 'Tim mạch', 'Thiết bị đo', 'Chống nắng', 'Dưỡng ẩm', 'Trị mụn', 'Làm sạch da']
   const useChips = allUses.map((u) => ({ label: u, onClick: () => toggleUse(u), style: chip(sst.uses.includes(u)) }))
   const sortBtns = [{ k: 'popular', l: 'Phổ biến' }, { k: 'price-asc', l: 'Giá thấp → cao' }, { k: 'price-desc', l: 'Giá cao → thấp' }].map((b) => ({
@@ -414,6 +542,7 @@ export function useStorefront({
   const related = products.filter((p) => p.cat === sel.cat && p.id !== sel.id).slice(0, 5).map((p) => cardVM(p))
   const d = {
     name: sel.name,
+    image: sel.image ?? '',
     brand: sel.brand,
     catLabel: catLabel(sel.cat),
     priceText: fmt(sel.price),
@@ -451,6 +580,7 @@ export function useStorefront({
     return {
       id: p.id,
       name: p.name,
+      image: p.image ?? '',
       catLabel: catLabel(p.cat),
       priceText: fmt(p.price),
       lineText: fmt(p.price * c.qty),
@@ -464,13 +594,16 @@ export function useStorefront({
     }
   })
   const subtotal = sst.cart.reduce((a, c) => a + get(c.id).price * c.qty, 0)
-  const ship = cc === 0 ? 0 : subtotal >= 300000 ? 0 : 20000
+  const ship = cc === 0 || subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE
   const total = subtotal + ship
-  const freeshipHint = cc > 0 && subtotal < 300000 ? 'Mua thêm ' + fmt(300000 - subtotal) + ' để được miễn phí giao hàng' : ''
+  const freeshipHint =
+    cc > 0 && subtotal < FREE_SHIP_THRESHOLD
+      ? 'Mua thêm ' + fmt(FREE_SHIP_THRESHOLD - subtotal) + ' để được miễn phí giao hàng'
+      : ''
 
   const pays = [
     { k: 'cod', l: 'Thanh toán khi nhận hàng (COD)', d: 'Trả tiền mặt cho shipper' },
-    { k: 'bank', l: 'Chuyển khoản ngân hàng', d: 'Quét mã QR khi đặt hàng' },
+    { k: 'bank', l: 'Chuyển khoản ngân hàng', d: 'Dược sĩ gửi thông tin chuyển khoản sau khi đặt' },
     { k: 'momo', l: 'Ví MoMo', d: 'Thanh toán qua ví điện tử' },
   ]
   const payOptions = pays.map((p) => {
@@ -522,6 +655,8 @@ export function useStorefront({
     // view-models
     navLinks,
     catCards,
+    // Danh mục cho footer — cùng bộ lọc cnt>0 với nav (danh mục ẩn không hiện).
+    footerCats: catNavLinks.map(({ label, onClick }) => ({ label, onClick })),
     trustBadges,
     bestSellers,
     supps,

@@ -10,9 +10,14 @@ export default function ProductScreen({ hub }: { hub: StorefrontHub }) {
     <div style={s('max-width:1180px;margin:0 auto;padding:24px;width:100%')}>
       <div style={s('font-size:13px;color:#8a948e;margin-bottom:18px')}><span onClick={goHome} style={s('cursor:pointer;color:#2e9e5b')}>Trang chủ</span> / <span onClick={d.onCat} style={s('cursor:pointer;color:#2e9e5b')}>{d.catLabel}</span> / {d.name}</div>
       <div className="qt-stack" style={s('display:grid;grid-template-columns:440px 1fr;gap:36px;align-items:start')}>
-        <div style={{ ...s('border-radius:20px;aspect-ratio:1 / 1;display:flex;align-items:center;justify-content:center;position:relative'), background: d.tintBg }}>
+        <div style={{ ...s('border-radius:20px;aspect-ratio:1 / 1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden'), background: d.tintBg }}>
+          {d.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img alt={d.name} src={d.image} style={s('width:100%;height:100%;object-fit:cover')} />
+          ) : (
+            <div style={s('width:34%;height:34%;position:relative;opacity:.92')}><div style={{ ...s('position:absolute;left:36%;top:0;width:28%;height:100%;border-radius:12px'), background: d.tintFg }} /><div style={{ ...s('position:absolute;top:36%;left:0;height:28%;width:100%;border-radius:12px'), background: d.tintFg }} /></div>
+          )}
           {d.badge ? <div style={s('position:absolute;top:16px;left:16px;background:#e8654e;color:#fff;font-size:13px;font-weight:600;padding:5px 14px;border-radius:20px')}>{d.badge}</div> : null}
-          <div style={s('width:34%;height:34%;position:relative;opacity:.92')}><div style={{ ...s('position:absolute;left:36%;top:0;width:28%;height:100%;border-radius:12px'), background: d.tintFg }} /><div style={{ ...s('position:absolute;top:36%;left:0;height:28%;width:100%;border-radius:12px'), background: d.tintFg }} /></div>
         </div>
         <div>
           <div style={{ ...s('font-size:13px;font-weight:600;margin-bottom:8px'), color: d.tintFg }}>{d.catLabel} · {d.brand}</div>
@@ -28,7 +33,7 @@ export default function ProductScreen({ hub }: { hub: StorefrontHub }) {
             <div style={s('display:flex;gap:10px;font-size:14px;color:#4a564e')}><span style={s('color:#9aa8a0;min-width:90px')}>Công dụng</span><span style={s('font-weight:600;color:#2a352e')}>{d.usesText}</span></div>
             <div style={s('display:flex;gap:10px;font-size:14px;color:#4a564e')}><span style={s('color:#9aa8a0;min-width:90px')}>Xuất xứ</span><span style={s('font-weight:600;color:#2a352e')}>Chính hãng, có hóa đơn</span></div>
           </div>
-          <div style={s('display:flex;align-items:center;gap:16px')}>
+          <div className="qt-buyrow" style={s('display:flex;align-items:center;gap:16px')}>
             <div style={s('display:flex;align-items:center;border:1.5px solid #e0ebe4;border-radius:11px;overflow:hidden')}>
               <button onClick={d.dec} style={s('border:none;background:#f1f6f3;width:42px;height:46px;font-size:20px;cursor:pointer;color:#1c7a45')}>−</button>
               <div style={s('width:48px;text-align:center;font-size:16px;font-weight:700')}>{sst.detailQty}</div>

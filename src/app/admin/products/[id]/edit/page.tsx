@@ -3,10 +3,12 @@ import Link from 'next/link'
 import { db } from '@/db/client'
 import { products, categories } from '@/db/schema'
 import { eq } from 'drizzle-orm'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
+import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
 import { requireAdmin } from '@/lib/auth'
 import { isUploadedImage, normalizeProductImages, parseProductImagesJson } from '@/lib/productImages'
 import ProductImageManager from '@/components/admin/ProductImageManager'
+import CategoryPrescriptionFields from '@/components/admin/CategoryPrescriptionFields'
 import type { CategorySlug } from '@/lib/constants'
 
 async function updateProduct(id: string, formData: FormData) {
@@ -34,12 +36,14 @@ async function updateProduct(id: string, formData: FormData) {
     countryOfOrigin: formData.get('countryOfOrigin') as string,
     stockQuantity: parseInt(formData.get('stockQuantity') as string || '0', 10),
     isActive: formData.get('isActive') === 'true',
+    // Chỉ danh mục "thuoc" gửi field này; danh mục khác mặc định không kê đơn.
+    prescriptionRequired: formData.get('prescriptionRequired') === 'true',
     images,
     updatedAt: new Date(),
   }).where(eq(products.id, id))
 
   revalidatePath('/admin/products')
-  revalidatePath('/') // trang chủ (ISR) cập nhật ngay
+  updateTag(STOREFRONT_CACHE_TAG) // data cache trang chủ cập nhật ngay
   revalidatePath(`/category/${categorySlug}`)
   redirect('/admin/products')
 }
@@ -86,19 +90,11 @@ export default async function AdminEditProductPage({ params }: { params: Promise
               />
             </div>
 
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-700">Danh mục *</label>
-              <select
-                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                defaultValue={product.categorySlug}
-                name="categorySlug"
-                required
-              >
-                {cats.map((cat) => (
-                  <option key={cat.slug} value={cat.slug}>{cat.label}</option>
-                ))}
-              </select>
-            </div>
+            <CategoryPrescriptionFields
+              cats={cats}
+              defaultCategory={product.categorySlug}
+              defaultPrescription={product.prescriptionRequired}
+            />
 
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-stone-700">Danh mục phụ</label>

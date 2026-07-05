@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation'
 import { db } from '@/db/client'
 import { categories } from '@/db/schema'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { requireAdmin } from '@/lib/auth'
+import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
 
 async function createCategory(formData: FormData) {
   'use server'
@@ -30,7 +31,7 @@ async function toggleCategoryActive(slug: string, nextActive: boolean) {
     .where(eq(categories.slug, slug))
 
   revalidatePath('/admin/categories')
-  revalidatePath('/') // trang chủ (ISR) cập nhật danh sách sản phẩm ngay
+  updateTag(STOREFRONT_CACHE_TAG) // data cache trang chủ cập nhật danh sách sản phẩm ngay
   revalidatePath(`/category/${slug}`)
 }
 

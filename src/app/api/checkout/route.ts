@@ -19,6 +19,12 @@ const schema = z.object({
   }),
   paymentMethod: z.enum(['cod', 'bank_transfer', 'momo', 'vnpay']).default('cod'),
   note: z.string().optional(),
+  // Nguồn giỏ hàng do client gửi thẳng (storefront trang chủ dùng giỏ client-side).
+  // Nếu bỏ trống → dùng giỏ theo cookie cart_token (trang /checkout thật).
+  items: z
+    .array(z.object({ slug: z.string().min(1), quantity: z.number().int().min(1).max(999) }))
+    .min(1)
+    .optional(),
 })
 
 export async function POST(request: Request) {
@@ -31,30 +37,60 @@ export async function POST(request: Request) {
     }
 
     const authUser = await getAuthUser()
-    const cartToken = await getCartTokenFromCookies()
-    const cart = await getExistingCart(cartToken)
 
-    if (!cart || !cart.items || cart.items.length === 0) {
-      return NextResponse.json({ error: 'Giỏ hàng trống' }, { status: 400 })
+    // Xác định nguồn dòng hàng: client gửi kèm `items`, hoặc giỏ theo cookie.
+    let sourceLines: Array<{ productSlug: string; quantity: number }>
+    if (parsed.data.items && parsed.data.items.length > 0) {
+      // Gộp trùng slug (client có thể gửi lặp) và bỏ dòng số lượng ≤ 0.
+      const merged = new Map<string, number>()
+      for (const line of parsed.data.items) {
+        merged.set(line.slug, (merged.get(line.slug) ?? 0) + line.quantity)
+      }
+      sourceLines = [...merged].map(([productSlug, quantity]) => ({ productSlug, quantity }))
+    } else {
+      const cartToken = await getCartTokenFromCookies()
+      const cart = await getExistingCart(cartToken)
+      if (!cart || !cart.items || cart.items.length === 0) {
+        return NextResponse.json({ error: 'Giỏ hàng trống' }, { status: 400 })
+      }
+      sourceLines = cart.items.map((i) => ({ productSlug: i.productSlug, quantity: i.quantity }))
     }
 
-    // Get current product prices
-    const slugs = cart.items.map((i) => i.productSlug)
+    // Đọc giá hiện tại + trạng thái từ DB (không tin giá/tên client gửi).
+    const slugs = sourceLines.map((l) => l.productSlug)
     const productRows = await db
-      .select({ slug: productsTable.slug, name: productsTable.name, price: productsTable.price })
+      .select({
+        slug: productsTable.slug,
+        name: productsTable.name,
+        price: productsTable.price,
+        salePrice: productsTable.salePrice,
+        isActive: productsTable.isActive,
+      })
       .from(productsTable)
       .where(inArray(productsTable.slug, slugs))
 
     const productMap = new Map(productRows.map((p) => [p.slug, p]))
 
-    const orderItems = cart.items.map((item) => {
-      const product = productMap.get(item.productSlug)
-      if (!product) throw new Error(`Product not found: ${item.productSlug}`)
+    // Chặn nếu có sản phẩm không tồn tại hoặc đã ẩn — tránh tạo đơn dữ liệu rác.
+    const invalid = sourceLines.filter((l) => {
+      const p = productMap.get(l.productSlug)
+      return !p || !p.isActive
+    })
+    if (invalid.length > 0) {
+      return NextResponse.json(
+        { error: 'Một số sản phẩm không còn khả dụng, vui lòng kiểm tra lại giỏ hàng' },
+        { status: 400 },
+      )
+    }
+
+    const orderItems = sourceLines.map((item) => {
+      const product = productMap.get(item.productSlug)!
       return {
         productSlug: item.productSlug,
         productName: product.name,
+        // Giá bán thực tế = giá giảm nếu có, ngược lại giá gốc.
         quantity: item.quantity,
-        price: product.price,
+        price: product.salePrice ?? product.price,
       }
     })
 

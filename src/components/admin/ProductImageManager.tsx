@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ACCEPTED_IMAGE_MIME, EXTENSION_BY_MIME, MAX_UPLOAD_BYTES } from '@/lib/productImages'
 import type { ProductImage } from '@/lib/schemas'
 
@@ -26,6 +26,27 @@ export default function ProductImageManager({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const hiddenRef = useRef<HTMLInputElement>(null)
+  const busyRef = useRef(false)
+
+  useEffect(() => {
+    busyRef.current = busy
+  }, [busy])
+
+  // Chặn submit form sản phẩm khi ảnh còn đang upload — nếu không, input ẩn
+  // chưa có ảnh và sản phẩm sẽ bị lưu với images rỗng (ảnh "biến mất" sau khi lưu).
+  useEffect(() => {
+    const form = hiddenRef.current?.form
+    if (!form) return
+    const onSubmit = (event: SubmitEvent) => {
+      if (busyRef.current) {
+        event.preventDefault()
+        setError('Ảnh đang được tải lên, vui lòng đợi xong rồi mới lưu.')
+      }
+    }
+    form.addEventListener('submit', onSubmit)
+    return () => form.removeEventListener('submit', onSubmit)
+  }, [])
 
   const remaining = max - images.length
 
@@ -107,7 +128,7 @@ export default function ProductImageManager({
 
   return (
     <div>
-      <input name={name} type="hidden" value={JSON.stringify(images)} />
+      <input name={name} ref={hiddenRef} type="hidden" value={JSON.stringify(images)} />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {images.map((image, index) => (

@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import {
   createArticle,
@@ -10,6 +10,7 @@ import {
   updateArticle,
   type ArticleStatus,
 } from '@/db/queries/articles'
+import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
 import { requireAdmin } from '@/lib/auth'
 
 export type ArticleFormState = { error?: string }
@@ -75,6 +76,7 @@ export async function saveArticleAction(
   revalidatePath('/admin/articles')
   revalidatePath('/bai-viet')
   revalidatePath(`/bai-viet/${slug}`)
+  updateTag(STOREFRONT_CACHE_TAG) // mục tin tức trên trang chủ cập nhật ngay
   redirect('/admin/articles')
 }
 
@@ -85,6 +87,7 @@ export async function deleteArticleAction(formData: FormData): Promise<void> {
     await deleteArticle(id)
     revalidatePath('/admin/articles')
     revalidatePath('/bai-viet')
+    updateTag(STOREFRONT_CACHE_TAG) // mục tin tức trên trang chủ cập nhật ngay
   }
   redirect('/admin/articles')
 }

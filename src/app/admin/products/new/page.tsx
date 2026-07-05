@@ -2,10 +2,12 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { db } from '@/db/client'
 import { products, categories } from '@/db/schema'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
+import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
 import { requireAdmin } from '@/lib/auth'
 import { parseProductImagesJson } from '@/lib/productImages'
 import ProductImageManager from '@/components/admin/ProductImageManager'
+import CategoryPrescriptionFields from '@/components/admin/CategoryPrescriptionFields'
 
 async function getCategories() {
   return db.select({ slug: categories.slug, label: categories.label }).from(categories)
@@ -55,10 +57,12 @@ async function createProduct(formData: FormData) {
     images,
     isActive: true,
     stockQuantity: parseInt(formData.get('stockQuantity') as string || '0', 10),
+    // Chỉ danh mục "thuoc" gửi field này; danh mục khác mặc định không kê đơn.
+    prescriptionRequired: formData.get('prescriptionRequired') === 'true',
   })
 
   revalidatePath('/admin/products')
-  revalidatePath('/') // trang chủ (ISR) hiển thị sản phẩm mới ngay
+  updateTag(STOREFRONT_CACHE_TAG) // data cache trang chủ hiển thị sản phẩm mới ngay
   revalidatePath(`/category/${categorySlug}`)
   redirect('/admin/products')
 }
@@ -82,18 +86,7 @@ export default async function AdminNewProductPage() {
             <Field label="Tên sản phẩm *" name="name" placeholder="Vitamin C 1000mg" required />
             <Field label="SKU" name="sku" placeholder="VIT-C-1000" />
 
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-700">Danh mục *</label>
-              <select
-                className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                name="categorySlug"
-                required
-              >
-                {cats.map((cat) => (
-                  <option key={cat.slug} value={cat.slug}>{cat.label}</option>
-                ))}
-              </select>
-            </div>
+            <CategoryPrescriptionFields cats={cats} />
 
             <Field label="Danh mục phụ" name="subCategory" placeholder="Vitamin & Khoáng chất" />
             <Field label="Badge" name="badge" placeholder="Bán chạy" />

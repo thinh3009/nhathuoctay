@@ -13,7 +13,14 @@ export default function CartScreen({ hub }: { hub: StorefrontHub }) {
           <div style={s('display:flex;flex-direction:column;gap:14px')}>
             {cartView.map((c, i) => (
               <div key={i} className="qt-cartrow" style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;padding:16px;display:flex;align-items:center;gap:16px')}>
-                <div onClick={c.onView} style={{ ...s('width:80px;height:80px;border-radius:12px;position:relative;flex-shrink:0;cursor:pointer'), background: c.tintBg }}><div style={{ ...s('position:absolute;left:38%;top:24%;width:24%;height:52%;border-radius:5px'), background: c.tintFg }} /><div style={{ ...s('position:absolute;top:38%;left:24%;height:24%;width:52%;border-radius:5px'), background: c.tintFg }} /></div>
+                <div onClick={c.onView} style={{ ...s('width:80px;height:80px;border-radius:12px;position:relative;flex-shrink:0;cursor:pointer;overflow:hidden'), background: c.tintBg }}>
+                  {c.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img alt={c.name} src={c.image} style={s('width:100%;height:100%;object-fit:cover')} />
+                  ) : (
+                    <><div style={{ ...s('position:absolute;left:38%;top:24%;width:24%;height:52%;border-radius:5px'), background: c.tintFg }} /><div style={{ ...s('position:absolute;top:38%;left:24%;height:24%;width:52%;border-radius:5px'), background: c.tintFg }} /></>
+                  )}
+                </div>
                 <div className="qt-cart-info" style={s('flex:1;min-width:0')}><div style={{ ...s('font-size:11px;font-weight:600'), color: c.tintFg }}>{c.catLabel}</div><div onClick={c.onView} style={s('font-size:15px;font-weight:600;color:#1f2a24;cursor:pointer;margin:2px 0 4px')}>{c.name}</div><div style={s('font-size:15px;font-weight:700;color:#1c7a45')}>{c.priceText}</div></div>
                 <div style={s('display:flex;align-items:center;border:1.5px solid #e0ebe4;border-radius:10px;overflow:hidden;flex-shrink:0')}><button onClick={c.dec} style={s('border:none;background:#f1f6f3;width:34px;height:38px;font-size:18px;cursor:pointer;color:#1c7a45')}>−</button><div style={s('width:40px;text-align:center;font-weight:700;font-size:15px')}>{c.qty}</div><button onClick={c.inc} style={s('border:none;background:#f1f6f3;width:34px;height:38px;font-size:18px;cursor:pointer;color:#1c7a45')}>+</button></div>
                 <div className="qt-cart-total" style={s('width:110px;text-align:right;font-size:16px;font-weight:700;color:#14532d')}>{c.lineText}</div>

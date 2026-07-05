@@ -1,8 +1,15 @@
+import { unstable_cache } from 'next/cache'
 import { and, eq } from 'drizzle-orm'
 import { db } from '../client'
 import { categories as categoriesTable, products as productsTable } from '../schema'
 import { listPublishedArticles } from './articles'
+import { normalizeProductImages } from '@/lib/productImages'
+import type { CategorySlug } from '@/lib/constants'
 import type { Cat, NewsArticle, Product } from '@/components/quaythuoc/data'
+
+// Tag cache dữ liệu trang chủ. Action admin ghi sản phẩm/danh mục/bài viết phải gọi
+// revalidateTag(STOREFRONT_CACHE_TAG) để khách thấy thay đổi ngay, không đợi hết 60s.
+export const STOREFRONT_CACHE_TAG = 'storefront'
 
 // Map slug danh mục trong DB → enum `cat` mà storefront trang chủ dùng.
 const CATEGORY_TO_CAT: Record<string, Cat> = {
@@ -14,7 +21,7 @@ const CATEGORY_TO_CAT: Record<string, Cat> = {
 
 // Lấy toàn bộ sản phẩm đang bán từ DB, map sang shape của trang chủ (QuayThuoc16).
 // Loại cả sản phẩm thuộc danh mục đã ẩn (admin ngừng bán loại hàng đó).
-export async function getStorefrontProducts(): Promise<Product[]> {
+async function fetchStorefrontProducts(): Promise<Product[]> {
   const rows = await db
     .select({ product: productsTable })
     .from(productsTable)
@@ -26,6 +33,8 @@ export async function getStorefrontProducts(): Promise<Product[]> {
     id: row.slug,
     name: row.name,
     cat: CATEGORY_TO_CAT[row.categorySlug] ?? 'thuoc',
+    // Ảnh chính: ảnh admin upload (Supabase Storage) hoặc ảnh demo theo danh mục.
+    image: normalizeProductImages(row.categorySlug as CategorySlug, row.slug, row.images)[0]?.src,
     brand: row.manufacturer || row.subCategory || '',
     uses: row.subCategory ? [row.subCategory] : [],
     // DB: `price` là giá gốc, `salePrice` là giá giảm (nếu có).
@@ -41,7 +50,7 @@ export async function getStorefrontProducts(): Promise<Product[]> {
 
 // Lấy bài viết đã đăng từ DB, map sang shape tin tức của trang chủ (QuayThuoc16).
 // `id` = slug để trang chủ điều hướng sang /bai-viet/[slug].
-export async function getStorefrontNews(): Promise<NewsArticle[]> {
+async function fetchStorefrontNews(): Promise<NewsArticle[]> {
   const rows = await listPublishedArticles()
 
   return rows.map((row) => ({
@@ -52,3 +61,16 @@ export async function getStorefrontNews(): Promise<NewsArticle[]> {
     excerpt: row.excerpt,
   }))
 }
+
+// Trang chủ render động mỗi request (đọc searchParams để giữ đúng màn SPA khi F5),
+// nhưng dữ liệu lấy qua Data Cache: tối đa 1 lượt query DB mỗi 60s, và admin action
+// gọi revalidateTag để làm mới ngay. DB gián đoạn ngắn vẫn còn cache để phục vụ.
+export const getStorefrontProducts = unstable_cache(fetchStorefrontProducts, ['storefront-products'], {
+  revalidate: 60,
+  tags: [STOREFRONT_CACHE_TAG],
+})
+
+export const getStorefrontNews = unstable_cache(fetchStorefrontNews, ['storefront-news'], {
+  revalidate: 60,
+  tags: [STOREFRONT_CACHE_TAG],
+})
