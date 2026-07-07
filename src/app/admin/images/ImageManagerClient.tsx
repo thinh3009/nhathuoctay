@@ -1,7 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { ACCEPTED_IMAGE_MIME, EXTENSION_BY_MIME, MAX_UPLOAD_BYTES } from '@/lib/productImages'
+
+const MAX_UPLOAD_MB = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)
+
+export type HeroImage = { id: string; url: string }
 
 export type ManagedImage = {
   name: string
@@ -39,15 +44,17 @@ const BAR_COLORS = ['#047857', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#647
 
 export default function ImageManagerClient({
   images,
+  heroImages,
   storageLimitBytes,
   usage,
 }: {
   images: ManagedImage[]
+  heroImages: HeroImage[]
   // Hạn mức Storage (bytes) — server truyền xuống từ env, không hard-code theo gói free.
   storageLimitBytes: number
   usage: Usage
 }) {
-  const [tab, setTab] = useState<'list' | 'usage'>('list')
+  const [tab, setTab] = useState<'list' | 'usage' | 'hero'>('list')
   const [deleting, setDeleting] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -93,6 +100,7 @@ export default function ImageManagerClient({
       <div className="mb-6 inline-flex rounded-xl border border-stone-200 bg-white p-1">
         <TabButton active={tab === 'list'} label="Danh sách ảnh" onClick={() => setTab('list')} />
         <TabButton active={tab === 'usage'} label="Dung lượng lưu trữ" onClick={() => setTab('usage')} />
+        <TabButton active={tab === 'hero'} label="Ảnh hero" onClick={() => setTab('hero')} />
       </div>
 
       {error ? (
@@ -101,8 +109,173 @@ export default function ImageManagerClient({
 
       {tab === 'list' ? (
         <ImageList deleting={deleting} images={images} onDelete={handleDelete} />
-      ) : (
+      ) : tab === 'usage' ? (
         <UsageChart limitBytes={storageLimitBytes} usage={usage} usagePercent={usagePercent} />
+      ) : (
+        <HeroManager heroImages={heroImages} />
+      )}
+    </div>
+  )
+}
+
+// Quản lý ảnh hero (banner trang chủ): thêm từ máy, đổi thứ tự (slider chạy theo thứ tự
+// này), xóa. Trang chủ tự trượt khi có ≥2 ảnh; 1 ảnh hiển thị tĩnh.
+function HeroManager({ heroImages }: { heroImages: HeroImage[] }) {
+  const router = useRouter()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleUpload(fileList: FileList | null) {
+    if (!fileList || fileList.length === 0) return
+    setError(null)
+    setBusy(true)
+    try {
+      for (const file of Array.from(fileList)) {
+        if (!(file.type in EXTENSION_BY_MIME)) {
+          throw new Error(`"${file.name}" không đúng định dạng (chỉ JPG, PNG, WebP, GIF, AVIF).`)
+        }
+        if (file.size > MAX_UPLOAD_BYTES) {
+          throw new Error(`"${file.name}" vượt quá ${MAX_UPLOAD_MB}MB.`)
+        }
+      }
+      for (const file of Array.from(fileList)) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const response = await fetch('/api/admin/hero-images', { method: 'POST', body: formData })
+        if (!response.ok) {
+          const data = await response.json().catch(() => null)
+          throw new Error(data?.error ?? 'Upload thất bại.')
+        }
+      }
+      router.refresh()
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : 'Upload thất bại.')
+    } finally {
+      setBusy(false)
+      if (inputRef.current) inputRef.current.value = ''
+    }
+  }
+
+  async function handleReorder(id: string, direction: 'up' | 'down') {
+    setError(null)
+    setBusy(true)
+    try {
+      const response = await fetch('/api/admin/hero-images', {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ id, direction }),
+      })
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.error ?? 'Đổi thứ tự thất bại.')
+      }
+      router.refresh()
+    } catch (reorderError) {
+      setError(reorderError instanceof Error ? reorderError.message : 'Đổi thứ tự thất bại.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!window.confirm('Xóa ảnh hero này khỏi trang chủ?')) return
+    setError(null)
+    setBusy(true)
+    try {
+      const response = await fetch(`/api/admin/hero-images?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.error ?? 'Xóa ảnh thất bại.')
+      }
+      router.refresh()
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Xóa ảnh thất bại.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-white p-6">
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-bold text-stone-900">Ảnh hero trang chủ</h2>
+        <button
+          className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:opacity-60"
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+          type="button"
+        >
+          {busy ? 'Đang xử lý…' : '+ Thêm ảnh từ máy'}
+        </button>
+      </div>
+      <p className="mb-4 text-sm text-stone-500">
+        Khuyến nghị ảnh ngang <span className="font-semibold text-stone-700">1200×900px</span> (tỉ lệ 4:3),
+        ≤ {MAX_UPLOAD_MB}MB. Có từ 2 ảnh trở lên trang chủ sẽ tự trượt mỗi 3 giây; 1 ảnh hiển thị tĩnh.
+        Kéo thứ tự bằng nút ▲▼.
+      </p>
+
+      <input
+        accept={ACCEPTED_IMAGE_MIME}
+        className="hidden"
+        multiple
+        onChange={(event) => handleUpload(event.target.files)}
+        ref={inputRef}
+        type="file"
+      />
+
+      {error ? <p className="mb-3 text-sm font-semibold text-red-600">{error}</p> : null}
+
+      {heroImages.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-stone-300 px-4 py-10 text-center text-sm text-stone-400">
+          Chưa có ảnh hero nào. Trang chủ đang hiển thị khung trang trí mặc định.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {heroImages.map((image, index) => (
+            <div className="overflow-hidden rounded-xl border border-stone-200" key={image.id}>
+              <div className="relative aspect-[4/3] bg-stone-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img alt={`Ảnh hero ${index + 1}`} className="h-full w-full object-cover" src={image.url} />
+                <span className="absolute left-2 top-2 rounded-full bg-emerald-700 px-2 py-0.5 text-[10px] font-bold text-white">
+                  #{index + 1}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2 px-3 py-2">
+                <div className="flex gap-1">
+                  <button
+                    aria-label="Lên trước"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-100 text-stone-600 transition hover:bg-stone-200 disabled:opacity-40"
+                    disabled={busy || index === 0}
+                    onClick={() => handleReorder(image.id, 'up')}
+                    type="button"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    aria-label="Xuống sau"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-100 text-stone-600 transition hover:bg-stone-200 disabled:opacity-40"
+                    disabled={busy || index === heroImages.length - 1}
+                    onClick={() => handleReorder(image.id, 'down')}
+                    type="button"
+                  >
+                    ▼
+                  </button>
+                </div>
+                <button
+                  className="text-sm font-semibold text-red-500 transition hover:text-red-700 disabled:opacity-40"
+                  disabled={busy}
+                  onClick={() => handleDelete(image.id)}
+                  type="button"
+                >
+                  Xóa
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

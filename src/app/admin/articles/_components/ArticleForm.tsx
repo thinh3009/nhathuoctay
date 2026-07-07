@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react'
 import MarkdownContent from '@/components/MarkdownContent'
 import { saveArticleAction, type ArticleFormState } from '../actions'
+import ArticleCoverImage from './ArticleCoverImage'
 
 type ArticleFormProps = {
   article?: {
@@ -126,18 +127,7 @@ export default function ArticleForm({ article }: ArticleFormProps) {
             />
           </div>
 
-          <div>
-            <label className={labelClass} htmlFor="coverImage">
-              Ảnh bìa (URL, tùy chọn)
-            </label>
-            <input
-              className={inputClass}
-              defaultValue={article?.coverImage ?? ''}
-              id="coverImage"
-              name="coverImage"
-              placeholder="https://..."
-            />
-          </div>
+          <ArticleCoverImage defaultUrl={article?.coverImage} />
 
           {article ? (
             <p className="text-xs text-stone-500">

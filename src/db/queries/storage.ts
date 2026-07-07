@@ -21,6 +21,7 @@ export type StorageUsageBucket = {
 // Nhãn thân thiện cho từng thư mục gốc trong bucket.
 const FOLDER_LABELS: Record<string, string> = {
   uploads: 'Ảnh admin tải lên',
+  hero: 'Ảnh hero (trang chủ)',
   'thuc-pham-chuc-nang': 'Thực phẩm chức năng',
   'cham-soc-da': 'Chăm sóc da',
   'thiet-bi-y-te': 'Thiết bị y tế',

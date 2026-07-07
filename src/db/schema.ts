@@ -259,6 +259,18 @@ export const comboItems = pgTable(
   }),
 )
 
+/* ── Hero images (ảnh banner trang chủ) ── */
+
+export const heroImages = pgTable('hero_images', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  // Đường dẫn trong bucket product-images (prefix `hero/`) — để xóa file khi gỡ ảnh.
+  storagePath: text('storage_path').notNull(),
+  url: text('url').notNull(),
+  sortOrder: integer('sort_order').notNull().default(0),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 /* ── Relations ── */
 
 export const usersRelations = relations(users, ({ many }) => ({

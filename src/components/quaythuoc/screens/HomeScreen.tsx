@@ -1,11 +1,12 @@
 import { s } from '../data'
+import HeroCarousel from '../HeroCarousel'
 import NewsCard from '../NewsCard'
 import ProductSlider from '../ProductSlider'
 import type { StorefrontHub } from '../use-storefront'
 
 /** Trang chủ storefront: hero, danh mục, các dãy sản phẩm, combo, tin tức, cam kết. */
 export default function HomeScreen({ hub }: { hub: StorefrontHub }) {
-  const { catCards, bestSellers, supps, skincare, devices, combos, newsHome, trustBadges, goCatScreen, goNews, openRx } = hub
+  const { catCards, bestSellers, supps, skincare, devices, combos, heroImages, newsHome, trustBadges, goCatScreen, goNews, openRx } = hub
 
   return (
     <div className="qt-home">
@@ -30,10 +31,8 @@ export default function HomeScreen({ hub }: { hub: StorefrontHub }) {
               <div><div style={s('font-size:22px;font-weight:800;color:#14532d')}>24/7</div><div style={s('font-size:12.5px;color:#8a948e')}>Dược sĩ tư vấn</div></div>
             </div>
           </div>
-          <div className="qt-hero-img" style={s('width:340px;flex-shrink:0;background:repeating-linear-gradient(135deg,#d7eede,#d7eede 11px,#cde7d6 11px,#cde7d6 22px);border-radius:18px;height:300px;display:flex;align-items:center;justify-content:center;color:#5a8a6e;font:600 12px ui-monospace,monospace;text-align:center')}>
-            ảnh hero
-            <br />
-            (sản phẩm / dược sĩ)
+          <div className="qt-hero-img" style={s('width:340px;flex-shrink:0;border-radius:18px;height:300px;overflow:hidden')}>
+            <HeroCarousel images={heroImages} />
           </div>
         </div>
       </div>
@@ -61,7 +60,8 @@ export default function HomeScreen({ hub }: { hub: StorefrontHub }) {
       {/* best sellers */}
       <ProductSlider title="🔥 Bán chạy nhất" cards={bestSellers} actionLabel="Xem tất cả →" onAction={() => goCatScreen('thuoc')} />
 
-      {/* combos */}
+      {/* combos — chỉ hiện khi admin đã tạo combo (không còn dữ liệu giả) */}
+      {combos.length > 0 ? (
       <div style={s('max-width:1180px;margin:44px auto 0;padding:0 24px;width:100%')}>
         <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0 0 18px')}>💚 Combo tiết kiệm</h2>
         <div className="qt-slider qt-combos" style={s('display:grid;grid-template-columns:repeat(3,1fr);gap:18px')}>
@@ -84,6 +84,7 @@ export default function HomeScreen({ hub }: { hub: StorefrontHub }) {
           ))}
         </div>
       </div>
+      ) : null}
 
       {/* supplements */}
       <ProductSlider title="Thực phẩm chức năng nổi bật" cards={supps} actionLabel="Xem tất cả →" onAction={() => goCatScreen('tpcn')} />

@@ -5,6 +5,7 @@ import {
   categories as categoriesTable,
   comboItems as comboItemsTable,
   combos as combosTable,
+  heroImages as heroImagesTable,
   products as productsTable,
 } from '../schema'
 import { listPublishedArticles } from './articles'
@@ -108,6 +109,17 @@ async function fetchStorefrontCombos(): Promise<StorefrontCombo[]> {
     .filter((combo) => combo.items.length > 0)
 }
 
+// Ảnh hero (banner trang chủ) đang bật, sắp theo thứ tự admin đặt. Trả về mảng URL.
+async function fetchStorefrontHeroImages(): Promise<string[]> {
+  const rows = await db
+    .select({ url: heroImagesTable.url })
+    .from(heroImagesTable)
+    .where(eq(heroImagesTable.isActive, true))
+    .orderBy(asc(heroImagesTable.sortOrder), asc(heroImagesTable.createdAt))
+
+  return rows.map((row) => row.url)
+}
+
 // Trang chủ render động mỗi request (đọc searchParams để giữ đúng màn SPA khi F5),
 // nhưng dữ liệu lấy qua Data Cache: tối đa 1 lượt query DB mỗi 60s, và admin action
 // gọi revalidateTag để làm mới ngay. DB gián đoạn ngắn vẫn còn cache để phục vụ.
@@ -122,6 +134,11 @@ export const getStorefrontNews = unstable_cache(fetchStorefrontNews, ['storefron
 })
 
 export const getStorefrontCombos = unstable_cache(fetchStorefrontCombos, ['storefront-combos'], {
+  revalidate: 60,
+  tags: [STOREFRONT_CACHE_TAG],
+})
+
+export const getStorefrontHeroImages = unstable_cache(fetchStorefrontHeroImages, ['storefront-hero'], {
   revalidate: 60,
   tags: [STOREFRONT_CACHE_TAG],
 })

@@ -116,6 +116,35 @@ export async function uploadProductImage(
   return { storagePath, publicUrl: getPublicUrl(storagePath) }
 }
 
+// Tải ảnh hero (banner trang chủ) lên bucket, prefix `hero/`. Tách khỏi prefix `uploads/`
+// của ảnh sản phẩm để /admin/images không cho xóa nhầm (chỉ xóa qua tab Ảnh hero).
+export async function uploadHeroImage(file: Blob, mimeType: string): Promise<UploadedImage> {
+  const { supabaseUrl, serviceRoleKey } = getStorageConfig()
+  await ensureBucket()
+  const ext = EXTENSION_BY_MIME[mimeType] ?? 'jpg'
+  const storagePath = `hero/${randomUUID()}.${ext}`
+
+  const response = await fetch(
+    `${supabaseUrl}/storage/v1/object/${PRODUCT_IMAGE_BUCKET}/${storagePath}`,
+    {
+      method: 'POST',
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+        'content-type': mimeType,
+        'cache-control': '3600',
+      },
+      body: file,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`Upload thất bại (${response.status}): ${await response.text()}`)
+  }
+
+  return { storagePath, publicUrl: getPublicUrl(storagePath) }
+}
+
 // Xoá một object khỏi Storage. Trả về true nếu thành công (hoặc file vốn không tồn tại).
 export async function deleteProductImage(storagePath: string): Promise<boolean> {
   const { supabaseUrl, serviceRoleKey } = getStorageConfig()

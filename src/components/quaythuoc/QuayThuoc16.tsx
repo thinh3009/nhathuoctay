@@ -25,14 +25,16 @@ export default function QuayThuoc16({
   products,
   news,
   combos,
+  heroImages,
   initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
   combos?: StorefrontCombo[]
+  heroImages?: string[]
   initialParams?: StorefrontInitialParams
 }) {
-  const hub = useStorefront({ products, news, combos, initialParams })
+  const hub = useStorefront({ products, news, combos, heroImages, initialParams })
   const { screen } = hub.sst
 
   return (

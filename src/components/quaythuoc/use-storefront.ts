@@ -158,11 +158,13 @@ export function useStorefront({
   products: productsProp,
   news: newsProp,
   combos: combosProp,
+  heroImages: heroImagesProp,
   initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
   combos?: StorefrontCombo[]
+  heroImages?: string[]
   initialParams?: StorefrontInitialParams
 }) {
   const router = useRouter()
@@ -436,65 +438,26 @@ export function useStorefront({
     ],
   }
 
-  // Combo hiển thị trang chủ. Ưu tiên combo admin tạo (DB); nếu chưa có combo nào thì
-  // fallback demo dựng từ sản phẩm bán chạy. Giá combo = salePrice (nếu admin đặt)
-  // hoặc tự tính giảm 85% tổng giá thành viên. Dùng slug thật nên thêm giỏ/đặt được.
-  const buildCombo = (meta: {
-    tag: string
-    title: string
-    ids: string[]
-    memberNames: string[]
-    sum: number
-    override: number | null
-  }) => {
-    const price = meta.override ?? Math.round((meta.sum * 0.85) / 1000) * 1000
-    return {
-      tag: meta.tag,
-      title: meta.title,
-      items: meta.memberNames,
-      priceText: fmt(price),
-      oldPriceText: fmt(meta.sum),
-      saveText: 'Tiết kiệm ' + fmt(Math.max(0, meta.sum - price)),
-      onAdd: () => addCombo(meta.ids),
-    }
-  }
-
-  let combos: ReturnType<typeof buildCombo>[]
-  if (combosProp && combosProp.length > 0) {
-    combos = combosProp
-      .filter((c) => c.items.length > 0)
-      .map((c) =>
-        buildCombo({
-          tag: c.tag,
-          title: c.title,
-          ids: c.items.map((it) => it.slug),
-          memberNames: c.items.map((it) => it.name),
-          sum: c.items.reduce((a, it) => a + it.price, 0),
-          override: c.salePrice,
-        }),
-      )
-  } else {
-    const comboMeta = [
-      { tag: 'Tiết kiệm', title: 'Combo chăm sóc gia đình' },
-      { tag: 'Bán chạy', title: 'Combo sức khỏe mỗi ngày' },
-      { tag: 'Ưu đãi', title: 'Combo tiết kiệm cuối tuần' },
-    ]
-    const comboBase = products.slice().sort((a, b) => b.reviews - a.reviews)
-    combos = comboMeta
-      .map((meta, ci) => {
-        const picks = comboBase.slice(ci * 3, ci * 3 + 3)
-        if (picks.length < 3) return null
-        return buildCombo({
-          tag: meta.tag,
-          title: meta.title,
-          ids: picks.map((p) => p.id),
-          memberNames: picks.map((p) => p.name),
-          sum: picks.reduce((a, p) => a + p.price, 0),
-          override: null,
-        })
-      })
-      .filter((c): c is ReturnType<typeof buildCombo> => c !== null)
-  }
+  // Combo trang chủ chỉ lấy từ DB (admin tạo ở /admin/combos). KHÔNG còn combo demo giả:
+  // chưa có combo nào thì mảng rỗng và HomeScreen ẩn hẳn section. Giá combo = salePrice
+  // (nếu admin đặt) hoặc tự tính giảm 85% tổng giá thành viên. Dùng slug thật nên thêm
+  // giỏ/đặt hàng được như sản phẩm thường.
+  const combos = (combosProp ?? [])
+    .filter((c) => c.items.length > 0)
+    .map((c) => {
+      const sum = c.items.reduce((a, it) => a + it.price, 0)
+      const price = c.salePrice ?? Math.round((sum * 0.85) / 1000) * 1000
+      const ids = c.items.map((it) => it.slug)
+      return {
+        tag: c.tag,
+        title: c.title,
+        items: c.items.map((it) => it.name),
+        priceText: fmt(price),
+        oldPriceText: fmt(sum),
+        saveText: 'Tiết kiệm ' + fmt(Math.max(0, sum - price)),
+        onAdd: () => addCombo(ids),
+      }
+    })
 
   const cnt = (c: Cat) => products.filter((p) => p.cat === c).length
   // Danh mục không còn sản phẩm nào (vd: admin ẩn danh mục — server đã lọc hết
@@ -699,6 +662,7 @@ export function useStorefront({
     devices,
     skincare,
     combos,
+    heroImages: heroImagesProp ?? [],
     newsHome,
     newsList,
     article,

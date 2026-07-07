@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth'
 import { isUploadedImage, isUploadedPath } from '@/lib/productImages'
 import type { ProductImage } from '@/lib/schemas'
 import { listStorageObjects, summarizeStorageUsage } from '@/db/queries/storage'
+import { listHeroImages } from '@/db/queries/heroImages'
 import ImageManagerClient, { type ManagedImage } from './ImageManagerClient'
 
 // Trang đọc thẳng Storage của Supabase mỗi lần vào để dung lượng luôn cập nhật.
@@ -12,9 +13,10 @@ export const dynamic = 'force-dynamic'
 export default async function AdminImagesPage() {
   await requireAdmin()
 
-  const [objects, productRows] = await Promise.all([
+  const [objects, productRows, heroRows] = await Promise.all([
     listStorageObjects(),
     db.select({ name: products.name, slug: products.slug, images: products.images }).from(products),
+    listHeroImages(),
   ])
 
   // Map storagePath → tên sản phẩm đang dùng ảnh đó (chỉ với ảnh admin upload).
@@ -43,5 +45,14 @@ export default async function AdminImagesPage() {
   const limitGb = Number.parseFloat(process.env.NEXT_PUBLIC_STORAGE_LIMIT_GB ?? '1')
   const storageLimitBytes = (Number.isFinite(limitGb) && limitGb > 0 ? limitGb : 1) * 1024 * 1024 * 1024
 
-  return <ImageManagerClient images={images} storageLimitBytes={storageLimitBytes} usage={usage} />
+  const heroImages = heroRows.map((row) => ({ id: row.id, url: row.url }))
+
+  return (
+    <ImageManagerClient
+      heroImages={heroImages}
+      images={images}
+      storageLimitBytes={storageLimitBytes}
+      usage={usage}
+    />
+  )
 }
