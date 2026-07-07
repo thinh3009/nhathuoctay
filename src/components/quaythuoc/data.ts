@@ -52,6 +52,16 @@ export const products: Product[] = [
   { id: 'k6', name: 'Nước tẩy trang Bioderma Sensibio', cat: 'skincare', brand: 'Bioderma', uses: ['Làm sạch da'], price: 395000, oldPrice: 450000, rating: 4.8, reviews: 1100, unit: 'Chai 500ml', badge: '-12%' },
 ]
 
+// Combo do admin tạo (từ DB) truyền xuống storefront. `items` là các sản phẩm thành
+// viên với giá hiệu lực (salePrice ?? price) để dựng giá combo.
+export type StorefrontCombo = {
+  id: string
+  title: string
+  tag: string
+  salePrice: number | null
+  items: { slug: string; name: string; price: number }[]
+}
+
 export type Review = { name: string; date: string; stars: string; text: string }
 
 export const reviewData: Review[] = [

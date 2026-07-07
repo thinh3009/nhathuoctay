@@ -1,11 +1,16 @@
 import { unstable_cache } from 'next/cache'
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 import { db } from '../client'
-import { categories as categoriesTable, products as productsTable } from '../schema'
+import {
+  categories as categoriesTable,
+  comboItems as comboItemsTable,
+  combos as combosTable,
+  products as productsTable,
+} from '../schema'
 import { listPublishedArticles } from './articles'
 import { normalizeProductImages } from '@/lib/productImages'
 import type { CategorySlug } from '@/lib/constants'
-import type { Cat, NewsArticle, Product } from '@/components/quaythuoc/data'
+import type { Cat, NewsArticle, Product, StorefrontCombo } from '@/components/quaythuoc/data'
 
 // Tag cache dữ liệu trang chủ. Action admin ghi sản phẩm/danh mục/bài viết phải gọi
 // revalidateTag(STOREFRONT_CACHE_TAG) để khách thấy thay đổi ngay, không đợi hết 60s.
@@ -62,6 +67,47 @@ async function fetchStorefrontNews(): Promise<NewsArticle[]> {
   }))
 }
 
+// Lấy combo đang bật từ DB kèm sản phẩm thành viên (chỉ thành viên còn đang bán).
+// Combo không còn thành viên hợp lệ sẽ bị loại. Giá hiệu lực = salePrice ?? price.
+async function fetchStorefrontCombos(): Promise<StorefrontCombo[]> {
+  const comboRows = await db
+    .select()
+    .from(combosTable)
+    .where(eq(combosTable.isActive, true))
+    .orderBy(asc(combosTable.createdAt))
+
+  if (comboRows.length === 0) return []
+
+  const memberRows = await db
+    .select({
+      comboId: comboItemsTable.comboId,
+      slug: productsTable.slug,
+      name: productsTable.name,
+      price: productsTable.price,
+      salePrice: productsTable.salePrice,
+    })
+    .from(comboItemsTable)
+    .innerJoin(productsTable, eq(comboItemsTable.productSlug, productsTable.slug))
+    .where(eq(productsTable.isActive, true))
+    .orderBy(asc(comboItemsTable.createdAt))
+
+  return comboRows
+    .map((combo) => ({
+      id: combo.id,
+      title: combo.title,
+      tag: combo.tag,
+      salePrice: combo.salePrice,
+      items: memberRows
+        .filter((member) => member.comboId === combo.id)
+        .map((member) => ({
+          slug: member.slug,
+          name: member.name,
+          price: member.salePrice ?? member.price,
+        })),
+    }))
+    .filter((combo) => combo.items.length > 0)
+}
+
 // Trang chủ render động mỗi request (đọc searchParams để giữ đúng màn SPA khi F5),
 // nhưng dữ liệu lấy qua Data Cache: tối đa 1 lượt query DB mỗi 60s, và admin action
 // gọi revalidateTag để làm mới ngay. DB gián đoạn ngắn vẫn còn cache để phục vụ.
@@ -71,6 +117,11 @@ export const getStorefrontProducts = unstable_cache(fetchStorefrontProducts, ['s
 })
 
 export const getStorefrontNews = unstable_cache(fetchStorefrontNews, ['storefront-news'], {
+  revalidate: 60,
+  tags: [STOREFRONT_CACHE_TAG],
+})
+
+export const getStorefrontCombos = unstable_cache(fetchStorefrontCombos, ['storefront-combos'], {
   revalidate: 60,
   tags: [STOREFRONT_CACHE_TAG],
 })

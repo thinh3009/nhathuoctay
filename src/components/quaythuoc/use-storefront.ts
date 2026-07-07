@@ -7,6 +7,7 @@ import {
   type Cat,
   type NewsArticle,
   type Product,
+  type StorefrontCombo,
   catLabel,
   fmt,
   newsData,
@@ -156,10 +157,12 @@ function genOrderCode(): string {
 export function useStorefront({
   products: productsProp,
   news: newsProp,
+  combos: combosProp,
   initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
+  combos?: StorefrontCombo[]
   initialParams?: StorefrontInitialParams
 }) {
   const router = useRouter()
@@ -433,32 +436,65 @@ export function useStorefront({
     ],
   }
 
-  // Combo dựng từ SẢN PHẨM THẬT (DB) — mỗi combo gom 3 sản phẩm bán chạy, giá ưu đãi
-  // 85%. Dùng slug thật nên combo thêm vào giỏ và đặt hàng được như sản phẩm thường.
-  const comboMeta = [
-    { tag: 'Tiết kiệm', title: 'Combo chăm sóc gia đình' },
-    { tag: 'Bán chạy', title: 'Combo sức khỏe mỗi ngày' },
-    { tag: 'Ưu đãi', title: 'Combo tiết kiệm cuối tuần' },
-  ]
-  const comboBase = products.slice().sort((a, b) => b.reviews - a.reviews)
-  const combos = comboMeta
-    .map((meta, ci) => {
-      const picks = comboBase.slice(ci * 3, ci * 3 + 3)
-      if (picks.length < 3) return null
-      const ids = picks.map((p) => p.id)
-      const sum = picks.reduce((a, p) => a + p.price, 0)
-      const price = Math.round((sum * 0.85) / 1000) * 1000
-      return {
-        tag: meta.tag,
-        title: meta.title,
-        items: picks.map((p) => p.name),
-        priceText: fmt(price),
-        oldPriceText: fmt(sum),
-        saveText: 'Tiết kiệm ' + fmt(sum - price),
-        onAdd: () => addCombo(ids),
-      }
-    })
-    .filter((c): c is NonNullable<typeof c> => c !== null)
+  // Combo hiển thị trang chủ. Ưu tiên combo admin tạo (DB); nếu chưa có combo nào thì
+  // fallback demo dựng từ sản phẩm bán chạy. Giá combo = salePrice (nếu admin đặt)
+  // hoặc tự tính giảm 85% tổng giá thành viên. Dùng slug thật nên thêm giỏ/đặt được.
+  const buildCombo = (meta: {
+    tag: string
+    title: string
+    ids: string[]
+    memberNames: string[]
+    sum: number
+    override: number | null
+  }) => {
+    const price = meta.override ?? Math.round((meta.sum * 0.85) / 1000) * 1000
+    return {
+      tag: meta.tag,
+      title: meta.title,
+      items: meta.memberNames,
+      priceText: fmt(price),
+      oldPriceText: fmt(meta.sum),
+      saveText: 'Tiết kiệm ' + fmt(Math.max(0, meta.sum - price)),
+      onAdd: () => addCombo(meta.ids),
+    }
+  }
+
+  let combos: ReturnType<typeof buildCombo>[]
+  if (combosProp && combosProp.length > 0) {
+    combos = combosProp
+      .filter((c) => c.items.length > 0)
+      .map((c) =>
+        buildCombo({
+          tag: c.tag,
+          title: c.title,
+          ids: c.items.map((it) => it.slug),
+          memberNames: c.items.map((it) => it.name),
+          sum: c.items.reduce((a, it) => a + it.price, 0),
+          override: c.salePrice,
+        }),
+      )
+  } else {
+    const comboMeta = [
+      { tag: 'Tiết kiệm', title: 'Combo chăm sóc gia đình' },
+      { tag: 'Bán chạy', title: 'Combo sức khỏe mỗi ngày' },
+      { tag: 'Ưu đãi', title: 'Combo tiết kiệm cuối tuần' },
+    ]
+    const comboBase = products.slice().sort((a, b) => b.reviews - a.reviews)
+    combos = comboMeta
+      .map((meta, ci) => {
+        const picks = comboBase.slice(ci * 3, ci * 3 + 3)
+        if (picks.length < 3) return null
+        return buildCombo({
+          tag: meta.tag,
+          title: meta.title,
+          ids: picks.map((p) => p.id),
+          memberNames: picks.map((p) => p.name),
+          sum: picks.reduce((a, p) => a + p.price, 0),
+          override: null,
+        })
+      })
+      .filter((c): c is ReturnType<typeof buildCombo> => c !== null)
+  }
 
   const cnt = (c: Cat) => products.filter((p) => p.cat === c).length
   // Danh mục không còn sản phẩm nào (vd: admin ẩn danh mục — server đã lọc hết

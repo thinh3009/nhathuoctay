@@ -1,6 +1,6 @@
 'use client'
 
-import { type NewsArticle, type Product, s } from './data'
+import { type NewsArticle, type Product, type StorefrontCombo, s } from './data'
 import HomeFooter from './HomeFooter'
 import HomeHeader from './HomeHeader'
 import RxModal from './RxModal'
@@ -24,13 +24,15 @@ import SearchScreen from './screens/SearchScreen'
 export default function QuayThuoc16({
   products,
   news,
+  combos,
   initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
+  combos?: StorefrontCombo[]
   initialParams?: StorefrontInitialParams
 }) {
-  const hub = useStorefront({ products, news, initialParams })
+  const hub = useStorefront({ products, news, combos, initialParams })
   const { screen } = hub.sst
 
   return (

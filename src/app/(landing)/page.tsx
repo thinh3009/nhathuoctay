@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import QuayThuoc16 from '@/components/quaythuoc/QuayThuoc16'
-import { getStorefrontProducts, getStorefrontNews } from '@/db/queries/storefront'
+import { getStorefrontProducts, getStorefrontNews, getStorefrontCombos } from '@/db/queries/storefront'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
 // Trang đọc searchParams (?screen=, ?cat=…) để server render đúng màn SPA đang xem —
@@ -29,15 +29,17 @@ export default async function LandingPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const [products, news, params] = await Promise.all([
+  const [products, news, combos, params] = await Promise.all([
     getStorefrontProducts(),
     getStorefrontNews(),
+    getStorefrontCombos(),
     searchParams,
   ])
   const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
 
   return (
     <QuayThuoc16
+      combos={combos}
       initialParams={{
         screen: first(params.screen),
         cat: first(params.cat),

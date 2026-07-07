@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm'
 import { revalidatePath, updateTag } from 'next/cache'
 import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
 import { requireAdmin } from '@/lib/auth'
+import { parsePrescription } from '@/lib/prescription'
 import { isUploadedImage, normalizeProductImages, parseProductImagesJson } from '@/lib/productImages'
 import ProductImageManager from '@/components/admin/ProductImageManager'
 import CategoryPrescriptionFields from '@/components/admin/CategoryPrescriptionFields'
@@ -36,8 +37,8 @@ async function updateProduct(id: string, formData: FormData) {
     countryOfOrigin: formData.get('countryOfOrigin') as string,
     stockQuantity: parseInt(formData.get('stockQuantity') as string || '0', 10),
     isActive: formData.get('isActive') === 'true',
-    // Chỉ danh mục "thuoc" gửi field này; danh mục khác mặc định không kê đơn.
-    prescriptionRequired: formData.get('prescriptionRequired') === 'true',
+    // 3 trạng thái: 'true' = kê đơn, 'false' = không kê đơn, '' = trống (null).
+    prescriptionRequired: parsePrescription(formData.get('prescriptionRequired')),
     images,
     updatedAt: new Date(),
   }).where(eq(products.id, id))

@@ -89,7 +89,8 @@ export const products = pgTable(
     shelfLife: text('shelf_life').notNull(),
     ingredientHighlight: text('ingredient_highlight').notNull(),
     images: jsonb('images').$type<ProductImage[]>().notNull(),
-    prescriptionRequired: boolean('prescription_required').notNull().default(false),
+    // 3 trạng thái: null = trống (không phân loại), false = không kê đơn, true = kê đơn.
+    prescriptionRequired: boolean('prescription_required'),
     isActive: boolean('is_active').notNull().default(true),
     stockQuantity: integer('stock_quantity').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -228,6 +229,36 @@ export const wishlists = pgTable(
   }),
 )
 
+/* ── Combos (combo thuốc do admin tạo) ── */
+
+export const combos = pgTable('combos', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(),
+  tag: text('tag').notNull().default('Tiết kiệm'),
+  // Giá combo tùy chọn; null = tự tính (giảm 85% tổng giá thành viên).
+  salePrice: integer('sale_price'),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const comboItems = pgTable(
+  'combo_items',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    comboId: uuid('combo_id')
+      .notNull()
+      .references(() => combos.id, { onDelete: 'cascade' }),
+    productSlug: text('product_slug')
+      .notNull()
+      .references(() => products.slug, { onDelete: 'cascade' }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    comboProductUnique: uniqueIndex('combo_product_unique').on(table.comboId, table.productSlug),
+  }),
+)
+
 /* ── Relations ── */
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -286,4 +317,13 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
 export const wishlistsRelations = relations(wishlists, ({ one }) => ({
   user: one(users, { fields: [wishlists.userId], references: [users.id] }),
   product: one(products, { fields: [wishlists.productSlug], references: [products.slug] }),
+}))
+
+export const combosRelations = relations(combos, ({ many }) => ({
+  items: many(comboItems),
+}))
+
+export const comboItemsRelations = relations(comboItems, ({ one }) => ({
+  combo: one(combos, { fields: [comboItems.comboId], references: [combos.id] }),
+  product: one(products, { fields: [comboItems.productSlug], references: [products.slug] }),
 }))
