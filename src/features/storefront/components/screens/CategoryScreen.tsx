@@ -26,16 +26,16 @@ export default function CategoryScreen({ hub }: { hub: StorefrontHub }) {
       <div className="qt-catlayout" style={s('display:grid;grid-template-columns:240px 1fr;gap:26px;align-items:start')}>
         <aside className={`qt-filter${mobileFilter ? ' qt-filter-open' : ''}`} style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;padding:20px;position:sticky;top:140px')}>
           <div className="qt-filter-close" style={s('display:none;align-items:center;justify-content:space-between;margin-bottom:14px')}>
-            <span style={s('font-size:16px;font-weight:800;color:#14532d')}>Bộ lọc</span>
+            <h2 style={s('font-size:16px;font-weight:800;color:#14532d;margin:0')}>Bộ lọc</h2>
             <button onClick={() => setMobileFilter(false)} style={s('border:none;background:#f1f6f3;width:32px;height:32px;border-radius:9px;font-size:16px;cursor:pointer;color:#8a948e')}>✕</button>
           </div>
-          <div style={s('font-size:14px;font-weight:700;color:#14532d;margin-bottom:12px')}>Danh mục</div>
+          <h2 style={s('font-size:14px;font-weight:700;color:#14532d;margin:0 0 12px')}>Danh mục</h2>
           <div style={s('display:flex;flex-direction:column;gap:7px;margin-bottom:22px')}>
             {catTabs.map((t, i) => (
               <div key={i} onClick={t.onClick} style={t.style}>{t.label}</div>
             ))}
           </div>
-          <div style={s('font-size:14px;font-weight:700;color:#14532d;margin-bottom:12px')}>Lọc theo công dụng</div>
+          <h2 style={s('font-size:14px;font-weight:700;color:#14532d;margin:0 0 12px')}>Lọc theo công dụng</h2>
           <div style={s('display:flex;flex-wrap:wrap;gap:8px')}>
             {useChips.map((u, i) => (
               <button key={i} onClick={u.onClick} style={u.style}>{u.label}</button>

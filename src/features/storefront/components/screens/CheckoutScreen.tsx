@@ -11,7 +11,7 @@ export default function CheckoutScreen({ hub }: { hub: StorefrontHub }) {
       <h1 style={s('font-size:28px;font-weight:800;color:#14532d;margin:0 0 22px')}>Thanh toán</h1>
       <div className="qt-stack" style={s('display:grid;grid-template-columns:1fr 360px;gap:26px;align-items:start')}>
         <div style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;padding:26px')}>
-          <div style={s('font-size:16px;font-weight:700;color:#14532d;margin-bottom:18px')}>Thông tin nhận hàng</div>
+          <h2 style={s('font-size:16px;font-weight:700;color:#14532d;margin:0 0 18px')}>Thông tin nhận hàng</h2>
           <div style={s('display:flex;flex-direction:column;gap:14px')}>
             <div><label style={s('font-size:13px;font-weight:600;color:#4a564e;display:block;margin-bottom:6px')}>Họ và tên *</label><input value={sst.form.name} onChange={(e) => setForm('name', e.target.value)} placeholder="Nguyễn Văn A" style={s('width:100%;border:1.5px solid #e0ebe4;border-radius:11px;padding:12px 14px;font-size:14px;outline:none')} /></div>
             <div><label style={s('font-size:13px;font-weight:600;color:#4a564e;display:block;margin-bottom:6px')}>Số điện thoại *</label><input value={sst.form.phone} onChange={(e) => setForm('phone', e.target.value)} placeholder="09xx xxx xxx" style={s('width:100%;border:1.5px solid #e0ebe4;border-radius:11px;padding:12px 14px;font-size:14px;outline:none')} /></div>
@@ -19,7 +19,7 @@ export default function CheckoutScreen({ hub }: { hub: StorefrontHub }) {
             <div><label style={s('font-size:13px;font-weight:600;color:#4a564e;display:block;margin-bottom:6px')}>Tỉnh/Thành phố *</label><input value={sst.form.city} onChange={(e) => setForm('city', e.target.value)} placeholder="TP. Hồ Chí Minh" style={s('width:100%;border:1.5px solid #e0ebe4;border-radius:11px;padding:12px 14px;font-size:14px;outline:none')} /></div>
             <div><label style={s('font-size:13px;font-weight:600;color:#4a564e;display:block;margin-bottom:6px')}>Ghi chú (tùy chọn)</label><input value={sst.form.note} onChange={(e) => setForm('note', e.target.value)} placeholder="Thời gian giao, lưu ý cho dược sĩ..." style={s('width:100%;border:1.5px solid #e0ebe4;border-radius:11px;padding:12px 14px;font-size:14px;outline:none')} /></div>
           </div>
-          <div style={s('font-size:16px;font-weight:700;color:#14532d;margin:26px 0 14px')}>Phương thức thanh toán</div>
+          <h2 style={s('font-size:16px;font-weight:700;color:#14532d;margin:26px 0 14px')}>Phương thức thanh toán</h2>
           <div style={s('display:flex;flex-direction:column;gap:10px')}>
             {payOptions.map((p, i) => (
               <div key={i} onClick={p.onClick} style={p.style}><div style={{ ...s('width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center'), border: '2px solid ' + p.dot }}><div style={{ ...s('width:10px;height:10px;border-radius:50%'), background: p.dotFill }} /></div><div><div style={s('font-size:14px;font-weight:600;color:#2a352e')}>{p.label}</div><div style={s('font-size:12px;color:#8a948e')}>{p.desc}</div></div></div>
@@ -27,7 +27,7 @@ export default function CheckoutScreen({ hub }: { hub: StorefrontHub }) {
           </div>
         </div>
         <div style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;padding:24px;position:sticky;top:140px')}>
-          <div style={s('font-size:17px;font-weight:700;color:#14532d;margin-bottom:16px')}>Đơn hàng ({cc})</div>
+          <h2 style={s('font-size:17px;font-weight:700;color:#14532d;margin:0 0 16px')}>Đơn hàng ({cc})</h2>
           <div style={s('display:flex;flex-direction:column;gap:10px;margin-bottom:16px;max-height:200px;overflow:auto')}>
             {cartView.map((c, i) => (
               <div key={i} style={s('display:flex;justify-content:space-between;gap:10px;font-size:13px')}><span style={s('color:#4a564e')}>{c.name} <span style={s('color:#9aa8a0')}>×{c.qty}</span></span><span style={s('font-weight:600;color:#14532d;white-space:nowrap')}>{c.lineText}</span></div>

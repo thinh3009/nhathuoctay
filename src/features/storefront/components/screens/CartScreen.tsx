@@ -29,7 +29,7 @@ export default function CartScreen({ hub }: { hub: StorefrontHub }) {
             ))}
           </div>
           <div style={s('background:#fff;border:1px solid #e7efe9;border-radius:16px;padding:24px;position:sticky;top:140px')}>
-            <div style={s('font-size:17px;font-weight:700;color:#14532d;margin-bottom:18px')}>Tóm tắt đơn hàng</div>
+            <h2 style={s('font-size:17px;font-weight:700;color:#14532d;margin:0 0 18px')}>Tóm tắt đơn hàng</h2>
             <div style={s('display:flex;justify-content:space-between;font-size:14px;color:#4a564e;margin-bottom:11px')}><span>Tạm tính</span><span style={s('font-weight:600')}>{subtotalText}</span></div>
             <div style={s('display:flex;justify-content:space-between;font-size:14px;color:#4a564e;margin-bottom:11px')}><span>Phí giao hàng</span><span style={s('font-weight:600')}>{shipText}</span></div>
             {freeshipHint ? <div style={s('background:#eaf7ef;color:#1c7a45;font-size:12.5px;padding:9px 12px;border-radius:9px;margin-bottom:11px')}>{freeshipHint}</div> : null}
