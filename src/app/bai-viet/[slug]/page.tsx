@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getPublishedArticleBySlug } from '@/db/queries/articles'
-import MarkdownContent from '@/components/MarkdownContent'
-import SiteFooter from '@/components/SiteFooter'
-import SiteHeader from '@/components/SiteHeader'
+import { getPublishedArticleBySlug } from '@/features/articles/queries'
+import MarkdownContent from '@/components/ui/MarkdownContent'
+import SiteFooter from '@/components/layout/SiteFooter'
+import SiteHeader from '@/components/layout/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
 
 // Render theo từng request (không prerender lúc build) để build không cần DB.

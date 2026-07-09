@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import { getOrdersByUserId } from '@/db/queries/users'
-import { formatPrice } from '@/lib/catalog'
+import { getOrdersByUserId } from '@/features/users/queries'
+import { formatPrice } from '@/utils/format'
 import { getServerCartCount } from '@/lib/cart'
-import SiteFooter from '@/components/SiteFooter'
-import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/layout/SiteFooter'
+import SiteHeader from '@/components/layout/SiteHeader'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Chờ xác nhận',

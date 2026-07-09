@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import QuayThuoc16 from '@/components/quaythuoc/QuayThuoc16'
-import { getStorefrontProducts, getStorefrontNews, getStorefrontCombos, getStorefrontHeroImages } from '@/db/queries/storefront'
+import QuayThuoc16 from '@/features/storefront/components/QuayThuoc16'
+import { getStorefrontProducts, getStorefrontNews, getStorefrontCombos, getStorefrontHeroImages } from '@/features/storefront/queries'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
 // Trang đọc searchParams (?screen=, ?cat=…) để server render đúng màn SPA đang xem —

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getProductReviews } from '@/db/queries/catalog'
+import { getProductReviews } from '@/features/products/queries'
 import { jsonError } from '@/lib/api'
 
 type ProductReviewsRouteProps = {

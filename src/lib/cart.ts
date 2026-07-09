@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { CART_COOKIE_NAME } from './constants.ts'
-import { getExistingCart } from '@/db/queries/cart'
+import { getExistingCart } from '@/features/cart/queries'
 
 export async function getCartTokenFromCookies() {
   const cookieStore = await cookies()

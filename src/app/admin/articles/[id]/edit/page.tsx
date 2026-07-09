@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getArticleById } from '@/db/queries/articles'
-import ArticleForm from '../../_components/ArticleForm'
-import { deleteArticleAction } from '../../actions'
+import { getArticleById } from '@/features/articles/queries'
+import ArticleForm from '@/features/articles/components/ArticleForm'
+import { deleteArticleAction } from '@/features/articles/actions'
 
 type EditArticlePageProps = {
   params: Promise<{ id: string }>

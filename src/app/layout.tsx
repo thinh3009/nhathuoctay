@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import DrugChatbot from '@/components/DrugChatbot'
+import DrugChatbot from '@/features/chat/components/DrugChatbot'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/config/site'
 import './globals.css'
 

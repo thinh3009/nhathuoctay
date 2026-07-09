@@ -1,61 +1,16 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { db } from '@/db/client'
-import { products, categories } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-import { revalidatePath, updateTag } from 'next/cache'
-import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
-import { requireAdmin } from '@/lib/auth'
-import { parsePrescription } from '@/lib/prescription'
-import { isUploadedImage, normalizeProductImages, parseProductImagesJson } from '@/lib/productImages'
-import ProductImageManager from '@/components/admin/ProductImageManager'
-import CategoryPrescriptionFields from '@/components/admin/CategoryPrescriptionFields'
+import { getProductForEdit, listCategoryOptions } from '@/features/products/queries'
+import { updateProduct } from '@/features/products/actions'
+import { normalizeProductImages, isUploadedImage } from '@/lib/productImages'
+import ProductImageManager from '@/features/products/components/ProductImageManager'
+import CategoryPrescriptionFields from '@/features/products/components/CategoryPrescriptionFields'
 import type { CategorySlug } from '@/lib/constants'
-
-async function updateProduct(id: string, formData: FormData) {
-  'use server'
-  await requireAdmin()
-
-  const categorySlug = formData.get('categorySlug') as string
-
-  // Ảnh admin đã upload (JSON từ ProductImageManager). Trống → dùng ảnh demo theo danh mục.
-  const images = parseProductImagesJson(formData.get('images'))
-
-  await db.update(products).set({
-    name: formData.get('name') as string,
-    categorySlug,
-    subCategory: formData.get('subCategory') as string,
-    benefit: formData.get('benefit') as string,
-    shortDescription: formData.get('shortDescription') as string,
-    description: formData.get('description') as string,
-    price: parseInt(formData.get('price') as string, 10),
-    salePrice: (formData.get('salePrice') as string) ? parseInt(formData.get('salePrice') as string, 10) : null,
-    badge: formData.get('badge') as string,
-    usage: formData.get('usage') as string,
-    unit: formData.get('unit') as string,
-    manufacturer: formData.get('manufacturer') as string,
-    countryOfOrigin: formData.get('countryOfOrigin') as string,
-    stockQuantity: parseInt(formData.get('stockQuantity') as string || '0', 10),
-    isActive: formData.get('isActive') === 'true',
-    // 3 trạng thái: 'true' = kê đơn, 'false' = không kê đơn, '' = trống (null).
-    prescriptionRequired: parsePrescription(formData.get('prescriptionRequired')),
-    images,
-    updatedAt: new Date(),
-  }).where(eq(products.id, id))
-
-  revalidatePath('/admin/products')
-  updateTag(STOREFRONT_CACHE_TAG) // data cache trang chủ cập nhật ngay
-  revalidatePath(`/category/${categorySlug}`)
-  redirect('/admin/products')
-}
 
 export default async function AdminEditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const [product, cats] = await Promise.all([
-    db.select().from(products).where(eq(products.id, id)).limit(1).then((r) => r[0]),
-    db.select({ slug: categories.slug, label: categories.label }).from(categories),
-  ])
+  const [product, cats] = await Promise.all([getProductForEdit(id), listCategoryOptions()])
 
   if (!product) notFound()
 

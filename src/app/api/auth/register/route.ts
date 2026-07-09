@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getUserByEmail, createUser } from '@/db/queries/users'
+import { getUserByEmail, createUser } from '@/features/users/queries'
 import { hashPassword } from '@/lib/password'
 import { signJWT, setAuthCookie } from '@/lib/auth'
 

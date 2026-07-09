@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getProductBySlug } from '@/db/queries/catalog'
+import { getProductBySlug } from '@/features/products/queries'
 import { jsonError } from '@/lib/api'
 import { productSchema } from '@/lib/schemas'
 

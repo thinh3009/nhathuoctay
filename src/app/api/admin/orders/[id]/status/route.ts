@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getAuthUser } from '@/lib/auth'
-import { updateOrderStatus } from '@/db/queries/orders'
+import { updateOrderStatus } from '@/features/orders/queries'
 
 const schema = z.object({
   status: z.enum(['pending', 'confirmed', 'processing', 'shipping', 'delivered', 'cancelled', 'refunded']),

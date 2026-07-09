@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getAllOrders, updateOrderStatus } from '@/db/queries/orders'
-import { formatPrice } from '@/lib/catalog'
+import { getAllOrders, updateOrderStatus } from '@/features/orders/queries'
+import { formatPrice } from '@/utils/format'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Chờ xác nhận',

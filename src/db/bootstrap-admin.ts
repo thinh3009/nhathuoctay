@@ -19,7 +19,7 @@ async function bootstrapAdmin() {
   }
 
   const [{ db }, { users }, { eq }, { hashPassword }] = await Promise.all([
-    import('./client.ts'),
+    import('../lib/db.ts'),
     import('./schema.ts'),
     import('drizzle-orm'),
     import('../lib/password.ts'),

@@ -10,7 +10,7 @@ async function seedCatalog() {
 
   const [{ db }, { categories, productReviews, products: productsTable }, { categoryNavItems, products }] =
     await Promise.all([
-      import('./client.ts'),
+      import('../lib/db.ts'),
       import('./schema.ts'),
       import('../lib/catalog.ts'),
     ])

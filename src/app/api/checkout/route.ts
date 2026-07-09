@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getAuthUser } from '@/lib/auth'
 import { getCartTokenFromCookies } from '@/lib/cart'
-import { getExistingCart } from '@/db/queries/cart'
-import { createOrder } from '@/db/queries/orders'
+import { getExistingCart } from '@/features/cart/queries'
+import { createOrder } from '@/features/orders/queries'
 import { products as productsTable } from '@/db/schema'
-import { db } from '@/db/client'
+import { db } from '@/lib/db'
 import { inArray } from 'drizzle-orm'
 
 const schema = z.object({

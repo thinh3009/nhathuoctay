@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import ArticleForm from '../_components/ArticleForm'
+import ArticleForm from '@/features/articles/components/ArticleForm'
 
 export default function NewArticlePage() {
   return (

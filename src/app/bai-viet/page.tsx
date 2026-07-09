@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { listPublishedArticles } from '@/db/queries/articles'
-import SiteFooter from '@/components/SiteFooter'
-import SiteHeader from '@/components/SiteHeader'
+import { listPublishedArticles } from '@/features/articles/queries'
+import SiteFooter from '@/components/layout/SiteFooter'
+import SiteHeader from '@/components/layout/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
 
 // Render theo từng request (không prerender lúc build) để build không cần DB.

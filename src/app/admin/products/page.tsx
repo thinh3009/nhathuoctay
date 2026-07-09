@@ -1,8 +1,6 @@
 import Link from 'next/link'
-import { db } from '@/db/client'
-import { products, categories } from '@/db/schema'
-import { eq, ilike, or } from 'drizzle-orm'
-import { formatPrice } from '@/lib/catalog'
+import { searchAdminProducts } from '@/features/products/queries'
+import { formatPrice } from '@/utils/format'
 
 export default async function AdminProductsPage({
   searchParams,
@@ -12,26 +10,7 @@ export default async function AdminProductsPage({
   const { q } = await searchParams
   const query = q?.trim() ?? ''
 
-  const rows = await db
-    .select({
-      id: products.id,
-      slug: products.slug,
-      name: products.name,
-      price: products.price,
-      salePrice: products.salePrice,
-      badge: products.badge,
-      sku: products.sku,
-      isActive: products.isActive,
-      categorySlug: products.categorySlug,
-      categoryLabel: categories.label,
-      rating: products.rating,
-      reviewCount: products.reviewCount,
-    })
-    .from(products)
-    .leftJoin(categories, eq(products.categorySlug, categories.slug))
-    .where(query ? or(ilike(products.name, `%${query}%`), ilike(products.sku, `%${query}%`)) : undefined)
-    .orderBy(products.name)
-    .limit(200)
+  const rows = await searchAdminProducts(query)
 
   return (
     <div>

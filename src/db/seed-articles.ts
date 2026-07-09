@@ -8,7 +8,7 @@ async function seedArticles() {
     process.loadEnvFile?.('.env')
   }
 
-  const [{ db }, { articles }] = await Promise.all([import('./client.ts'), import('./schema.ts')])
+  const [{ db }, { articles }] = await Promise.all([import('../lib/db.ts'), import('./schema.ts')])
 
   const now = new Date()
   const samples = [

@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getOrderById } from '@/db/queries/orders'
-import { formatPrice } from '@/lib/catalog'
-import OrderStatusUpdater from './_components/OrderStatusUpdater'
+import { getOrderById } from '@/features/orders/queries'
+import { formatPrice } from '@/utils/format'
+import OrderStatusUpdater from '@/features/orders/components/OrderStatusUpdater'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Chờ xác nhận',

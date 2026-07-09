@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { ZodError } from 'zod'
-import { removeCartItem, updateCartItemQuantity } from '@/db/queries/cart'
+import { removeCartItem, updateCartItemQuantity } from '@/features/cart/queries'
 import { jsonError } from '@/lib/api'
 import { CART_COOKIE_NAME } from '@/lib/constants'
 import { updateCartItemInputSchema } from '@/lib/schemas'

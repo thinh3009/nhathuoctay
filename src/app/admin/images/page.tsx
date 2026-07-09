@@ -1,11 +1,11 @@
-import { db } from '@/db/client'
+import { db } from '@/lib/db'
 import { products } from '@/db/schema'
 import { requireAdmin } from '@/lib/auth'
 import { isUploadedImage, isUploadedPath } from '@/lib/productImages'
 import type { ProductImage } from '@/lib/schemas'
-import { listStorageObjects, summarizeStorageUsage } from '@/db/queries/storage'
-import { listHeroImages } from '@/db/queries/heroImages'
-import ImageManagerClient, { type ManagedImage } from './ImageManagerClient'
+import { listStorageObjects, summarizeStorageUsage } from '@/features/images/storage'
+import { listHeroImages } from '@/features/images/queries'
+import ImageManagerClient, { type ManagedImage } from '@/features/images/components/ImageManagerClient'
 
 // Trang đọc thẳng Storage của Supabase mỗi lần vào để dung lượng luôn cập nhật.
 export const dynamic = 'force-dynamic'

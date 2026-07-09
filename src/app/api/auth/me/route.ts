@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getAuthUser } from '@/lib/auth'
-import { getUserById } from '@/db/queries/users'
+import { getUserById } from '@/features/users/queries'
 
 export async function GET() {
   const payload = await getAuthUser()

@@ -311,14 +311,6 @@ export const commitments = [
   'Giao hàng toàn quốc trong 2-4 ngày',
 ]
 
-export function formatPrice(price: number) {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-  }).format(price)
-}
-
 export function getCategoryBySlug(slug: string) {
   return categoryNavItems.find((item) => item.slug === slug)
 }

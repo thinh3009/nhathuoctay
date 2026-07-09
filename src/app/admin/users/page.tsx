@@ -1,17 +1,10 @@
-import { revalidatePath } from 'next/cache'
-import {
-  deleteUser,
-  listUsers,
-  setUserActive,
-  updateUserProfile,
-  updateUserRole,
-  type UserRole,
-} from '@/db/queries/users'
+import { listUsers, type UserRole } from '@/features/users/queries'
+import { changeRole, editUser, removeUser, toggleActive } from '@/features/users/actions'
+import { USER_ROLES } from '@/features/users/schemas'
 import { requireAdmin } from '@/lib/auth'
-import { hashPassword } from '@/lib/password'
-import CreateUserForm from './_components/CreateUserForm'
-import DeleteUserButton from './_components/DeleteUserButton'
-import EditUserButton from './_components/EditUserButton'
+import CreateUserForm from '@/features/users/components/CreateUserForm'
+import DeleteUserButton from '@/features/users/components/DeleteUserButton'
+import EditUserButton from '@/features/users/components/EditUserButton'
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Quản trị viên',
@@ -23,75 +16,6 @@ const ROLE_BADGE: Record<UserRole, string> = {
   admin: 'bg-emerald-100 text-emerald-700',
   pharmacist: 'bg-sky-100 text-sky-700',
   customer: 'bg-stone-100 text-stone-600',
-}
-
-const ROLE_VALUES: UserRole[] = ['customer', 'pharmacist', 'admin']
-
-async function changeRole(formData: FormData) {
-  'use server'
-  const admin = await requireAdmin()
-  const id = String(formData.get('id') ?? '')
-  const role = String(formData.get('role') ?? '') as UserRole
-  // Không cho tự đổi role của chính mình (tránh tự khóa quyền admin).
-  if (!id || id === admin.userId || !ROLE_VALUES.includes(role)) {
-    return
-  }
-  await updateUserRole(id, role)
-  revalidatePath('/admin/users')
-}
-
-async function toggleActive(formData: FormData) {
-  'use server'
-  const admin = await requireAdmin()
-  const id = String(formData.get('id') ?? '')
-  const next = String(formData.get('next') ?? '') === 'true'
-  // Không cho tự khóa tài khoản của chính mình.
-  if (!id || id === admin.userId) {
-    return
-  }
-  await setUserActive(id, next)
-  revalidatePath('/admin/users')
-}
-
-async function editUser(formData: FormData) {
-  'use server'
-  const admin = await requireAdmin()
-  const id = String(formData.get('id') ?? '')
-  // Không cho tự sửa qua bảng này (giữ nhất quán với các thao tác khác).
-  if (!id || id === admin.userId) {
-    return
-  }
-  const fullName = String(formData.get('fullName') ?? '').trim()
-  const phone = String(formData.get('phone') ?? '').trim()
-  const password = String(formData.get('password') ?? '')
-  if (fullName.length < 2) {
-    return
-  }
-  const patch: { fullName: string; phone: string | null; passwordHash?: string } = {
-    fullName,
-    phone: phone || null,
-  }
-  // Chỉ đổi mật khẩu khi có nhập và đủ độ dài.
-  if (password) {
-    if (password.length < 6) {
-      return
-    }
-    patch.passwordHash = await hashPassword(password)
-  }
-  await updateUserProfile(id, patch)
-  revalidatePath('/admin/users')
-}
-
-async function removeUser(formData: FormData) {
-  'use server'
-  const admin = await requireAdmin()
-  const id = String(formData.get('id') ?? '')
-  // Không cho tự xóa tài khoản của chính mình.
-  if (!id || id === admin.userId) {
-    return
-  }
-  await deleteUser(id)
-  revalidatePath('/admin/users')
 }
 
 export default async function AdminUsersPage() {
@@ -168,7 +92,7 @@ export default async function AdminUsersPage() {
                               defaultValue={role}
                               name="role"
                             >
-                              {ROLE_VALUES.map((value) => (
+                              {USER_ROLES.map((value) => (
                                 <option key={value} value={value}>
                                   {ROLE_LABELS[value]}
                                 </option>

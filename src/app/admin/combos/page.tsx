@@ -1,40 +1,9 @@
 import Link from 'next/link'
-import { revalidatePath, updateTag } from 'next/cache'
-import { asc, eq } from 'drizzle-orm'
-import { db } from '@/db/client'
-import { comboItems, combos, products } from '@/db/schema'
-import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
-import { requireAdmin } from '@/lib/auth'
-
-async function deleteCombo(formData: FormData) {
-  'use server'
-  await requireAdmin()
-  const id = formData.get('id') as string
-  if (!id) return
-  // combo_items ON DELETE CASCADE → xóa combo là gỡ luôn thành viên.
-  await db.delete(combos).where(eq(combos.id, id))
-  revalidatePath('/admin/combos')
-  updateTag(STOREFRONT_CACHE_TAG) // section combo trang chủ cập nhật ngay
-}
-
-async function getCombos() {
-  const comboRows = await db.select().from(combos).orderBy(asc(combos.createdAt))
-  if (comboRows.length === 0) return []
-
-  const memberRows = await db
-    .select({ comboId: comboItems.comboId, name: products.name })
-    .from(comboItems)
-    .innerJoin(products, eq(comboItems.productSlug, products.slug))
-    .orderBy(asc(comboItems.createdAt))
-
-  return comboRows.map((combo) => ({
-    ...combo,
-    members: memberRows.filter((m) => m.comboId === combo.id).map((m) => m.name),
-  }))
-}
+import { listCombosWithMembers } from '@/features/combos/queries'
+import { deleteCombo } from '@/features/combos/actions'
 
 export default async function AdminCombosPage() {
-  const rows = await getCombos()
+  const rows = await listCombosWithMembers()
 
   return (
     <div>

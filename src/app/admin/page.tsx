@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getOrderStats, getAllOrders } from '@/db/queries/orders'
-import { formatPrice } from '@/lib/catalog'
+import { getOrderStats, getAllOrders } from '@/features/orders/queries'
+import { formatPrice } from '@/utils/format'
 
 function StatCard({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) {
   return (

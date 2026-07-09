@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
-import { searchDrugs } from '@/db/queries/drugSearch'
+import { searchDrugs } from '@/features/chat/queries'
 
 // Agentic loop có thể chạy nhiều vòng tool-use → cho thêm thời gian trên serverless.
 export const runtime = 'nodejs'

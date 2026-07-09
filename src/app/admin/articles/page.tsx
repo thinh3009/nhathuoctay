@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { listArticles } from '@/db/queries/articles'
+import { listArticles } from '@/features/articles/queries'
 
 export default async function AdminArticlesPage() {
   const rows = await listArticles()

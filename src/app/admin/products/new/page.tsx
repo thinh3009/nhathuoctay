@@ -1,75 +1,11 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { db } from '@/db/client'
-import { products, categories } from '@/db/schema'
-import { revalidatePath, updateTag } from 'next/cache'
-import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
-import { requireAdmin } from '@/lib/auth'
-import { parsePrescription } from '@/lib/prescription'
-import { parseProductImagesJson } from '@/lib/productImages'
-import ProductImageManager from '@/components/admin/ProductImageManager'
-import CategoryPrescriptionFields from '@/components/admin/CategoryPrescriptionFields'
-
-async function getCategories() {
-  return db.select({ slug: categories.slug, label: categories.label }).from(categories)
-}
-
-async function createProduct(formData: FormData) {
-  'use server'
-  await requireAdmin()
-
-  const name = formData.get('name') as string
-  const slug = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-  const categorySlug = formData.get('categorySlug') as string
-  const price = parseInt(formData.get('price') as string, 10)
-  const salePriceRaw = formData.get('salePrice') as string
-  const salePrice = salePriceRaw ? parseInt(salePriceRaw, 10) : null
-
-  // Ảnh admin đã upload lên Storage (JSON từ ProductImageManager). Trống → dùng ảnh demo.
-  const images = parseProductImagesJson(formData.get('images'))
-
-  await db.insert(products).values({
-    slug: `${slug}-${Date.now()}`,
-    categorySlug,
-    name,
-    subCategory: formData.get('subCategory') as string || name,
-    benefit: formData.get('benefit') as string || '',
-    description: formData.get('description') as string || '',
-    shortDescription: formData.get('shortDescription') as string || '',
-    price,
-    salePrice,
-    badge: formData.get('badge') as string || 'Mới',
-    ingredients: [],
-    usage: formData.get('usage') as string || '',
-    unit: formData.get('unit') as string || 'hộp',
-    defaultQuantity: 1,
-    sku: formData.get('sku') as string || `SKU-${Date.now()}`,
-    rating: 5.0,
-    reviewCount: 0,
-    commentCount: 0,
-    officialName: name,
-    registrationNumber: '',
-    form: '',
-    specification: '',
-    manufacturer: formData.get('manufacturer') as string || '',
-    countryOfOrigin: formData.get('countryOfOrigin') as string || 'Việt Nam',
-    shelfLife: '',
-    ingredientHighlight: '',
-    images,
-    isActive: true,
-    stockQuantity: parseInt(formData.get('stockQuantity') as string || '0', 10),
-    // 3 trạng thái: 'true' = kê đơn, 'false' = không kê đơn, '' = trống (null).
-    prescriptionRequired: parsePrescription(formData.get('prescriptionRequired')),
-  })
-
-  revalidatePath('/admin/products')
-  updateTag(STOREFRONT_CACHE_TAG) // data cache trang chủ hiển thị sản phẩm mới ngay
-  revalidatePath(`/category/${categorySlug}`)
-  redirect('/admin/products')
-}
+import { listCategoryOptions } from '@/features/products/queries'
+import { createProduct } from '@/features/products/actions'
+import ProductImageManager from '@/features/products/components/ProductImageManager'
+import CategoryPrescriptionFields from '@/features/products/components/CategoryPrescriptionFields'
 
 export default async function AdminNewProductPage() {
-  const cats = await getCategories()
+  const cats = await listCategoryOptions()
 
   return (
     <div>

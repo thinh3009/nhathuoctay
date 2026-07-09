@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import { updateTag } from 'next/cache'
 import { asc, eq } from 'drizzle-orm'
-import { db } from '@/db/client'
+import { db } from '@/lib/db'
 import { heroImages } from '@/db/schema'
-import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
+import { STOREFRONT_CACHE_TAG } from '@/features/storefront/queries'
 import { getAuthUser } from '@/lib/auth'
 import {
   deleteProductImage,

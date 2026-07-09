@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { getOrCreateCart } from '@/db/queries/cart'
+import { getOrCreateCart } from '@/features/cart/queries'
 import { CART_COOKIE_NAME } from '@/lib/constants'
 
 export async function GET() {

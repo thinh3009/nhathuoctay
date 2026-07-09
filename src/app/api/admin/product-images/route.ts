@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { eq, sql } from 'drizzle-orm'
-import { db } from '@/db/client'
+import { db } from '@/lib/db'
 import { products } from '@/db/schema'
 import { getAuthUser } from '@/lib/auth'
 import { buildUploadedProductImage, isUploadedPath } from '@/lib/productImages'

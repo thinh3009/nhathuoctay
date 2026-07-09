@@ -1,42 +1,8 @@
-import { redirect } from 'next/navigation'
-import { db } from '@/db/client'
-import { categories } from '@/db/schema'
-import { revalidatePath, updateTag } from 'next/cache'
-import { eq } from 'drizzle-orm'
-import { requireAdmin } from '@/lib/auth'
-import { STOREFRONT_CACHE_TAG } from '@/db/queries/storefront'
-
-async function createCategory(formData: FormData) {
-  'use server'
-  await requireAdmin()
-  const label = formData.get('label') as string
-  const slug = formData.get('slug') as string
-  const heroTitle = formData.get('heroTitle') as string
-  const heroDescription = formData.get('heroDescription') as string
-
-  await db.insert(categories).values({ slug, label, heroTitle, heroDescription })
-  revalidatePath('/admin/categories')
-  redirect('/admin/categories')
-}
-
-// Bật/tắt hiển thị danh mục trên storefront. Khi ẩn: nav, trang danh mục,
-// trang chủ và trang chi tiết sản phẩm thuộc danh mục đều không truy cập được.
-async function toggleCategoryActive(slug: string, nextActive: boolean) {
-  'use server'
-  await requireAdmin()
-
-  await db
-    .update(categories)
-    .set({ isActive: nextActive, updatedAt: new Date() })
-    .where(eq(categories.slug, slug))
-
-  revalidatePath('/admin/categories')
-  updateTag(STOREFRONT_CACHE_TAG) // data cache trang chủ cập nhật danh sách sản phẩm ngay
-  revalidatePath(`/category/${slug}`)
-}
+import { listAdminCategories } from '@/features/categories/queries'
+import { createCategory, toggleCategoryActive } from '@/features/categories/actions'
 
 export default async function AdminCategoriesPage() {
-  const cats = await db.select().from(categories).orderBy(categories.label)
+  const cats = await listAdminCategories()
 
   return (
     <div>

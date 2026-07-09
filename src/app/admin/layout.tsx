@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
-import AdminShell from './_components/AdminShell'
+import AdminShell from '@/components/layout/AdminShell'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthUser()
