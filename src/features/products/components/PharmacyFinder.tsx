@@ -121,7 +121,7 @@ export default function PharmacyFinder({ productName }: PharmacyFinderProps) {
   return (
     <>
       <button
-        className="rounded-full bg-emerald-50 px-5 py-4 text-lg font-semibold text-emerald-700 hover:bg-emerald-100"
+        className="rounded-full bg-brand-50 px-5 py-4 text-lg font-semibold text-brand-700 hover:bg-brand-100"
         onClick={() => setIsOpen(true)}
         type="button"
       >
@@ -139,16 +139,16 @@ export default function PharmacyFinder({ productName }: PharmacyFinderProps) {
             className="flex max-h-[88vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4 border-b border-stone-200 bg-emerald-50 px-5 py-4">
+            <div className="flex items-start justify-between gap-4 border-b border-stone-200 bg-brand-50 px-5 py-4">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">
                   Nhà thuốc còn hàng
                 </p>
                 <h2 className="mt-1 truncate text-lg font-bold text-stone-900">{productName}</h2>
               </div>
               <button
                 aria-label="Đóng"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-600 transition hover:border-emerald-300 hover:text-emerald-700"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-600 transition hover:border-brand-300 hover:text-brand-700"
                 onClick={() => setIsOpen(false)}
                 type="button"
               >
@@ -162,7 +162,7 @@ export default function PharmacyFinder({ productName }: PharmacyFinderProps) {
               </label>
               <input
                 autoComplete="off"
-                className="mt-2 w-full rounded-full border border-stone-300 px-4 py-2.5 text-sm text-stone-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                className="mt-2 w-full rounded-full border border-stone-300 px-4 py-2.5 text-sm text-stone-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
                 id="pharmacy-search"
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Nhập quận, đường hoặc tên nhà thuốc..."
@@ -179,12 +179,12 @@ export default function PharmacyFinder({ productName }: PharmacyFinderProps) {
                 <ul className="space-y-3">
                   {filteredPharmacies.map((pharmacy) => (
                     <li
-                      className="rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-emerald-300 hover:shadow-sm"
+                      className="rounded-2xl border border-stone-200 bg-white p-4 transition hover:border-brand-300 hover:shadow-sm"
                       key={pharmacy.id}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <p className="font-semibold text-stone-900">{pharmacy.name}</p>
-                        <span className="shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        <span className="shrink-0 rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
                           Còn {pharmacy.stock} sản phẩm
                         </span>
                       </div>

@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { ACCEPTED_IMAGE_MIME, EXTENSION_BY_MIME, MAX_UPLOAD_BYTES } from '@/lib/productImages'
+import AppearanceManager from '@/features/siteImages/components/AppearanceManager'
+import type { SiteImageMap } from '@/features/siteImages/types'
 
 const MAX_UPLOAD_MB = Math.round(MAX_UPLOAD_BYTES / 1024 / 1024)
 
@@ -45,11 +47,14 @@ const BAR_COLORS = ['#047857', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#647
 export default function ImageManagerClient({
   images,
   heroImages,
+  siteImages,
   storageLimitBytes,
   usage,
 }: {
   images: ManagedImage[]
   heroImages: HeroImage[]
+  // Ảnh giao diện tùy biến (CTA, logo) — admin đặt trong tab "Ảnh hero".
+  siteImages: SiteImageMap
   // Hạn mức Storage (bytes) — server truyền xuống từ env, không hard-code theo gói free.
   storageLimitBytes: number
   usage: Usage
@@ -112,7 +117,18 @@ export default function ImageManagerClient({
       ) : tab === 'usage' ? (
         <UsageChart limitBytes={storageLimitBytes} usage={usage} usagePercent={usagePercent} />
       ) : (
-        <HeroManager heroImages={heroImages} />
+        <div className="space-y-6">
+          <HeroManager heroImages={heroImages} />
+
+          {/* Giao diện khác: ảnh nền CTA + logo tùy chỉnh (lưu ở bảng site_images) */}
+          <div className="rounded-2xl border border-stone-200 bg-white p-6">
+            <div className="mb-4">
+              <h2 className="font-bold text-stone-900">Giao diện trang chủ</h2>
+              <p className="mt-0.5 text-sm text-stone-500">Ảnh nền khu kêu gọi (CTA) và logo hiển thị ở header/footer.</p>
+            </div>
+            <AppearanceManager embedded initial={siteImages} slots={['cta', 'logo']} />
+          </div>
+        </div>
       )}
     </div>
   )

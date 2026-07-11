@@ -10,8 +10,8 @@ type ProductVisualProps = {
 }
 
 const theme = {
-  accent: 'bg-emerald-700',
-  ink: 'text-emerald-800',
+  accent: 'bg-brand-700',
+  ink: 'text-brand-800',
 }
 
 export default function ProductVisual({
@@ -24,7 +24,7 @@ export default function ProductVisual({
     return (
       <div
         className={`flex h-20 items-center justify-center rounded-lg border bg-white px-2 text-center shadow-sm ${
-          active ? 'border-emerald-800 ring-2 ring-emerald-200' : 'border-stone-200'
+          active ? 'border-brand-800 ring-2 ring-brand-200' : 'border-stone-200'
         }`}
       >
         <div>
@@ -38,7 +38,7 @@ export default function ProductVisual({
   }
 
   return (
-    <div className="relative h-36 overflow-hidden rounded-lg border border-emerald-100 bg-emerald-950">
+    <div className="relative h-36 overflow-hidden rounded-lg border border-brand-100 bg-brand-950">
       <Image
         alt={`${product.name} - ${image.label}`}
         className="object-cover opacity-95"
@@ -46,7 +46,7 @@ export default function ProductVisual({
         sizes="(max-width: 768px) 50vw, 320px"
         src={getProductImageSrc(image)}
       />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-950 via-emerald-950/35 to-transparent p-3">
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-950 via-brand-950/35 to-transparent p-3">
         <div
           className={`inline-flex rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white ${theme.accent}`}
         >

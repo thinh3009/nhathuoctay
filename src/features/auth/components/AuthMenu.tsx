@@ -65,10 +65,10 @@ export default function AuthMenu({
   const triggerClass =
     variant === 'dark'
       ? 'bg-white/15 text-white hover:bg-white/25'
-      : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+      : 'bg-brand-50 text-brand-800 hover:bg-brand-100'
 
   if (loading) {
-    return <div className={`h-9 w-24 animate-pulse rounded-full ${variant === 'dark' ? 'bg-white/10' : 'bg-emerald-50'}`} />
+    return <div className={`h-9 w-24 animate-pulse rounded-full ${variant === 'dark' ? 'bg-white/10' : 'bg-brand-50'}`} />
   }
 
   if (!user) {
@@ -96,7 +96,7 @@ export default function AuthMenu({
         onClick={() => setOpen((v) => !v)}
         type="button"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
           {displayName.charAt(0).toUpperCase()}
         </span>
         <span className="max-w-[120px] truncate">{displayName}</span>
@@ -106,14 +106,14 @@ export default function AuthMenu({
       </button>
 
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-xl shadow-emerald-900/10">
+        <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-xl shadow-brand-900/10">
           <div className="border-b border-stone-100 px-4 py-3">
             <p className="truncate text-sm font-bold text-stone-900">{displayName}</p>
             <p className="truncate text-xs text-stone-500">{user.email}</p>
           </div>
           <div className="p-1.5">
             <Link
-              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-stone-700 transition hover:bg-emerald-50 hover:text-emerald-800"
+              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-stone-700 transition hover:bg-brand-50 hover:text-brand-800"
               href="/account/orders"
               onClick={() => {
                 setOpen(false)

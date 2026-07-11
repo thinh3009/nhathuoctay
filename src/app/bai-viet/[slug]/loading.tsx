@@ -1,10 +1,10 @@
 export default function ArticleLoading() {
   return (
-    <main className="min-h-screen bg-[#f6fbf4] px-4 py-8 text-stone-900">
+    <main className="min-h-screen bg-[var(--color-bg-page)] px-4 py-8 text-stone-900">
       <div className="mx-auto max-w-3xl animate-pulse">
-        <div className="h-16 rounded-2xl bg-emerald-100/60" />
-        <div className="mt-6 h-4 w-32 rounded bg-emerald-100" />
-        <div className="mt-4 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-8">
+        <div className="h-16 rounded-2xl bg-brand-100/60" />
+        <div className="mt-6 h-4 w-32 rounded bg-brand-100" />
+        <div className="mt-4 rounded-2xl border border-brand-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="h-4 w-24 rounded bg-stone-100" />
           <div className="mt-3 h-9 w-3/4 rounded bg-stone-200" />
           <div className="mt-2 h-4 w-40 rounded bg-stone-100" />

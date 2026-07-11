@@ -42,19 +42,19 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 via-white to-teal-50 px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.26em] text-emerald-600">Nhà thuốc</p>
-          <Link className="text-3xl font-black tracking-tight text-emerald-900" href="/">
+          <p className="text-xs font-bold uppercase tracking-[0.26em] text-brand-600">Nhà thuốc</p>
+          <Link className="text-3xl font-black tracking-tight text-brand-900" href="/">
             {SITE_NAME}
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-[28px] border border-stone-100 bg-white shadow-xl shadow-emerald-100/40">
-          <div className="bg-gradient-to-r from-emerald-700 to-teal-600 px-6 py-5 text-white">
+        <div className="overflow-hidden rounded-[28px] border border-stone-100 bg-white shadow-xl shadow-brand-100/40">
+          <div className="bg-gradient-to-r from-brand-700 to-teal-600 px-6 py-5 text-white">
             <h1 className="text-xl font-black">Đăng nhập</h1>
-            <p className="mt-1 text-sm text-emerald-100/80">Chào mừng bạn trở lại</p>
+            <p className="mt-1 text-sm text-brand-100/80">Chào mừng bạn trở lại</p>
           </div>
 
           <form className="p-6" onSubmit={handleSubmit}>
@@ -71,7 +71,7 @@ export default function LoginForm() {
                 </label>
                 <input
                   autoComplete="email"
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-100"
                   id="email"
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   placeholder="email@example.com"
@@ -87,7 +87,7 @@ export default function LoginForm() {
                 </label>
                 <input
                   autoComplete="current-password"
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-100"
                   id="password"
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   placeholder="••••••••"
@@ -99,7 +99,7 @@ export default function LoginForm() {
             </div>
 
             <button
-              className="mt-6 w-full rounded-xl bg-emerald-700 px-4 py-3.5 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:opacity-60"
+              className="mt-6 w-full rounded-full bg-brand-700 px-4 py-3.5 text-sm font-bold text-white transition hover:bg-brand-800 disabled:opacity-60"
               disabled={loading}
               type="submit"
             >
@@ -108,7 +108,7 @@ export default function LoginForm() {
 
             <p className="mt-4 text-center text-sm text-stone-500">
               Chưa có tài khoản?{' '}
-              <Link className="font-semibold text-emerald-700 hover:underline" href="/auth/register">
+              <Link className="font-semibold text-brand-700 hover:underline" href="/auth/register">
                 Đăng ký ngay
               </Link>
             </p>

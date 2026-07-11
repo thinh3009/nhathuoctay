@@ -82,10 +82,10 @@ export const newsData: NewsArticle[] = [
 ]
 
 export const palette: [string, string][] = [
-  ['#e8f6ee', '#2e9e5b'],
-  ['#fff1e3', '#d98324'],
-  ['#fceef3', '#cf5f86'],
-  ['#e9f0fb', '#2f6fd0'],
+  ['#e4f4f1', '#00796b'],
+  ['#ffe3c4', '#e56a1e'],
+  ['#bfe7e0', '#26a69a'],
+  ['#f2f4f7', '#48555b'],
 ]
 
 export function fmt(n: number): string {
@@ -93,10 +93,10 @@ export function fmt(n: number): string {
 }
 
 export function tint(cat: Cat): { bg: string; fg: string } {
-  if (cat === 'thuoc') return { bg: '#e8f6ee', fg: '#2e9e5b' }
-  if (cat === 'tpcn') return { bg: '#fff1e3', fg: '#d98324' }
-  if (cat === 'skincare') return { bg: '#fceef3', fg: '#cf5f86' }
-  return { bg: '#e9f0fb', fg: '#2f6fd0' }
+  if (cat === 'thuoc') return { bg: '#e4f4f1', fg: '#00796b' }
+  if (cat === 'tpcn') return { bg: '#ffe3c4', fg: '#e56a1e' }
+  if (cat === 'skincare') return { bg: '#bfe7e0', fg: '#26a69a' }
+  return { bg: '#f2f4f7', fg: '#48555b' }
 }
 
 export function catLabel(cat: Cat): string {

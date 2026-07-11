@@ -13,15 +13,15 @@ export default async function CartPage() {
   const cartCount = await getServerCartCount()
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+    <div className="flex min-h-screen flex-col bg-[var(--color-bg-page)] text-stone-900">
       <SiteHeader cartCount={cartCount} />
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/60">
+          <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm shadow-brand-100/60">
             <div className="flex flex-col gap-2 border-b border-stone-200 pb-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Giỏ hàng</p>
+                <p className="text-sm font-semibold uppercase tracking-wide text-brand-700">Giỏ hàng</p>
                 <h1 className="text-2xl font-bold text-stone-900">Sản phẩm đã chọn</h1>
               </div>
               <p className="text-sm text-stone-600">{cartCount} sản phẩm trong giỏ</p>
@@ -34,7 +34,7 @@ export default async function CartPage() {
                   Hãy quay lại danh mục để thêm sản phẩm phù hợp với nhu cầu của bạn.
                 </p>
                 <Link
-                  className="mt-5 inline-block rounded-lg bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800"
+                  className="mt-5 inline-block rounded-full bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700"
                   href={`/category/${DEFAULT_CATEGORY_SLUG}`}
                 >
                   Tiếp tục mua sắm
@@ -46,12 +46,12 @@ export default async function CartPage() {
                   <article className="rounded-2xl border border-stone-200 p-4" key={item.productSlug}>
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
                           {item.product.topCategory} • {item.product.subCategory}
                         </p>
                         <h2 className="mt-1 text-lg font-semibold text-stone-900">{item.product.name}</h2>
                         <p className="mt-1 text-sm text-stone-600">{item.product.benefit}</p>
-                        <p className="mt-3 text-sm font-semibold text-emerald-700">
+                        <p className="mt-3 text-sm font-semibold text-accent-600">
                           {formatPrice(item.product.price)}
                         </p>
                       </div>
@@ -69,7 +69,7 @@ export default async function CartPage() {
             )}
           </div>
 
-          <aside className="h-fit rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/60">
+          <aside className="h-fit rounded-2xl border border-brand-100 bg-white p-5 shadow-sm shadow-brand-100/60">
             <h2 className="text-lg font-semibold text-stone-900">Tóm tắt đơn hàng</h2>
             <div className="mt-4 space-y-3 text-sm text-stone-700">
               <div className="flex items-center justify-between">
@@ -86,13 +86,13 @@ export default async function CartPage() {
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl bg-emerald-50 p-4">
+            <div className="mt-5 rounded-2xl bg-brand-50 p-4">
               <p className="text-sm font-semibold text-stone-900">Tổng thanh toán</p>
-              <p className="mt-2 text-2xl font-bold text-emerald-700">{formatPrice(cart?.subtotal ?? 0)}</p>
+              <p className="mt-2 text-2xl font-bold text-accent-600">{formatPrice(cart?.subtotal ?? 0)}</p>
             </div>
 
             <button
-              className="mt-5 w-full rounded-lg bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-5 w-full rounded-full bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={!cart || cart.items.length === 0}
               type="button"
             >
@@ -100,7 +100,7 @@ export default async function CartPage() {
             </button>
 
             <Link
-              className="mt-3 block text-center text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+              className="mt-3 block text-center text-sm font-semibold text-brand-700 hover:text-brand-800"
               href={`/category/${DEFAULT_CATEGORY_SLUG}`}
             >
               Tiếp tục xem sản phẩm

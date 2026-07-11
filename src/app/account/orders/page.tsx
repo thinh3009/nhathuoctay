@@ -22,7 +22,7 @@ const STATUS_CLASS: Record<string, string> = {
   confirmed: 'bg-blue-100 text-blue-700',
   processing: 'bg-purple-100 text-purple-700',
   shipping: 'bg-cyan-100 text-cyan-700',
-  delivered: 'bg-emerald-100 text-emerald-700',
+  delivered: 'bg-brand-100 text-brand-700',
   cancelled: 'bg-red-100 text-red-700',
   refunded: 'bg-stone-100 text-stone-600',
 }
@@ -37,7 +37,7 @@ export default async function AccountOrdersPage() {
   ])
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f6faf7]">
+    <div className="flex min-h-screen flex-col bg-[var(--color-bg-page)]">
       <SiteHeader cartCount={cartCount} />
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
@@ -51,7 +51,7 @@ export default async function AccountOrdersPage() {
             <div className="text-4xl">📦</div>
             <p className="mt-3 text-stone-500">Bạn chưa có đơn hàng nào</p>
             <Link
-              className="mt-4 inline-block rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
+              className="mt-4 inline-block rounded-full bg-brand-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-800"
               href="/"
             >
               Bắt đầu mua sắm
@@ -63,7 +63,7 @@ export default async function AccountOrdersPage() {
               <div className="rounded-2xl border border-stone-200 bg-white p-5" key={order.id}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-bold text-emerald-700">{order.orderNumber}</p>
+                    <p className="font-bold text-brand-700">{order.orderNumber}</p>
                     <p className="mt-0.5 text-sm text-stone-500">
                       {new Date(order.createdAt).toLocaleDateString('vi-VN', {
                         day: '2-digit',

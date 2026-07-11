@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createStaffUser, getUserByEmail } from '@/features/users/queries'
 import { getAuthUser } from '@/lib/auth'
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
       phone: phone || undefined,
       role,
     })
+    revalidatePath('/admin/users')
 
     return NextResponse.json({
       user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role },

@@ -5,6 +5,7 @@ import { isUploadedImage, isUploadedPath } from '@/lib/productImages'
 import type { ProductImage } from '@/lib/schemas'
 import { listStorageObjects, summarizeStorageUsage } from '@/features/images/storage'
 import { listHeroImages } from '@/features/images/queries'
+import { getSiteImageMap } from '@/features/siteImages/queries'
 import ImageManagerClient, { type ManagedImage } from '@/features/images/components/ImageManagerClient'
 
 // Trang đọc thẳng Storage của Supabase mỗi lần vào để dung lượng luôn cập nhật.
@@ -13,10 +14,11 @@ export const dynamic = 'force-dynamic'
 export default async function AdminImagesPage() {
   await requireAdmin()
 
-  const [objects, productRows, heroRows] = await Promise.all([
+  const [objects, productRows, heroRows, siteImages] = await Promise.all([
     listStorageObjects(),
     db.select({ name: products.name, slug: products.slug, images: products.images }).from(products),
     listHeroImages(),
+    getSiteImageMap(),
   ])
 
   // Map storagePath → tên sản phẩm đang dùng ảnh đó (chỉ với ảnh admin upload).
@@ -51,6 +53,7 @@ export default async function AdminImagesPage() {
     <ImageManagerClient
       heroImages={heroImages}
       images={images}
+      siteImages={siteImages}
       storageLimitBytes={storageLimitBytes}
       usage={usage}
     />

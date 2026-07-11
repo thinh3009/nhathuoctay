@@ -69,7 +69,7 @@ export default function CartItemControls({ productSlug, quantity }: CartItemCont
       </div>
 
       <button
-        className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 disabled:opacity-50"
+        className="text-sm font-semibold text-brand-700 hover:text-brand-800 disabled:opacity-50"
         disabled={isPending}
         onClick={() =>
           runRequest({

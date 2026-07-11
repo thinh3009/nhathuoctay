@@ -37,7 +37,7 @@ export default function PaginationControls({
         className={`rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium ${
           page === 1
             ? 'pointer-events-none opacity-50'
-            : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
+            : 'text-stone-700 hover:border-brand-300 hover:text-brand-700'
         }`}
         href={createHref(basePath, query, Math.max(1, page - 1))}
       >
@@ -48,8 +48,8 @@ export default function PaginationControls({
         <Link
           className={`flex h-10 min-w-10 items-center justify-center rounded-lg border px-3 text-sm font-medium ${
             page === value
-              ? 'border-emerald-700 bg-emerald-700 text-white'
-              : 'border-stone-300 bg-white text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
+              ? 'border-brand-700 bg-brand-700 text-white'
+              : 'border-stone-300 bg-white text-stone-700 hover:border-brand-300 hover:text-brand-700'
           }`}
           href={createHref(basePath, query, value)}
           key={value}
@@ -63,7 +63,7 @@ export default function PaginationControls({
         className={`rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium ${
           page === totalPages
             ? 'pointer-events-none opacity-50'
-            : 'text-stone-700 hover:border-emerald-300 hover:text-emerald-700'
+            : 'text-stone-700 hover:border-brand-300 hover:text-brand-700'
         }`}
         href={createHref(basePath, query, Math.min(totalPages, page + 1))}
       >

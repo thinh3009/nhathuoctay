@@ -26,19 +26,23 @@ export default function QuayThuoc16({
   news,
   combos,
   heroImages,
+  ctaImage,
+  logoUrl,
   initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
   combos?: StorefrontCombo[]
   heroImages?: string[]
+  ctaImage?: string
+  logoUrl?: string
   initialParams?: StorefrontInitialParams
 }) {
-  const hub = useStorefront({ products, news, combos, heroImages, initialParams })
+  const hub = useStorefront({ products, news, combos, heroImages, ctaImage, logoUrl, initialParams })
   const { screen } = hub.sst
 
   return (
-    <div className="qt-root" style={s("font-family:'Be Vietnam Pro',system-ui,sans-serif;background:#f6faf7;color:#1f2a24;min-height:100vh;display:flex;flex-direction:column")}>
+    <div className="qt-root" style={s("font-family:var(--font-body);background:var(--color-bg-page);color:var(--color-text-body);min-height:100vh;display:flex;flex-direction:column")}>
       <HomeHeader hub={hub} />
 
       <main style={s('flex:1')}>

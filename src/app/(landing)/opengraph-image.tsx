@@ -18,9 +18,8 @@ export default function OpenGraphImage() {
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '56px',
-          background:
-            'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 30%, #bbf7d0 65%, #fef3c7 100%)',
-          color: '#14532d',
+          background: 'linear-gradient(135deg, #E4F4F1 0%, #BFE7E0 45%, #FFF6E9 100%)',
+          color: '#263238',
           fontFamily: 'sans-serif',
         }}
       >
@@ -30,26 +29,26 @@ export default function OpenGraphImage() {
             width: 'fit-content',
             padding: '12px 20px',
             borderRadius: '999px',
-            background: '#166534',
+            background: '#00796B',
             color: '#ffffff',
             fontSize: 24,
             fontWeight: 700,
           }}
         >
-          NutriHome
+          Quầy thuốc 16
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ fontSize: 68, fontWeight: 800, lineHeight: 1.1, maxWidth: 920 }}>
-            Thực phẩm chức năng và chăm sóc sức khỏe cho cả gia đình
+            Nhà thuốc trực tuyến chính hãng cho cả gia đình bạn
           </div>
-          <div style={{ fontSize: 28, color: '#365314', maxWidth: 860, lineHeight: 1.4 }}>
-            Bố cục landing page bán hàng được dựng bằng Next.js App Router với metadata, sitemap và redirect tối ưu SEO.
+          <div style={{ fontSize: 28, color: '#48555B', maxWidth: 860, lineHeight: 1.4 }}>
+            Thuốc, thực phẩm chức năng, thiết bị y tế và chăm sóc da — dược sĩ tư vấn miễn phí, giao nhanh tận nơi.
           </div>
         </div>
 
-        <div style={{ display: 'flex', fontSize: 24, fontWeight: 600, color: '#15803d' }}>
-          supplements • skincare • medical devices • pharmacy
+        <div style={{ display: 'flex', fontSize: 24, fontWeight: 600, color: '#FF8A3D' }}>
+          Tận tâm, tận lòng · quaythuoc16.vn
         </div>
       </div>
     ),

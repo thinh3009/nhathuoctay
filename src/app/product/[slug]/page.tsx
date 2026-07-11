@@ -22,7 +22,7 @@ async function RelatedProducts({ product }: { product: Product }) {
 
 function RelatedProductsSkeleton() {
   return (
-    <section className="mt-8 animate-pulse rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/60">
+    <section className="mt-8 animate-pulse rounded-2xl border border-brand-100 bg-white p-6 shadow-sm shadow-brand-100/60">
       <div className="h-6 w-48 rounded bg-stone-200" />
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
@@ -52,12 +52,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+    <div className="flex min-h-screen flex-col bg-[var(--color-bg-page)] text-stone-900">
       <SiteHeader activeCategorySlug={product.topCategorySlug} cartCount={cartCount} />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         <div>
           <Link
-            className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+            className="text-sm font-semibold text-brand-700 hover:text-brand-800"
             href={`/category/${product.topCategorySlug}`}
           >
             ← Quay lại {product.topCategory.toLowerCase()}

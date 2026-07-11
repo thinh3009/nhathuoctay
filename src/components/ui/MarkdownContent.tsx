@@ -21,13 +21,13 @@ const components: Components = {
   ),
   li: ({ node: _node, ...props }) => <li className="leading-7" {...props} />,
   a: ({ node: _node, ...props }) => (
-    <a className="font-medium text-emerald-700 underline hover:text-emerald-800" {...props} />
+    <a className="font-medium text-brand-700 underline hover:text-brand-800" {...props} />
   ),
   blockquote: ({ node: _node, ...props }) => (
-    <blockquote className="my-3 border-l-4 border-emerald-200 pl-4 italic text-stone-600" {...props} />
+    <blockquote className="my-3 border-l-4 border-brand-200 pl-4 italic text-stone-600" {...props} />
   ),
   code: ({ node: _node, ...props }) => (
-    <code className="rounded bg-stone-100 px-1.5 py-0.5 text-sm text-emerald-700" {...props} />
+    <code className="rounded bg-stone-100 px-1.5 py-0.5 text-sm text-brand-700" {...props} />
   ),
   strong: ({ node: _node, ...props }) => (
     <strong className="font-semibold text-stone-900" {...props} />

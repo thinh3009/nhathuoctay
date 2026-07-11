@@ -1,9 +1,9 @@
 // Skeleton cho trang giỏ hàng trong lúc tải dữ liệu giỏ từ DB.
 export default function CartLoading() {
   return (
-    <div className="min-h-screen bg-[#f6faf7] text-stone-900">
+    <div className="min-h-screen bg-[var(--color-bg-page)] text-stone-900">
       {/* Header (khớp SiteHeader) */}
-      <div className="h-8 bg-[#14532d]" />
+      <div className="h-8 bg-[var(--color-footer-bg)]" />
       <div className="border-b border-stone-100 bg-white">
         <div className="mx-auto flex h-16 max-w-[1180px] animate-pulse items-center gap-4 px-6">
           <div className="h-10 w-40 rounded bg-stone-100" />
@@ -15,7 +15,7 @@ export default function CartLoading() {
       <div className="mx-auto max-w-7xl animate-pulse px-4 py-8">
         <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
           {/* Danh sách sản phẩm trong giỏ */}
-          <div className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+          <div className="rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
             <div className="h-6 w-48 rounded bg-stone-200" />
             <div className="mt-5 space-y-4">
               {Array.from({ length: 3 }).map((_, index) => (
@@ -32,14 +32,14 @@ export default function CartLoading() {
           </div>
 
           {/* Tóm tắt đơn */}
-          <div className="h-fit rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+          <div className="h-fit rounded-2xl border border-brand-100 bg-white p-5 shadow-sm">
             <div className="h-6 w-32 rounded bg-stone-200" />
             <div className="mt-5 space-y-3">
               <div className="h-4 w-full rounded bg-stone-100" />
               <div className="h-4 w-full rounded bg-stone-100" />
               <div className="h-4 w-2/3 rounded bg-stone-100" />
             </div>
-            <div className="mt-6 h-12 w-full rounded-full bg-emerald-100" />
+            <div className="mt-6 h-12 w-full rounded-full bg-brand-100" />
           </div>
         </div>
       </div>

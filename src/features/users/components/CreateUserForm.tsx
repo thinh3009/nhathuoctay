@@ -56,7 +56,7 @@ export default function CreateUserForm() {
   if (!isOpen) {
     return (
       <button
-        className="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
+        className="rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-800"
         onClick={() => setIsOpen(true)}
         type="button"
       >
@@ -86,32 +86,32 @@ export default function CreateUserForm() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         <input
-          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
           name="fullName"
           placeholder="Họ và tên"
           required
         />
         <input
-          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
           name="email"
           placeholder="Email"
           type="email"
           required
         />
         <input
-          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
           name="phone"
           placeholder="Số điện thoại (tùy chọn)"
         />
         <input
-          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
           name="password"
           placeholder="Mật khẩu (tối thiểu 6 ký tự)"
           type="password"
           required
         />
         <select
-          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-500"
+          className="rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500"
           defaultValue="pharmacist"
           name="role"
         >
@@ -126,7 +126,7 @@ export default function CreateUserForm() {
       {error ? <p className="mt-3 text-sm font-medium text-red-600">{error}</p> : null}
 
       <button
-        className="mt-4 rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800 disabled:opacity-60"
+        className="mt-4 rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-800 disabled:opacity-60"
         disabled={isSubmitting}
         type="submit"
       >

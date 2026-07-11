@@ -46,7 +46,7 @@ export default function HeroCarousel({ images }: { images: string[] }) {
 
   if (count === 0) {
     return (
-      <div style={s('width:100%;height:100%;background:repeating-linear-gradient(135deg,#d7eede,#d7eede 11px,#cde7d6 11px,#cde7d6 22px);display:flex;align-items:center;justify-content:center;color:#5a8a6e;font:600 12px ui-monospace,monospace;text-align:center')}>
+      <div style={s('width:100%;height:100%;background:linear-gradient(135deg,var(--teal-100),var(--teal-50));display:flex;align-items:center;justify-content:center;color:var(--teal-700);font:600 12px ui-monospace,monospace;text-align:center')}>
         ảnh hero
         <br />
         (thêm ở Quản lý ảnh)
@@ -56,7 +56,7 @@ export default function HeroCarousel({ images }: { images: string[] }) {
 
   const arrowStyle = (side: 'left' | 'right') =>
     s(
-      `position:absolute;${side}:10px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.85);color:#14532d;font-size:20px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);z-index:2`,
+      `position:absolute;${side}:10px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.9);color:var(--teal-800);font-size:20px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);z-index:2`,
     )
 
   return (
@@ -84,7 +84,7 @@ export default function HeroCarousel({ images }: { images: string[] }) {
                 onClick={() => go(i)}
                 style={{
                   ...s('width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0'),
-                  background: i === current ? '#14532d' : 'rgba(255,255,255,.7)',
+                  background: i === current ? 'var(--color-brand-primary)' : 'rgba(255,255,255,.7)',
                 }}
                 type="button"
               />

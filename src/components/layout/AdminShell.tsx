@@ -65,6 +65,14 @@ function NavIcon({ name }: { name: string }) {
       <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" stroke="currentColor" strokeWidth="1.8" />
     </svg>
   )
+  if (name === 'palette') return (
+    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path d="M12 3a9 9 0 1 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.24-.26-.39-.62-.39-1 0-.83.67-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.42-4.03-8-9-8Z" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="7.5" cy="10.5" fill="currentColor" r="1.2" />
+      <circle cx="12" cy="7.5" fill="currentColor" r="1.2" />
+      <circle cx="16.5" cy="10.5" fill="currentColor" r="1.2" />
+    </svg>
+  )
   return (
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" stroke="currentColor" strokeWidth="1.8" />

@@ -26,6 +26,13 @@ export default function DrugChatbot() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, isOpen])
 
+  // Mở chatbot khi bấm nút "Tư vấn bác sĩ" ở header/hero (phát sự kiện qt:open-consult).
+  useEffect(() => {
+    const onOpen = () => setIsOpen(true)
+    window.addEventListener('qt:open-consult', onOpen)
+    return () => window.removeEventListener('qt:open-consult', onOpen)
+  }, [])
+
   async function sendMessage() {
     const text = input.trim()
     if (!text || isLoading) {
@@ -92,7 +99,7 @@ export default function DrugChatbot() {
       {/* Nút mở chat */}
       <button
         aria-label={isOpen ? 'Đóng trợ lý nhà thuốc' : 'Mở trợ lý nhà thuốc'}
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-700 text-white shadow-lg shadow-emerald-900/30 transition hover:bg-emerald-800"
+        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-brand-700 text-white shadow-lg shadow-brand-900/30 transition hover:bg-brand-800"
         onClick={() => setIsOpen((open) => !open)}
         type="button"
       >
@@ -105,9 +112,9 @@ export default function DrugChatbot() {
 
       {/* Khung chat */}
       {isOpen ? (
-        <div className="fixed bottom-24 right-5 z-50 flex h-[32rem] w-[90vw] max-w-sm flex-col overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-2xl">
-          <div className="border-b border-emerald-100 bg-emerald-50 px-4 py-3">
-            <p className="text-sm font-bold text-emerald-800">Trợ lý nhà thuốc</p>
+        <div className="fixed bottom-24 right-5 z-50 flex h-[32rem] w-[90vw] max-w-sm flex-col overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-2xl">
+          <div className="border-b border-brand-100 bg-brand-50 px-4 py-3">
+            <p className="text-sm font-bold text-brand-800">Trợ lý nhà thuốc</p>
             <p className="text-xs text-stone-500">Tra cứu sản phẩm &amp; công dụng</p>
           </div>
 
@@ -120,7 +127,7 @@ export default function DrugChatbot() {
                 <div
                   className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
                     message.role === 'user'
-                      ? 'bg-emerald-700 text-white'
+                      ? 'bg-brand-700 text-white'
                       : 'bg-stone-100 text-stone-800'
                   }`}
                 >
@@ -133,7 +140,7 @@ export default function DrugChatbot() {
           <div className="border-t border-stone-200 p-3">
             <div className="flex items-end gap-2">
               <textarea
-                className="max-h-24 min-h-[2.5rem] flex-1 resize-none rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                className="max-h-24 min-h-[2.5rem] flex-1 resize-none rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
                 onChange={(event) => setInput(event.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Nhập câu hỏi về sản phẩm..."
@@ -142,7 +149,7 @@ export default function DrugChatbot() {
               />
               <button
                 aria-label="Gửi"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-700 text-white transition hover:bg-emerald-800 disabled:opacity-50"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-white transition hover:bg-brand-800 disabled:opacity-50"
                 disabled={isLoading || !input.trim()}
                 onClick={() => void sendMessage()}
                 type="button"

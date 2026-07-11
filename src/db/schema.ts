@@ -271,6 +271,15 @@ export const heroImages = pgTable('hero_images', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+// Ảnh tùy biến giao diện trang chủ do admin đặt: mỗi `slot` một ảnh
+// ('hero' = banner đầu trang, 'cta' = nền dải kêu gọi, 'logo' = logo header/footer).
+export const siteImages = pgTable('site_images', {
+  slot: text('slot').primaryKey(),
+  storagePath: text('storage_path').notNull(),
+  url: text('url').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 /* ── Relations ── */
 
 export const usersRelations = relations(users, ({ many }) => ({

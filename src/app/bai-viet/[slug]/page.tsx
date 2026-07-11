@@ -35,18 +35,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+    <div className="flex min-h-screen flex-col bg-[var(--color-bg-page)] text-stone-900">
       <SiteHeader activeCategorySlug="" cartCount={cartCount} />
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">
         <div>
-          <Link className="text-sm font-semibold text-emerald-700 hover:text-emerald-800" href="/bai-viet">
+          <Link className="text-sm font-semibold text-brand-700 hover:text-brand-800" href="/bai-viet">
             ← Tất cả bài viết
           </Link>
         </div>
 
-        <article className="mt-4 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+        <article className="mt-4 rounded-2xl border border-brand-100 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
             {article.category}
           </p>
           <h1 className="mt-2 text-3xl font-black leading-tight text-stone-900">{article.title}</h1>

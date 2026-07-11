@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import QuayThuoc16 from '@/features/storefront/components/QuayThuoc16'
 import { getStorefrontProducts, getStorefrontNews, getStorefrontCombos, getStorefrontHeroImages } from '@/features/storefront/queries'
+import { getSiteImageMap } from '@/features/siteImages/queries'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
 // Trang đọc searchParams (?screen=, ?cat=…) để server render đúng màn SPA đang xem —
@@ -29,19 +30,24 @@ export default async function LandingPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const [products, news, combos, heroImages, params] = await Promise.all([
+  const [products, news, combos, heroImages, siteImages, params] = await Promise.all([
     getStorefrontProducts(),
     getStorefrontNews(),
     getStorefrontCombos(),
     getStorefrontHeroImages(),
+    getSiteImageMap(),
     searchParams,
   ])
   const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
+  // Ảnh hero admin đặt riêng (nếu có) hiển thị đầu carousel cùng ảnh hero hiện có.
+  const heroList = siteImages.hero ? [siteImages.hero, ...heroImages] : heroImages
 
   return (
     <QuayThuoc16
       combos={combos}
-      heroImages={heroImages}
+      heroImages={heroList}
+      ctaImage={siteImages.cta}
+      logoUrl={siteImages.logo}
       initialParams={{
         screen: first(params.screen),
         cat: first(params.cat),

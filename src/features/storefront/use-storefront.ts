@@ -2,6 +2,8 @@
 
 import { type CSSProperties, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { computeDiscount, PROMOS } from '@/lib/promos'
+import { VIETNAM_PROVINCES } from '@/lib/provinces'
 import { type CardVM } from './components/ProductCard'
 import {
   type Cat,
@@ -64,6 +66,10 @@ type State = {
   ordered: string | null
   placingOrder: boolean
   form: Form
+  // Mã giảm giá
+  promoInput: string
+  appliedCode: string | null
+  promoError: string
 }
 
 const INITIAL: State = {
@@ -84,6 +90,9 @@ const INITIAL: State = {
   ordered: null,
   placingOrder: false,
   form: { name: '', phone: '', address: '', city: '', note: '', pay: 'cod' },
+  promoInput: '',
+  appliedCode: null,
+  promoError: '',
 }
 
 /** Query param trang chủ nhận từ server (?screen=, ?q=, ?rx=…) để dựng đúng màn SPA. */
@@ -126,22 +135,22 @@ function initialStateFromParams(params: StorefrontInitialParams | undefined, pro
 
 function chip(active: boolean): CSSProperties {
   return active
-    ? s('padding:8px 15px;border-radius:22px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #2e9e5b;background:#2e9e5b;color:#fff;white-space:nowrap')
-    : s('padding:8px 15px;border-radius:22px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #d8e6dd;background:#fff;color:#3a4a42;white-space:nowrap')
+    ? s('padding:8px 15px;border-radius:var(--radius-pill);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--color-brand-primary);background:var(--color-brand-primary);color:#fff;white-space:nowrap')
+    : s('padding:8px 15px;border-radius:var(--radius-pill);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--color-border-subtle);background:var(--neutral-0);color:var(--color-text-body);white-space:nowrap')
 }
 function tab(active: boolean): CSSProperties {
   return active
-    ? s('padding:9px 14px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;background:#eaf6ef;color:#1c7a45')
-    : s('padding:9px 14px;border-radius:10px;font-size:13.5px;font-weight:500;cursor:pointer;background:transparent;color:#4a564e')
+    ? s('padding:9px 14px;border-radius:var(--radius-pill);font-size:13.5px;font-weight:600;cursor:pointer;background:var(--teal-50);color:var(--teal-800)')
+    : s('padding:9px 14px;border-radius:var(--radius-pill);font-size:13.5px;font-weight:500;cursor:pointer;background:transparent;color:var(--color-text-body)')
 }
 function navStyle(active: boolean): CSSProperties {
   return {
     cursor: 'pointer',
     fontWeight: active ? 700 : 500,
-    color: active ? '#1c7a45' : '#3a4a42',
+    color: active ? 'var(--color-brand-primary)' : 'var(--color-text-body)',
     fontSize: '14px',
     padding: '13px 0',
-    borderBottom: active ? '2px solid #2e9e5b' : '2px solid transparent',
+    borderBottom: active ? '2.5px solid var(--color-brand-primary)' : '2.5px solid transparent',
   }
 }
 
@@ -159,12 +168,16 @@ export function useStorefront({
   news: newsProp,
   combos: combosProp,
   heroImages: heroImagesProp,
+  ctaImage,
+  logoUrl,
   initialParams,
 }: {
   products?: Product[]
   news?: NewsArticle[]
   combos?: StorefrontCombo[]
   heroImages?: string[]
+  ctaImage?: string
+  logoUrl?: string
   initialParams?: StorefrontInitialParams
 }) {
   const router = useRouter()
@@ -302,6 +315,26 @@ export function useStorefront({
     if (e.key === 'Enter') doSearch()
   }
   const setForm = (f: keyof Form, v: string) => set({ form: { ...state.form, [f]: v } })
+
+  // Mã giảm giá — tính lại tạm tính tại chỗ (subtotal computed ở cuối hook).
+  const setPromoInput = (v: string) => set({ promoInput: v, promoError: '' })
+  const applyPromo = () => {
+    const sub = state.cart.reduce((a, c) => a + get(c.id).price * c.qty, 0)
+    const res = computeDiscount(state.promoInput, sub)
+    if (res.promo && !res.error) set({ appliedCode: res.promo.code, promoError: '' })
+    else set({ appliedCode: null, promoError: res.error ?? 'Mã giảm giá không hợp lệ' })
+  }
+  const removePromo = () => set({ appliedCode: null, promoInput: '', promoError: '' })
+
+  // Nút "Tư vấn bác sĩ" — mở trợ lý chat (DrugChatbot lắng nghe sự kiện này).
+  const openConsult = () => {
+    try {
+      window.dispatchEvent(new CustomEvent('qt:open-consult'))
+    } catch {
+      /* noop */
+    }
+  }
+
   const openRx = () => set({ showRx: true })
   const closeRx = () => set({ showRx: false })
   const onRxFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -347,6 +380,7 @@ export function useStorefront({
           },
           paymentMethod: PAYMENT_METHOD_MAP[f.pay] ?? 'cod',
           note: f.note.trim() || undefined,
+          discountCode: state.appliedCode || undefined,
           items,
         }),
       })
@@ -368,6 +402,9 @@ export function useStorefront({
         screen: 'done',
         ordered: data?.orderNumber ?? genOrderCode(),
         cart: [],
+        promoInput: '',
+        appliedCode: null,
+        promoError: '',
       }))
       top()
     } catch {
@@ -477,10 +514,10 @@ export function useStorefront({
     })
 
   const trustBadges = [
-    { icon: '🛡️', title: 'Chính hãng 100%', desc: 'Nguồn gốc rõ ràng' },
-    { icon: '💬', title: 'Dược sĩ tư vấn 24/7', desc: 'Miễn phí, tận tình' },
-    { icon: '🚚', title: 'Giao nhanh 2 giờ', desc: 'Nội thành TP.HCM' },
-    { icon: '↩️', title: 'Đổi trả dễ dàng', desc: 'Trong vòng 7 ngày' },
+    { icon: 'ph-shield-check', title: 'Chính hãng 100%', desc: 'Nguồn gốc rõ ràng' },
+    { icon: 'ph-headset', title: 'Dược sĩ tư vấn 24/7', desc: 'Miễn phí, tận tình' },
+    { icon: 'ph-truck', title: 'Giao nhanh 2 giờ', desc: 'Nội thành TP.HCM' },
+    { icon: 'ph-arrow-u-up-left', title: 'Đổi trả dễ dàng', desc: 'Trong vòng 7 ngày' },
   ]
   const catNavLinks = (
     [
@@ -594,29 +631,34 @@ export function useStorefront({
   })
   const subtotal = sst.cart.reduce((a, c) => a + get(c.id).price * c.qty, 0)
   const ship = cc === 0 || subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE
-  const total = subtotal + ship
+  // Mã giảm giá đã áp — server xác thực lại khi đặt đơn (nguồn sự thật).
+  const discount = computeDiscount(sst.appliedCode, subtotal)
+  const discountAmount = discount.amount
+  const total = Math.max(0, subtotal + ship - discountAmount)
   const freeshipHint =
     cc > 0 && subtotal < FREE_SHIP_THRESHOLD
       ? 'Mua thêm ' + fmt(FREE_SHIP_THRESHOLD - subtotal) + ' để được miễn phí giao hàng'
       : ''
 
   const pays = [
-    { k: 'cod', l: 'Thanh toán khi nhận hàng (COD)', d: 'Trả tiền mặt cho shipper' },
-    { k: 'bank', l: 'Chuyển khoản ngân hàng', d: 'Dược sĩ gửi thông tin chuyển khoản sau khi đặt' },
-    { k: 'momo', l: 'Ví MoMo', d: 'Thanh toán qua ví điện tử' },
+    { k: 'cod', l: 'Thanh toán khi nhận hàng (COD)', d: 'Trả tiền mặt cho shipper', icon: 'ph-hand-coins' },
+    { k: 'bank', l: 'Chuyển khoản ngân hàng', d: 'Dược sĩ gửi thông tin chuyển khoản sau khi đặt', icon: 'ph-bank' },
+    { k: 'momo', l: 'Ví MoMo', d: 'Thanh toán qua ví điện tử', icon: 'ph-wallet' },
   ]
   const payOptions = pays.map((p) => {
     const on = sst.form.pay === p.k
     return {
       label: p.l,
       desc: p.d,
+      icon: p.icon,
       onClick: () => setForm('pay', p.k),
-      dot: on ? '#2e9e5b' : '#cdd8d1',
-      dotFill: on ? '#2e9e5b' : 'transparent',
+      dot: on ? 'var(--color-brand-primary)' : 'var(--neutral-300)',
+      dotFill: on ? 'var(--color-brand-primary)' : 'transparent',
+      active: on,
       style: {
-        ...s('display:flex;align-items:center;gap:12px;border-radius:12px;padding:14px 16px;cursor:pointer'),
-        border: on ? '1.5px solid #2e9e5b' : '1.5px solid #e0ebe4',
-        background: on ? '#f3faf5' : '#fff',
+        ...s('display:flex;align-items:center;gap:12px;border-radius:var(--radius-md);padding:14px 16px;cursor:pointer'),
+        border: on ? '1.5px solid var(--color-brand-primary)' : '1.5px solid var(--color-border-subtle)',
+        background: on ? 'var(--teal-50)' : 'var(--neutral-0)',
       } as CSSProperties,
     }
   })
@@ -624,6 +666,7 @@ export function useStorefront({
   const subtotalText = fmt(subtotal)
   const shipText = ship === 0 ? 'Miễn phí' : fmt(ship)
   const totalText = fmt(total)
+  const discountText = discountAmount > 0 ? '-' + fmt(discountAmount) : ''
 
   return {
     // state + setters
@@ -648,6 +691,10 @@ export function useStorefront({
     closeRx,
     onRxFile,
     submitRx,
+    openConsult,
+    setPromoInput,
+    applyPromo,
+    removePromo,
     placeOrder,
     doSearch,
     onQueryKey,
@@ -679,8 +726,20 @@ export function useStorefront({
     subtotalText,
     shipText,
     totalText,
+    discountText,
+    discountAmount,
     freeshipHint,
     payOptions,
+    // Ảnh giao diện admin đặt
+    ctaImage,
+    logoUrl,
+    // Mã giảm giá
+    promoInput: sst.promoInput,
+    appliedCode: sst.appliedCode,
+    promoError: sst.promoError,
+    promos: PROMOS,
+    // Danh sách tỉnh/thành cho ô chọn địa chỉ
+    provinces: VIETNAM_PROVINCES,
   }
 }
 

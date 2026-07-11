@@ -7,6 +7,7 @@ import { createOrder } from '@/features/orders/queries'
 import { products as productsTable } from '@/db/schema'
 import { db } from '@/lib/db'
 import { inArray } from 'drizzle-orm'
+import { computeDiscount } from '@/lib/promos'
 
 const schema = z.object({
   shippingAddress: z.object({
@@ -19,6 +20,8 @@ const schema = z.object({
   }),
   paymentMethod: z.enum(['cod', 'bank_transfer', 'momo', 'vnpay']).default('cod'),
   note: z.string().optional(),
+  // Mã giảm giá (tùy chọn). Server tự xác thực lại — không tin số tiền client gửi.
+  discountCode: z.string().max(40).optional(),
   // Nguồn giỏ hàng do client gửi thẳng (storefront trang chủ dùng giỏ client-side).
   // Nếu bỏ trống → dùng giỏ theo cookie cart_token (trang /checkout thật).
   items: z
@@ -96,7 +99,18 @@ export async function POST(request: Request) {
 
     const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
     const shippingFee = subtotal >= 500000 ? 0 : 30000
-    const totalAmount = subtotal + shippingFee
+
+    // Xác thực lại mã giảm giá phía server (nguồn sự thật cho tổng tiền).
+    const discount = computeDiscount(parsed.data.discountCode, subtotal)
+    const discountAmount = discount.amount
+    const totalAmount = Math.max(0, subtotal + shippingFee - discountAmount)
+
+    // Ghi mã giảm giá vào ghi chú đơn (bảng orders chưa có cột discount riêng).
+    const noteParts = [parsed.data.note?.trim()].filter(Boolean) as string[]
+    if (discountAmount > 0 && discount.promo) {
+      noteParts.push(`Mã giảm giá: ${discount.promo.code} (-${discountAmount.toLocaleString('vi-VN')}₫)`)
+    }
+    const note = noteParts.length > 0 ? noteParts.join(' | ') : undefined
 
     const order = await createOrder({
       userId: authUser?.userId,
@@ -104,7 +118,7 @@ export async function POST(request: Request) {
       shippingFee,
       paymentMethod: parsed.data.paymentMethod,
       shippingAddress: parsed.data.shippingAddress,
-      note: parsed.data.note,
+      note,
       items: orderItems,
     })
 

@@ -28,17 +28,17 @@ export default function RelatedProductsSection({ products }: RelatedProductsSect
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-emerald-100 bg-white p-6 shadow-sm shadow-emerald-100/60">
+    <section className="mt-8 rounded-2xl border border-brand-100 bg-white p-6 shadow-sm shadow-brand-100/60">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Gợi ý mua thêm</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-brand-700">Gợi ý mua thêm</p>
           <h2 className="mt-1 text-2xl font-bold text-stone-900">Sản phẩm liên quan</h2>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             aria-label="Xem sản phẩm liên quan trước"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-emerald-300 hover:text-emerald-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-brand-300 hover:text-brand-700"
             onClick={() => scrollTrack('previous')}
             type="button"
           >
@@ -46,7 +46,7 @@ export default function RelatedProductsSection({ products }: RelatedProductsSect
           </button>
           <button
             aria-label="Xem sản phẩm liên quan tiếp theo"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-emerald-300 hover:text-emerald-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-brand-300 hover:text-brand-700"
             onClick={() => scrollTrack('next')}
             type="button"
           >

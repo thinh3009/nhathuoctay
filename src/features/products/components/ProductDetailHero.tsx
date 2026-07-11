@@ -28,13 +28,13 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
   }
 
   return (
-    <section className="mt-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm shadow-emerald-100/70 sm:p-6">
+    <section className="mt-6 rounded-2xl border border-brand-100 bg-white p-5 shadow-sm shadow-brand-100/70 sm:p-6">
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="min-w-0">
-          <div className="overflow-hidden rounded-[1.75rem] border border-emerald-100 bg-white shadow-sm shadow-emerald-100/60">
-            <div className="flex items-center justify-between border-b border-stone-200 bg-emerald-50 px-4 py-4 sm:px-5">
+          <div className="overflow-hidden rounded-[1.75rem] border border-brand-100 bg-white shadow-sm shadow-brand-100/60">
+            <div className="flex items-center justify-between border-b border-stone-200 bg-brand-50 px-4 py-4 sm:px-5">
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-700">
                   Hình ảnh sản phẩm
                 </p>
                 <h2 className="mt-1 truncate text-lg font-bold text-stone-900">{product.name}</h2>
@@ -43,7 +43,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
               <div className="flex items-center gap-2">
                 <button
                   aria-label="Ảnh trước"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-emerald-300 hover:text-emerald-700"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-brand-300 hover:text-brand-700"
                   onClick={showPreviousImage}
                   type="button"
                 >
@@ -51,7 +51,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
                 </button>
                 <button
                   aria-label="Ảnh sau"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-emerald-300 hover:text-emerald-700"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white text-lg font-bold text-stone-700 transition hover:border-brand-300 hover:text-brand-700"
                   onClick={showNextImage}
                   type="button"
                 >
@@ -60,15 +60,15 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-stone-50 via-white to-emerald-50 px-4 py-6 sm:px-6">
+            <div className="bg-gradient-to-br from-stone-50 via-white to-brand-50 px-4 py-6 sm:px-6">
               <div className="flex min-h-[420px] items-center justify-center">
                 {selectedImage ? (
-                  <div className="w-full max-w-[420px] rounded-[2rem] border border-stone-200 bg-white p-4 shadow-xl shadow-emerald-100/60">
+                  <div className="w-full max-w-[420px] rounded-[2rem] border border-stone-200 bg-white p-4 shadow-xl shadow-brand-100/60">
                     <div className="mb-4 flex items-center justify-between gap-3">
                       <span className="rounded-full bg-stone-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
                         {product.unit}
                       </span>
-                      <span className="rounded-full bg-emerald-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
+                      <span className="rounded-full bg-brand-700 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
                         {selectedImage.label}
                       </span>
                     </div>
@@ -91,7 +91,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
                 <p className="truncate font-medium">
                   Đang xem: <span className="font-semibold text-stone-900">{selectedImage?.label ?? 'Ảnh sản phẩm'}</span>
                 </p>
-                <p className="shrink-0 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                <p className="shrink-0 text-xs font-semibold uppercase tracking-wide text-brand-700">
                   {selectedImageIndex + 1}/{product.images.length}
                 </p>
               </div>
@@ -103,14 +103,14 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
               <button
                 className={`rounded-2xl border px-3 py-3 text-left transition ${
                   selectedImageIndex === index
-                    ? 'border-emerald-700 bg-emerald-50 shadow-sm'
-                    : 'border-stone-200 bg-white hover:border-emerald-200'
+                    ? 'border-brand-700 bg-brand-50 shadow-sm'
+                    : 'border-stone-200 bg-white hover:border-brand-200'
                 }`}
                 key={image.storagePath}
                 onClick={() => setSelectedImageIndex(index)}
                 type="button"
               >
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
                   {image.label}
                 </p>
                 <p className="mt-1 text-sm text-stone-500">{product.unit}</p>
@@ -134,10 +134,10 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
               Chính hãng
             </span>
-            <span className="rounded-full border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <span className="rounded-full border border-brand-200 px-3 py-1 text-xs font-semibold text-brand-700">
               {product.badge}
             </span>
           </div>
@@ -146,12 +146,12 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
 
           <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-stone-600">
             <span>{product.sku}</span>
-            <span className="text-emerald-600">★ {product.rating.toFixed(1)}</span>
+            <span className="text-accent-600">★ {product.rating.toFixed(1)}</span>
             <span>{product.reviewCount} đánh giá</span>
             <span>{product.commentCount} bình luận</span>
           </div>
 
-          <p className="mt-5 text-4xl font-bold text-emerald-700">
+          <p className="mt-5 text-4xl font-bold text-accent-700">
             {formatPrice(product.price)}
             <span className="ml-2 text-2xl font-medium text-stone-500">/ {product.unit}</span>
           </p>
@@ -159,7 +159,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
           <div className="mt-6 space-y-5">
             <div className="flex flex-wrap items-center gap-4">
               <p className="text-sm font-medium text-stone-700">Chọn đơn vị tính</p>
-              <span className="rounded-full border border-emerald-700 px-4 py-2 font-semibold text-emerald-700">
+              <span className="rounded-full border border-brand-700 px-4 py-2 font-semibold text-brand-700">
                 {product.unit}
               </span>
             </div>
@@ -171,7 +171,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <AddToCartButton
-                className="rounded-full bg-emerald-700 px-5 py-4 text-lg font-semibold text-white hover:bg-emerald-800 disabled:opacity-60"
+                className="rounded-full bg-brand-700 px-5 py-4 text-lg font-semibold text-white hover:bg-brand-800 disabled:opacity-60"
                 label="Chọn mua"
                 productSlug={product.slug}
                 quantity={quantity}
@@ -188,7 +188,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
             <p className="font-medium text-stone-700">Số đăng ký</p>
             <div>
               <p className="text-stone-900">{product.registrationNumber}</p>
-              <p className="mt-1 text-sm text-emerald-700">Xem giấy công bố sản phẩm</p>
+              <p className="mt-1 text-sm text-brand-700">Xem giấy công bố sản phẩm</p>
             </div>
             <p className="font-medium text-stone-700">Thành phần</p>
             <p className="text-stone-900">{product.ingredientHighlight}</p>
@@ -197,7 +197,7 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
             <p className="font-medium text-stone-700">Quy cách</p>
             <p className="text-stone-900">{product.specification}</p>
             <p className="font-medium text-stone-700">Danh mục</p>
-            <p className="text-emerald-700">{product.subCategory}</p>
+            <p className="text-brand-700">{product.subCategory}</p>
             <p className="font-medium text-stone-700">Nhà sản xuất</p>
             <p className="text-stone-900">{product.manufacturer}</p>
             <p className="font-medium text-stone-700">Nước sản xuất</p>

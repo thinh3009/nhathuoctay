@@ -21,9 +21,9 @@ export default function ProductSlider({ title, cards, actionLabel, onAction, col
   return (
     <div style={s('max-width:1180px;margin:44px auto 0;padding:0 24px;width:100%')}>
       <div style={s('display:flex;align-items:center;justify-content:space-between;margin-bottom:18px')}>
-        <h2 style={s('font-size:22px;font-weight:700;color:#14532d;margin:0')}>{title}</h2>
+        <h2 style={s('font:var(--text-heading-lg);color:var(--color-text-heading);margin:0')}>{title}</h2>
         {actionLabel && onAction ? (
-          <span onClick={onAction} style={s('font-size:13.5px;color:#2e9e5b;font-weight:600;cursor:pointer')}>
+          <span onClick={onAction} style={s('font-size:13.5px;color:var(--color-text-link);font-weight:600;cursor:pointer')}>
             {actionLabel}
           </span>
         ) : null}

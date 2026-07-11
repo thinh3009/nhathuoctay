@@ -24,7 +24,7 @@ export default async function BlogPage() {
   ])
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f6faf7] text-stone-900">
+    <div className="flex min-h-screen flex-col bg-[var(--color-bg-page)] text-stone-900">
       <SiteHeader activeCategorySlug="" cartCount={cartCount} />
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
@@ -37,7 +37,7 @@ export default async function BlogPage() {
 
         {articles.length === 0 ? (
           <div
-            className="mt-6 rounded-2xl border border-dashed border-emerald-200 bg-white py-16 text-center"
+            className="mt-6 rounded-2xl border border-dashed border-brand-200 bg-white py-16 text-center"
             role="status"
           >
             <p className="text-lg font-semibold text-stone-700">Chưa có bài viết</p>
@@ -47,11 +47,11 @@ export default async function BlogPage() {
           <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
               <Link
-                className="group flex flex-col overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm transition hover:border-emerald-300 hover:shadow-md"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-brand-100 bg-white shadow-sm transition hover:border-brand-300 hover:shadow-md"
                 href={`/bai-viet/${article.slug}`}
                 key={article.slug}
               >
-                <div className="aspect-[16/9] overflow-hidden bg-emerald-50">
+                <div className="aspect-[16/9] overflow-hidden bg-brand-50">
                   {article.coverImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -61,13 +61,13 @@ export default async function BlogPage() {
                       src={article.coverImage}
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-50 text-emerald-700">
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-100 to-brand-50 text-brand-700">
                       <span className="text-sm font-semibold">{article.category}</span>
                     </div>
                   )}
                 </div>
                 <div className="flex flex-1 flex-col p-4">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-brand-700">
                     {article.category}
                   </span>
                   <h2 className="mt-1 line-clamp-2 text-base font-bold text-stone-900">
