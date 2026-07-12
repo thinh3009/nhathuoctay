@@ -37,6 +37,8 @@ export const chatMessages = pgTable(
     id: uuid('id').defaultRandom().primaryKey(),
     userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     sender: text('sender', { enum: ['user', 'admin'] }).notNull(),
+    // Tên người gửi hiển thị trong thông báo (chủ yếu cho tin admin: tên dược sĩ trả lời).
+    senderName: text('sender_name'),
     content: text('content').notNull(),
     readByAdmin: boolean('read_by_admin').notNull().default(false),
     readByUser: boolean('read_by_user').notNull().default(false),

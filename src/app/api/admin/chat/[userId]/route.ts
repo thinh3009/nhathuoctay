@@ -57,6 +57,8 @@ export async function POST(request: Request, ctx: Ctx) {
     return Response.json({ error: 'Không tìm thấy khách hàng' }, { status: 404 })
   }
 
-  const saved = await addChatMessage(userId, 'admin', parsed.data.content)
+  // Lưu tên dược sĩ/admin trả lời để hiện trong thông báo của khách.
+  const adminUser = await getUserById(admin.userId)
+  const saved = await addChatMessage(userId, 'admin', parsed.data.content, adminUser?.fullName?.trim() || 'Dược sĩ')
   return Response.json({ ok: true, message: saved })
 }

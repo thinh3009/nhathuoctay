@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SITE_NAME } from '@/config/site'
+import AdminChatBell from '@/features/chat/components/AdminChatBell'
 import AdminLogoutButton from './AdminLogoutButton'
 
 const NAV_ITEMS = [
@@ -153,20 +154,11 @@ export default function AdminShell({
         </button>
         <span className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Admin</span>
         <span className="truncate text-base font-black tracking-tight">{SITE_NAME}</span>
-        <Link
-          aria-label={unreadChat > 0 ? `Tin nhắn tư vấn, ${unreadChat} tin mới` : 'Tin nhắn tư vấn'}
-          className="relative ml-auto flex h-10 w-10 items-center justify-center rounded-lg text-white transition hover:bg-emerald-800"
-          href="/admin/chat"
-        >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-          </svg>
-          {unreadChat > 0 ? (
-            <span className="absolute right-1 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-white">
-              {unreadChat > 9 ? '9+' : unreadChat}
-            </span>
-          ) : null}
-        </Link>
+        <AdminChatBell
+          unread={unreadChat}
+          className="ml-auto"
+          buttonClassName="relative flex h-10 w-10 items-center justify-center rounded-lg text-white transition hover:bg-emerald-800"
+        />
       </header>
 
       {/* Lớp phủ mờ khi mở drawer (mobile) */}
@@ -192,21 +184,10 @@ export default function AdminShell({
             <p className="mt-0.5 text-xl font-black tracking-tight">{SITE_NAME}</p>
           </div>
           <div className="flex items-center gap-1">
-            <Link
-              aria-label={unreadChat > 0 ? `Tin nhắn tư vấn, ${unreadChat} tin mới` : 'Tin nhắn tư vấn'}
-              className="relative flex h-9 w-9 items-center justify-center rounded-lg text-emerald-200 transition hover:bg-emerald-800 hover:text-white"
-              href="/admin/chat"
-              onClick={() => setOpen(false)}
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
-              </svg>
-              {unreadChat > 0 ? (
-                <span className="absolute right-0.5 top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-bold text-white">
-                  {unreadChat > 9 ? '9+' : unreadChat}
-                </span>
-              ) : null}
-            </Link>
+            <AdminChatBell
+              unread={unreadChat}
+              buttonClassName="relative flex h-9 w-9 items-center justify-center rounded-lg text-emerald-200 transition hover:bg-emerald-800 hover:text-white"
+            />
             <button
               aria-label="Đóng menu"
               className="admin-close flex h-9 w-9 items-center justify-center rounded-lg text-emerald-200 transition hover:bg-emerald-800 hover:text-white lg:hidden"

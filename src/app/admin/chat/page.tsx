@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { requireAdmin } from '@/lib/auth'
 import { listConversations } from '@/features/chat/queries'
 import ChatInbox, { type ConversationVM } from '@/features/chat/components/ChatInbox'
@@ -19,5 +20,9 @@ export default async function AdminChatPage() {
     unread: c.unread,
   }))
 
-  return <ChatInbox initialConversations={initial} />
+  return (
+    <Suspense fallback={null}>
+      <ChatInbox initialConversations={initial} />
+    </Suspense>
+  )
 }

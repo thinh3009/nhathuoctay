@@ -79,7 +79,7 @@ src/
 │   ├── users/                    #   { actions, queries, schemas, types, components/ }
 │   ├── auth/                     #   { components/ } — cấu hình auth nằm ở lib/auth.ts
 │   ├── cart/                     #   { queries, types, components/ }
-│   ├── chat/                     #   { queries, components/ } — chat tư vấn 2 chiều (DrugChatbot, ChatInbox, ChatNotifyBell)
+│   ├── chat/                     #   { queries, components/ } — chat 2 chiều (DrugChatbot, ChatInbox, ChatNotifyBell, AdminChatBell)
 │   ├── images/                   #   { queries, storage, types, components/ } — Storage & ảnh hero
 │   └── storefront/               #   SPA "Quầy thuốc 16"
 │       ├── queries.ts            #     dữ liệu trang chủ (sản phẩm/tin/combo/hero)
@@ -151,8 +151,9 @@ Bảng chính (xem `src/db/schema.ts`):
 - `hero_images` — ảnh banner hero trang chủ.
 - `site_images` — ảnh giao diện admin đặt (hero/cta). Logo **không** còn ở đây (dùng ảnh cứng).
 - `chat_messages` — tin nhắn tư vấn 2 chiều khách ↔ dược sĩ (xem mục 8).
-  Cột: `user_id`, `sender('user'|'admin')`, `content`, `read_by_admin`, `read_by_user`, `created_at`.
-  Mỗi user = 1 hội thoại. Migration: `drizzle/manual-0005-chat-messages.sql`.
+  Cột: `user_id`, `sender('user'|'admin')`, `sender_name` (tên dược sĩ trả lời, cho thông báo),
+  `content`, `read_by_admin`, `read_by_user`, `created_at`. Mỗi user = 1 hội thoại.
+  Migration: `drizzle/manual-0005-chat-messages.sql` + `manual-0006-chat-sender-name.sql`.
 
 ### Bảo mật RLS
 - RLS **bật trên toàn bộ bảng, KHÔNG có policy** → chặn REST Data API công khai (anon key) đọc/ghi.
@@ -223,10 +224,14 @@ gắn toàn cục trong `app/layout.tsx`) — là **chat 2 chiều lưu trong DB
 - Dược sĩ/admin trả lời tại **`/admin/chat`** (mục "Tư vấn" trên sidebar, `ChatInbox.tsx`): cột trái là
   danh sách hội thoại (mỗi user 1 hội thoại) + badge chưa đọc, cột phải là khung trả lời. Tin lưu sender=`admin`.
 - Web **tự cập nhật bằng polling** (không websocket): khách 5s, admin thread 4s, danh sách hội thoại 8s.
-- **Chuông thông báo** (badge số tin chưa đọc):
+- **Chuông thông báo** (badge số tin chưa đọc, bấm mở **bảng thông báo** — không mở thẳng chat):
   - Khách: `ChatNotifyBell` trong `SiteHeader` + `HomeHeader` (chỉ hiện khi đã đăng nhập), poll 15s.
-    Bấm chuông mở khung tư vấn (sự kiện `qt:open-consult`).
-  - Admin: chuông trong `AdminShell` (sidebar + topbar mobile) + badge trên mục "Tư vấn", poll 10s.
+    Bảng liệt kê "*&lt;tên dược sĩ&gt; đã gửi tin nhắn cho bạn*"; bấm một dòng (hoặc nút "Mở khung
+    tư vấn") mới phát `qt:open-consult` để mở chat.
+  - Admin: `AdminChatBell` trong `AdminShell` (sidebar + topbar mobile) + badge trên mục "Tư vấn", poll 10s.
+    Bảng liệt kê "*&lt;tên khách&gt; đã gửi tin nhắn*"; bấm một dòng nhảy tới `/admin/chat?u=<userId>`
+    (ChatInbox đọc `?u=` để mở sẵn hội thoại đó).
+  - Admin còn có mục **"Tư vấn"** trong dropdown tài khoản (`AuthMenu`), đặt trên "Trang quản trị".
 
 ### Route API tư vấn
 
@@ -234,14 +239,16 @@ gắn toàn cục trong `app/layout.tsx`) — là **chat 2 chiều lưu trong DB
 |---|---|
 | `POST /api/chat` | Khách gửi tin (auth) → lưu DB + báo Telegram |
 | `GET  /api/chat?after=` | Khách lấy tin (polling) + đánh dấu tin dược sĩ đã đọc |
-| `GET  /api/chat/unread` | Số tin dược sĩ khách chưa đọc (chuông khách) |
+| `GET  /api/chat/notifications` | Số tin chưa đọc + danh sách tin dược sĩ trả lời (bảng chuông khách) |
 | `GET  /api/admin/chat` | Danh sách hội thoại (admin) |
 | `GET  /api/admin/chat/[userId]` | Xem thread + đánh dấu đã đọc (admin) |
 | `POST /api/admin/chat/[userId]` | Dược sĩ trả lời khách |
 | `GET  /api/admin/chat/unread` | Tổng tin khách chưa đọc (chuông admin) |
 
-Đọc/ghi tin gom trong `features/chat/queries.ts` (server-only): `addChatMessage`, `getUserMessages`,
-`markReadByAdmin/User`, `listConversations`, `countUnreadForAdmin/User`.
+Đọc/ghi tin gom trong `features/chat/queries.ts` (server-only): `addChatMessage` (kèm `senderName`),
+`getUserMessages`, `getUserNotifications`, `markReadByAdmin/User`, `listConversations`,
+`countUnreadForAdmin/User`. Component: `DrugChatbot` (khách), `ChatInbox` (admin), `ChatNotifyBell`
+(chuông khách), `AdminChatBell` (chuông admin).
 
 > ⚠️ Telegram chỉ **thông báo** cho dược sĩ có tin mới; **trả lời làm trên web** (`/admin/chat`).
 > Cần `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` set trên Vercel để có thông báo (không có vẫn chạy, chỉ mất thông báo).

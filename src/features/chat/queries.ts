@@ -1,5 +1,5 @@
 import 'server-only'
-import { and, asc, eq, gt, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gt, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { chatMessages, users } from '@/db/schema'
 
@@ -20,11 +20,16 @@ export type ChatConversation = {
   unread: number
 }
 
-// Thêm một tin nhắn vào hội thoại của user.
-export async function addChatMessage(userId: string, sender: 'user' | 'admin', content: string) {
+// Thêm một tin nhắn vào hội thoại của user. `senderName` = tên hiển thị (tên dược sĩ với tin admin).
+export async function addChatMessage(
+  userId: string,
+  sender: 'user' | 'admin',
+  content: string,
+  senderName?: string,
+) {
   const [row] = await db
     .insert(chatMessages)
-    .values({ userId, sender, content })
+    .values({ userId, sender, content, senderName: senderName ?? null })
     .returning({
       id: chatMessages.id,
       sender: chatMessages.sender,
@@ -32,6 +37,31 @@ export async function addChatMessage(userId: string, sender: 'user' | 'admin', c
       createdAt: chatMessages.createdAt,
     })
   return row!
+}
+
+export type ChatNotification = {
+  id: string
+  senderName: string | null
+  content: string
+  createdAt: Date
+  read: boolean
+}
+
+// Thông báo cho khách: các tin dược sĩ trả lời gần đây (mới nhất trước).
+export async function getUserNotifications(userId: string, limit = 10): Promise<ChatNotification[]> {
+  const rows = await db
+    .select({
+      id: chatMessages.id,
+      senderName: chatMessages.senderName,
+      content: chatMessages.content,
+      createdAt: chatMessages.createdAt,
+      read: chatMessages.readByUser,
+    })
+    .from(chatMessages)
+    .where(and(eq(chatMessages.userId, userId), eq(chatMessages.sender, 'admin')))
+    .orderBy(desc(chatMessages.createdAt))
+    .limit(limit)
+  return rows
 }
 
 // Tin nhắn của một user, tuỳ chọn chỉ lấy tin mới hơn `after` (cho polling).

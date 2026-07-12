@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 export type ConversationVM = {
   userId: string
@@ -39,6 +40,7 @@ export default function ChatInbox({ initialConversations }: { initialConversatio
   const [sending, setSending] = useState(false)
   const [loadingThread, setLoadingThread] = useState(false)
   const scrollRef = useRef<HTMLDivElement | null>(null)
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -75,6 +77,14 @@ export default function ChatInbox({ initialConversations }: { initialConversatio
     // Mở hội thoại = đã đọc → làm mới danh sách để xoá badge chưa đọc.
     void refreshConversations()
   }, [refreshConversations])
+
+  // Mở sẵn hội thoại khi tới từ thông báo admin (/admin/chat?u=<userId>).
+  useEffect(() => {
+    const u = searchParams.get('u')
+    if (!u) return
+    const id = setTimeout(() => void openConversation(u), 0)
+    return () => clearTimeout(id)
+  }, [searchParams, openConversation])
 
   // Poll danh sách hội thoại mỗi 8s.
   useEffect(() => {
