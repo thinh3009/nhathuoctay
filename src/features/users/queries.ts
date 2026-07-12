@@ -2,13 +2,27 @@ import 'server-only'
 import { desc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { users, orders, orderItems } from '@/db/schema'
+import { classifyIdentifier } from '@/lib/identifier'
 import type { UserRole } from './types'
 
 export type { UserRole } from './types'
 
 export async function getUserByEmail(email: string) {
-  const result = await db.select().from(users).where(eq(users.email, email)).limit(1)
+  const result = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1)
   return result[0] ?? null
+}
+
+export async function getUserByPhone(phone: string) {
+  const result = await db.select().from(users).where(eq(users.phone, phone)).limit(1)
+  return result[0] ?? null
+}
+
+// Tìm user theo định danh đăng nhập: tự nhận biết email hay SĐT rồi tra đúng cột.
+export async function getUserByIdentifier(identifier: string) {
+  const c = classifyIdentifier(identifier)
+  if (c.kind === 'email') return getUserByEmail(c.email)
+  if (c.kind === 'phone') return getUserByPhone(c.phone)
+  return null
 }
 
 export async function getUserById(id: string) {
@@ -17,10 +31,10 @@ export async function getUserById(id: string) {
 }
 
 export async function createUser(data: {
-  email: string
+  email?: string | null
+  phone?: string | null
   passwordHash: string
   fullName: string
-  phone?: string
 }) {
   const result = await db.insert(users).values(data).returning()
   return result[0]!

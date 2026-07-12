@@ -1,21 +1,19 @@
 import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import { s } from '@/features/storefront/data'
-import { getSiteImageMap } from '@/features/siteImages/queries'
 
 const social = ['ph-facebook-logo', 'ph-tiktok-logo', 'ph-instagram-logo', 'ph-youtube-logo']
 
 // Footer dùng chung, khớp giao diện footer trang chủ (Quầy thuốc 16).
 // Dùng điều hướng route thật (Link) thay cho SPA state.
-export default async function SiteFooter() {
-  const { logo: logoUrl } = await getSiteImageMap()
+export default function SiteFooter() {
   return (
     <footer style={s('background:var(--color-footer-bg);color:rgba(255,255,255,0.85);margin-top:54px')}>
       <div style={s('max-width:1180px;margin:0 auto;padding:42px 24px 30px;width:100%;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px')} className="qt-footer-grid">
         <div>
           <div style={s('margin-bottom:14px')}>
             <span style={s('display:inline-flex;padding:10px 14px;border-radius:var(--radius-md);background:rgba(255,255,255,0.94)')}>
-              <Logo height={46} src={logoUrl} />
+              <Logo height={46} />
             </span>
           </div>
           <div style={s('font-size:13.5px;line-height:1.7')}>

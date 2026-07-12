@@ -16,7 +16,7 @@ type SlotConfig = {
 const SLOTS: SlotConfig[] = [
   { slot: 'hero', title: 'Banner Hero đầu trang', desc: 'Ảnh lớn hiển thị trong carousel ở đầu trang chủ. Khuyến nghị ảnh ngang, tối thiểu 800×600.', icon: 'ph-image', ratio: '4 / 3', preview: 'banner' },
   { slot: 'cta', title: 'Ảnh nền khu CTA', desc: 'Ảnh nền cho dải “Đặt thuốc theo toa / Tư vấn bác sĩ”. Nên chọn ảnh sáng, tông xanh ngọc.', icon: 'ph-megaphone', ratio: '16 / 6', preview: 'banner' },
-  { slot: 'logo', title: 'Logo (header & footer)', desc: 'Logo tùy chỉnh thay cho logo mặc định. Dùng ảnh nền trong suốt (PNG/SVG-raster), cao ~120px.', icon: 'ph-sparkle', ratio: '3 / 1', preview: 'logo' },
+  // Logo dùng ảnh cứng tại public/logo_brand.svg — không còn cho admin đổi qua đây.
 ]
 
 export default function AppearanceManager({
@@ -88,7 +88,7 @@ export default function AppearanceManager({
       {embedded ? null : (
         <div className="mb-6">
           <h1 className="text-3xl font-black tracking-tight text-stone-900">Giao diện trang chủ</h1>
-          <p className="mt-1 text-sm text-stone-500">Tùy chỉnh logo, banner hero và ảnh nền khu kêu gọi (CTA) hiển thị trên trang chủ.</p>
+          <p className="mt-1 text-sm text-stone-500">Tùy chỉnh banner hero và ảnh nền khu kêu gọi (CTA) hiển thị trên trang chủ.</p>
         </div>
       )}
 

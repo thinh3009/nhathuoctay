@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 
 type AuthUser = {
   id: string
-  email: string
+  email: string | null
+  phone: string | null
   fullName: string | null
   role: 'customer' | 'admin' | 'pharmacist'
 } | null
@@ -87,7 +88,8 @@ export default function AuthMenu({
     )
   }
 
-  const displayName = user.fullName?.trim() || user.email
+  const contactLabel = user.email ?? user.phone ?? ''
+  const displayName = user.fullName?.trim() || contactLabel
 
   return (
     <div className="relative shrink-0" ref={boxRef}>
@@ -109,7 +111,7 @@ export default function AuthMenu({
         <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-xl shadow-brand-900/10">
           <div className="border-b border-stone-100 px-4 py-3">
             <p className="truncate text-sm font-bold text-stone-900">{displayName}</p>
-            <p className="truncate text-xs text-stone-500">{user.email}</p>
+            <p className="truncate text-xs text-stone-500">{contactLabel}</p>
           </div>
           <div className="p-1.5">
             <Link

@@ -9,14 +9,14 @@ const social = ['ph-facebook-logo', 'ph-tiktok-logo', 'ph-instagram-logo', 'ph-y
  * gập còn 2 cột trên mobile qua class `.qt-footer-grid` (globals.css).
  */
 export default function HomeFooter({ hub }: { hub: StorefrontHub }) {
-  const { footerCats, openRx, logoUrl } = hub
+  const { footerCats, openRx } = hub
   return (
     <footer style={s('background:var(--color-footer-bg);color:rgba(255,255,255,0.85);margin-top:54px')}>
       <div className="qt-footer-grid" style={s('max-width:1180px;margin:0 auto;padding:42px 24px 30px;width:100%;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px')}>
         <div>
           <div style={s('margin-bottom:14px')}>
             <span style={s('display:inline-flex;padding:10px 14px;border-radius:var(--radius-md);background:rgba(255,255,255,0.94)')}>
-              <Logo height={46} src={logoUrl} />
+              <Logo height={46} />
             </span>
           </div>
           <div style={s('font-size:13.5px;line-height:1.7')}>Tận tâm, tận lòng.<br />Hệ thống nhà thuốc đạt chuẩn GPP, cam kết thuốc chính hãng, tư vấn bởi dược sĩ.</div>

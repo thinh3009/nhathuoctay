@@ -8,5 +8,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/')
   }
 
-  return <AdminShell userEmail={user.email}>{children}</AdminShell>
+  return <AdminShell userEmail={user.email ?? ''}>{children}</AdminShell>
 }

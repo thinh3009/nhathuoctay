@@ -10,7 +10,7 @@ export default function LoginForm() {
   const searchParams = useSearchParams()
   const from = searchParams?.get('from') ?? '/'
 
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState({ identifier: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -66,18 +66,18 @@ export default function LoginForm() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-stone-700" htmlFor="email">
-                  Email
+                <label className="mb-1.5 block text-sm font-semibold text-stone-700" htmlFor="identifier">
+                  Email hoặc số điện thoại
                 </label>
                 <input
-                  autoComplete="email"
+                  autoComplete="username"
                   className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-900 outline-none transition focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-100"
-                  id="email"
-                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  placeholder="email@example.com"
+                  id="identifier"
+                  onChange={(e) => setForm((f) => ({ ...f, identifier: e.target.value }))}
+                  placeholder="Nhập email hoặc số điện thoại"
                   required
-                  type="email"
-                  value={form.email}
+                  type="text"
+                  value={form.identifier}
                 />
               </div>
 

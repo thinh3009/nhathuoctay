@@ -16,10 +16,12 @@ import type { ProductImage } from '@/lib/schemas'
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
-  email: text('email').notNull().unique(),
+  // Định danh đăng nhập: email HOẶC số điện thoại (ít nhất một, ràng buộc ở app + CHECK DB).
+  // Cả hai đều unique nhưng nullable — Postgres cho phép nhiều NULL trong cột unique.
+  email: text('email').unique(),
+  phone: text('phone').unique(),
   passwordHash: text('password_hash').notNull(),
   fullName: text('full_name').notNull(),
-  phone: text('phone'),
   role: text('role', { enum: ['customer', 'admin', 'pharmacist'] }).notNull().default('customer'),
   isActive: boolean('is_active').notNull().default(true),
   emailVerified: boolean('email_verified').notNull().default(false),

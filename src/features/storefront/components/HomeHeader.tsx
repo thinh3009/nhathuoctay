@@ -8,7 +8,7 @@ import type { StorefrontHub } from '../use-storefront'
  * hành động (desktop) hoặc icon tìm/giỏ/menu (mobile), và thanh điều hướng.
  */
 export default function HomeHeader({ hub }: { hub: StorefrontHub }) {
-  const { sst, cc, set, doSearch, onQueryKey, goHome, goCart, openRx, openConsult, logoUrl, navLinks, mobSearch, setMobSearch, mobMenu, setMobMenu } = hub
+  const { sst, cc, set, doSearch, onQueryKey, goHome, goCart, openRx, openConsult, navLinks, mobSearch, setMobSearch, mobMenu, setMobMenu } = hub
 
   return (
     <>
@@ -25,7 +25,7 @@ export default function HomeHeader({ hub }: { hub: StorefrontHub }) {
       <header style={s('position:sticky;top:0;z-index:30;background:var(--neutral-0);box-shadow:var(--shadow-xs)')}>
       <div className="qt-hrow" style={s('max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:22px;width:100%')}>
         <div onClick={goHome} style={s('cursor:pointer;flex-shrink:0')}>
-          <Logo height={50} src={logoUrl} />
+          <Logo height={50} />
         </div>
         <div className="qt-search-full" style={s('flex:1;display:flex;align-items:center;background:var(--neutral-100);border:1.5px solid var(--color-border-subtle);border-radius:var(--radius-md);padding:0 6px 0 14px;max-width:560px')}>
           <i className="ph ph-magnifying-glass" style={s('color:var(--color-text-muted);font-size:16px')} />

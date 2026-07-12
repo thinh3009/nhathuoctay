@@ -23,8 +23,6 @@ export default function SiteHeader({
   const [query, setQuery] = useState('')
   const [mobSearch, setMobSearch] = useState(false)
   const [mobMenu, setMobMenu] = useState(false)
-  // Logo tùy chỉnh do admin đặt (nếu có) — đọc qua API công khai.
-  const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined)
   // Danh mục hiển thị trên nav: khởi tạo bằng config tĩnh (ổn định khi SSR),
   // sau đó đồng bộ từ DB qua /api/categories — danh mục admin đã ẩn sẽ biến mất.
   const [navCategories, setNavCategories] = useState<{ slug: string; label: string }[]>(
@@ -41,19 +39,6 @@ export default function SiteHeader({
         }
       })
       .catch(() => {}) // lỗi mạng → giữ danh sách tĩnh
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    fetch('/api/site-images')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!cancelled && data && typeof data.logo === 'string') setLogoUrl(data.logo)
-      })
-      .catch(() => {})
     return () => {
       cancelled = true
     }
@@ -120,7 +105,7 @@ export default function SiteHeader({
       <header style={s('position:sticky;top:0;z-index:30;background:var(--neutral-0);box-shadow:var(--shadow-xs)')}>
         <div className="qt-hrow" style={s('max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:22px;width:100%')}>
           <Link href="/" aria-label="Quầy thuốc 16 - trang chủ" style={s('display:flex;align-items:center;cursor:pointer;flex-shrink:0;text-decoration:none')}>
-            <Logo height={50} src={logoUrl} />
+            <Logo height={50} />
           </Link>
 
           <div className="qt-search-full" style={s('flex:1;display:flex;align-items:center;background:var(--neutral-100);border:1.5px solid var(--color-border-subtle);border-radius:var(--radius-md);padding:0 6px 0 14px;max-width:560px')}>

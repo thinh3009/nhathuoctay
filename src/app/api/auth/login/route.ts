@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getUserByEmail } from '@/features/users/queries'
+import { getUserByIdentifier } from '@/features/users/queries'
 import { comparePassword } from '@/lib/password'
 import { signJWT, setAuthCookie } from '@/lib/auth'
 
 const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
+  identifier: z.string().trim().min(1, 'Vui lòng nhập email hoặc số điện thoại'),
   password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
 })
 
@@ -21,11 +21,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const { email, password } = parsed.data
+    const { identifier, password } = parsed.data
 
-    const user = await getUserByEmail(email)
+    const user = await getUserByIdentifier(identifier)
     if (!user) {
-      return NextResponse.json({ error: 'Email hoặc mật khẩu không đúng' }, { status: 401 })
+      return NextResponse.json({ error: 'Tài khoản hoặc mật khẩu không đúng' }, { status: 401 })
     }
 
     if (!user.isActive) {
@@ -34,14 +34,14 @@ export async function POST(request: Request) {
 
     const valid = await comparePassword(password, user.passwordHash)
     if (!valid) {
-      return NextResponse.json({ error: 'Email hoặc mật khẩu không đúng' }, { status: 401 })
+      return NextResponse.json({ error: 'Tài khoản hoặc mật khẩu không đúng' }, { status: 401 })
     }
 
     const token = await signJWT({ userId: user.id, email: user.email, role: user.role })
     await setAuthCookie(token)
 
     return NextResponse.json({
-      user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role },
+      user: { id: user.id, email: user.email, phone: user.phone, fullName: user.fullName, role: user.role },
     })
   } catch (error) {
     console.error('Login error:', error)

@@ -9,7 +9,8 @@ const JWT_SECRET = new TextEncoder().encode(
 
 export type JWTPayload = {
   userId: string
-  email: string
+  // Có thể null nếu tài khoản đăng ký bằng số điện thoại (không có email).
+  email: string | null
   role: 'customer' | 'admin' | 'pharmacist'
 }
 

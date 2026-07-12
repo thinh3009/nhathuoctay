@@ -1,77 +1,33 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
-import { searchDrugs } from '@/features/chat/queries'
+import { getAuthUser } from '@/lib/auth'
+import { getUserById } from '@/features/users/queries'
 
-// Agentic loop có thể chạy nhiều vòng tool-use → cho thêm thời gian trên serverless.
+// Khung "chat" nay chi chuyen tiep tin nhan khach toi Telegram cua duoc si —
+// khong con goi AI. Duoc si nhan tin trong Telegram va lien he lai voi khach.
 export const runtime = 'nodejs'
-export const maxDuration = 60
-
-const MODEL = 'claude-opus-4-8'
-const MAX_TOKENS = 8000
-
-const SYSTEM_PROMPT = `Bạn là trợ lý tư vấn của một nhà thuốc online tại Việt Nam. Nhiệm vụ của bạn là
-giúp khách tra cứu thông tin sản phẩm (thuốc, thực phẩm chức năng, thiết bị y tế,
-sản phẩm chăm sóc da) có bán tại nhà thuốc.
-
-QUY TẮC:
-- Khi khách hỏi về một sản phẩm, triệu chứng, công dụng, thành phần, giá hoặc tình
-  trạng còn hàng, hãy LUÔN dùng công cụ \`search_drugs\` để tra cứu trước. Không bịa
-  thông tin sản phẩm từ trí nhớ.
-- Chỉ giới thiệu những sản phẩm có trong kết quả tra cứu. Nếu không tìm thấy, nói rõ
-  là hiện chưa tìm thấy sản phẩm phù hợp và mời khách liên hệ dược sĩ của nhà thuốc.
-- Với mỗi sản phẩm gợi ý, nêu: tên, công dụng chính, giá (định dạng tiền Việt, ví dụ
-  389.000đ), tình trạng còn hàng (nếu stockQuantity > 0 là "còn hàng"), và đường dẫn
-  chi tiết dạng /product/<slug>.
-- Nếu sản phẩm có prescriptionRequired = true, nhắc khách rằng đây là thuốc cần kê đơn
-  và cần tư vấn của bác sĩ/dược sĩ.
-- KHÔNG chẩn đoán bệnh, KHÔNG đưa liều dùng cụ thể vượt quá thông tin trên sản phẩm.
-  Với câu hỏi về triệu chứng, hãy gợi ý nhóm sản phẩm phù hợp và khuyên khách hỏi
-  dược sĩ trước khi dùng.
-- Luôn kết thúc bằng một lưu ý ngắn: thông tin chỉ mang tính tham khảo, không thay thế
-  tư vấn y khoa; đọc kỹ hướng dẫn sử dụng trước khi dùng.
-- Trả lời bằng tiếng Việt, ngắn gọn, thân thiện, dễ đọc.`
-
-const TOOLS: Anthropic.Tool[] = [
-  {
-    name: 'search_drugs',
-    description:
-      'Tìm sản phẩm trong cơ sở dữ liệu nhà thuốc theo tên, công dụng, triệu chứng, ' +
-      'thành phần hoặc nhóm sản phẩm. Gọi công cụ này mỗi khi người dùng hỏi về một ' +
-      'sản phẩm, triệu chứng, công dụng, thành phần, giá, hoặc tình trạng còn hàng — ' +
-      'không trả lời từ trí nhớ.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        query: {
-          type: 'string',
-          description:
-            "Từ khoá tìm kiếm: tên thuốc, triệu chứng, công dụng, thành phần hoặc nhóm " +
-            "sản phẩm. Ví dụ: 'hạ sốt', 'vitamin C', 'omega 3', 'huyết áp'.",
-        },
-      },
-      required: ['query'],
-    },
-  },
-]
 
 const requestSchema = z.object({
-  messages: z
-    .array(
-      z.object({
-        role: z.enum(['user', 'assistant']),
-        content: z.string(),
-      }),
-    )
-    .min(1),
+  message: z.string().trim().min(1, 'Nội dung trống').max(2000),
+  // Ngữ cảnh không bắt buộc: SĐT khách để lại + trang đang xem.
+  contact: z.string().trim().max(120).optional(),
+  pageUrl: z.string().trim().max(300).optional(),
 })
 
-async function runTool(name: string, input: unknown): Promise<string> {
-  if (name === 'search_drugs') {
-    const query = typeof input === 'object' && input !== null ? String((input as Record<string, unknown>).query ?? '') : ''
-    const results = await searchDrugs(query)
-    return JSON.stringify({ results })
-  }
-  return JSON.stringify({ error: `Không có công cụ tên ${name}` })
+// Chống spam đơn giản theo IP (in-memory, best-effort trên serverless).
+const RATE_LIMIT = 8 // số tin / cửa sổ
+const RATE_WINDOW_MS = 60_000
+const hits = new Map<string, number[]>()
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS)
+  recent.push(now)
+  hits.set(ip, recent)
+  return recent.length > RATE_LIMIT
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 export async function POST(request: Request) {
@@ -81,72 +37,67 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Yêu cầu không hợp lệ' }, { status: 400 })
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return Response.json({ error: 'Chưa cấu hình ANTHROPIC_API_KEY' }, { status: 500 })
+  // Bắt buộc đăng nhập mới được gửi tư vấn (bảo mật hơn, tránh spam ẩn danh).
+  const authUser = await getAuthUser()
+  if (!authUser) {
+    return Response.json({ error: 'Vui lòng đăng nhập để được tư vấn.' }, { status: 401 })
   }
 
-  const client = new Anthropic() // tự đọc ANTHROPIC_API_KEY từ môi trường
-  const convo: Anthropic.MessageParam[] = parsed.data.messages.map((m) => ({
-    role: m.role,
-    content: m.content,
-  }))
+  const token = process.env.TELEGRAM_BOT_TOKEN
+  const chatId = process.env.TELEGRAM_CHAT_ID
+  if (!token || !chatId) {
+    return Response.json(
+      { error: 'Chưa cấu hình Telegram (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID)' },
+      { status: 500 },
+    )
+  }
 
-  const encoder = new TextEncoder()
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  if (isRateLimited(ip)) {
+    return Response.json({ error: 'Bạn gửi hơi nhanh, vui lòng thử lại sau ít phút.' }, { status: 429 })
+  }
 
-  const body$ = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      try {
-        // Vòng lặp agentic có streaming: stream text cho client, tự chạy tool khi cần.
-        // Giới hạn số vòng để tránh lặp vô hạn nếu mô hình liên tục gọi tool.
-        for (let round = 0; round < 6; round += 1) {
-          const stream = client.messages.stream({
-            model: MODEL,
-            max_tokens: MAX_TOKENS,
-            system: SYSTEM_PROMPT,
-            tools: TOOLS,
-            thinking: { type: 'adaptive' },
-            output_config: { effort: 'medium' },
-            messages: convo,
-          })
+  const { message, contact, pageUrl } = parsed.data
 
-          stream.on('text', (text) => {
-            controller.enqueue(encoder.encode(text))
-          })
+  // Tên lấy từ tài khoản đã đăng nhập (đáng tin, không cho client giả mạo).
+  const dbUser = await getUserById(authUser.userId)
+  const senderName = dbUser?.fullName?.trim() || 'Khách hàng'
+  // Ưu tiên SĐT khách để lại trong ô liên hệ, nếu trống thì lấy SĐT hồ sơ.
+  const contactPhone = contact?.trim() || dbUser?.phone || ''
 
-          const final = await stream.finalMessage()
+  const lines = [
+    `🩺 <b>Tư vấn từ ${escapeHtml(senderName)} (thành viên) — Quầy thuốc 16</b>`,
+    '',
+    escapeHtml(message),
+  ]
+  if (contactPhone) lines.push('', `📞 Liên hệ: ${escapeHtml(contactPhone)}`)
+  if (pageUrl) lines.push(`🔗 Trang: ${escapeHtml(pageUrl)}`)
+  lines.push(`🕒 ${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}`)
 
-          if (final.stop_reason !== 'tool_use') {
-            break
-          }
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: lines.join('\n'),
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
+    })
 
-          // Giữ nguyên content (gồm cả thinking block) để gửi lại đúng định dạng.
-          convo.push({ role: 'assistant', content: final.content })
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '')
+      console.error('Telegram sendMessage failed:', res.status, detail)
+      return Response.json({ error: 'Không gửi được tới dược sĩ, vui lòng thử lại.' }, { status: 502 })
+    }
 
-          const toolResults: Anthropic.ToolResultBlockParam[] = []
-          for (const block of final.content) {
-            if (block.type === 'tool_use') {
-              const result = await runTool(block.name, block.input)
-              toolResults.push({
-                type: 'tool_result',
-                tool_use_id: block.id,
-                content: result,
-              })
-            }
-          }
-          convo.push({ role: 'user', content: toolResults })
-        }
-      } catch (error) {
-        console.error('Chat error:', error)
-        controller.enqueue(
-          encoder.encode('\n\nXin lỗi, hiện chưa kết nối được trợ lý. Vui lòng thử lại sau.'),
-        )
-      } finally {
-        controller.close()
-      }
-    },
-  })
-
-  return new Response(body$, {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  })
+    return Response.json({ ok: true })
+  } catch (error) {
+    console.error('Telegram error:', error)
+    return Response.json({ error: 'Lỗi kết nối, vui lòng thử lại.' }, { status: 502 })
+  }
 }

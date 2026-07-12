@@ -7,7 +7,7 @@ import { SITE_NAME } from '@/config/site'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ fullName: '', email: '', phone: '', password: '', confirm: '' })
+  const [form, setForm] = useState({ fullName: '', identifier: '', password: '', confirm: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -28,8 +28,7 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: form.fullName,
-          email: form.email,
-          phone: form.phone || undefined,
+          identifier: form.identifier,
           password: form.password,
         }),
       })
@@ -96,31 +95,19 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-semibold text-stone-700" htmlFor="email">
-                  Email
+                <label className="mb-1.5 block text-sm font-semibold text-stone-700" htmlFor="identifier">
+                  Email hoặc số điện thoại
                 </label>
                 <input
-                  autoComplete="email"
+                  autoComplete="username"
                   className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-100"
-                  id="email"
-                  placeholder="email@example.com"
+                  id="identifier"
+                  placeholder="Nhập email hoặc số điện thoại"
                   required
-                  type="email"
-                  {...field('email')}
+                  type="text"
+                  {...field('identifier')}
                 />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-stone-700" htmlFor="phone">
-                  Số điện thoại <span className="font-normal text-stone-400">(tùy chọn)</span>
-                </label>
-                <input
-                  className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none transition focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-100"
-                  id="phone"
-                  placeholder="0900 123 456"
-                  type="tel"
-                  {...field('phone')}
-                />
+                <p className="mt-1 text-xs text-stone-400">Dùng để đăng nhập. Chỉ cần một trong hai.</p>
               </div>
 
               <div>

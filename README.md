@@ -4,7 +4,7 @@
 để quản lý sản phẩm, danh mục, combo, bài viết, đơn hàng, người dùng và hình ảnh.
 
 - **Storefront**: trang chủ SPA "Quầy thuốc 16", danh mục, chi tiết sản phẩm, giỏ hàng, thanh toán,
-  blog, đặt thuốc theo toa, chatbot dược sĩ.
+  blog, đặt thuốc theo toa, tư vấn dược sĩ (gửi tin qua Telegram).
 - **Admin** (`/admin`): CRUD sản phẩm/danh mục/combo/bài viết, quản lý đơn hàng, người dùng và
   ảnh (Storage + ảnh hero trang chủ).
 
@@ -20,7 +20,7 @@
 | Xác thực | JWT (`jose`) + cookie phiên, mật khẩu băm bằng `bcryptjs` |
 | Validate | **Zod** (schema dùng chung client ↔ server) |
 | Lưu trữ ảnh | **Supabase Storage** (bucket `product-images`, public) |
-| AI | `@anthropic-ai/sdk` (chatbot tư vấn) |
+| Tư vấn | Khung "Tư vấn dược sĩ" gửi tin thẳng vào **Telegram bot** (không dùng AI) |
 | Bảo vệ server code | `server-only` (chặn import query/DB vào client) |
 | Triển khai | Vercel |
 
@@ -79,7 +79,7 @@ src/
 │   ├── users/                    #   { actions, queries, schemas, types, components/ }
 │   ├── auth/                     #   { components/ } — cấu hình auth nằm ở lib/auth.ts
 │   ├── cart/                     #   { queries, types, components/ }
-│   ├── chat/                     #   { queries, components/ } — chatbot dược sĩ
+│   ├── chat/                     #   { components/ } — khung tư vấn dược sĩ (gửi Telegram)
 │   ├── images/                   #   { queries, storage, types, components/ } — Storage & ảnh hero
 │   └── storefront/               #   SPA "Quầy thuốc 16"
 │       ├── queries.ts            #     dữ liệu trang chủ (sản phẩm/tin/combo/hero)
@@ -140,6 +140,8 @@ truyền prop; `use-storefront.ts` fallback dữ liệu tĩnh (`data.ts`) khi pr
 Bảng chính (xem `src/db/schema.ts`):
 
 - `users`, `user_addresses` — tài khoản (role: customer/admin/pharmacist), địa chỉ.
+  Đăng ký/đăng nhập bằng **email HOẶC số điện thoại** (`email`/`phone` đều nullable + unique,
+  CHECK bắt buộc có ít nhất một — xem `drizzle/manual-0004-user-email-or-phone.sql`).
 - `categories` — danh mục (slug PK, `is_active` để ẩn khỏi storefront).
 - `products` — sản phẩm. `prescription_required` **nullable 3 trạng thái**:
   `null` = chưa phân loại · `false` = không kê đơn · `true` = kê đơn.
@@ -194,7 +196,7 @@ Xem `.env.example`. Nhóm chính:
 - **Supabase Storage**: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_JWT_SECRET`
 - **Auth**: `SUPABASE_JWT_SECRET` (bí mật ký JWT — **bắt buộc set trên Vercel**)
-- **AI**: `ANTHROPIC_API_KEY`
+- **Tư vấn Telegram**: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` (khung "Tư vấn dược sĩ" `/api/chat`)
 - **Admin bootstrap**: `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`
 
 > ⚠️ Không commit `.env`. Đảm bảo set đầy đủ biến bí mật trên môi trường triển khai.
