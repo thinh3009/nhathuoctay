@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm'
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -28,6 +29,21 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
+
+// Tin nhắn tư vấn giữa khách (đã đăng nhập) và dược sĩ/admin. Mỗi user = 1 hội thoại.
+export const chatMessages = pgTable(
+  'chat_messages',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    sender: text('sender', { enum: ['user', 'admin'] }).notNull(),
+    content: text('content').notNull(),
+    readByAdmin: boolean('read_by_admin').notNull().default(false),
+    readByUser: boolean('read_by_user').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index('chat_messages_user_created_idx').on(t.userId, t.createdAt)],
+)
 
 export const userAddresses = pgTable('user_addresses', {
   id: uuid('id').defaultRandom().primaryKey(),

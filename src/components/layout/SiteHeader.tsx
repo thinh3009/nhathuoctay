@@ -4,6 +4,7 @@ import { type CSSProperties, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import AuthMenu from '@/features/auth/components/AuthMenu'
+import ChatNotifyBell from '@/features/chat/components/ChatNotifyBell'
 import Logo from '@/components/ui/Logo'
 import { CATEGORY_CONFIG } from '@/lib/constants'
 import { s } from '@/features/storefront/data'
@@ -134,11 +135,13 @@ export default function SiteHeader({
               <i aria-hidden="true" className="ph ph-shopping-cart-simple" style={s('font-size:17px')} /> Giỏ hàng
               {cartBadge}
             </Link>
+            <ChatNotifyBell />
             <AuthMenu variant="light" />
           </div>
 
           {/* Icon mobile: tìm kiếm + giỏ + menu */}
           <div className="qt-hmobile" style={s('align-items:center;gap:8px;margin-left:auto')}>
+            <ChatNotifyBell />
             <button aria-label="Tìm kiếm" aria-expanded={mobSearch} onClick={() => { setMobSearch((v) => !v); setMobMenu(false) }} style={s('display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;background:var(--neutral-100);border-radius:50%;font-size:18px;cursor:pointer;color:var(--color-brand-primary)')}><i className="ph ph-magnifying-glass" /></button>
             <Link href="/cart" aria-label={`Giỏ hàng${cartCount > 0 ? `, ${cartCount} sản phẩm` : ''}`} style={s('position:relative;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;background:var(--teal-50);border-radius:50%;font-size:18px;cursor:pointer;text-decoration:none;color:var(--teal-800)')}><i className="ph ph-shopping-cart-simple" />{cartBadge}</Link>
             <button aria-label="Menu" aria-expanded={mobMenu} onClick={() => { setMobMenu((v) => !v); setMobSearch(false) }} style={s('display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;background:var(--neutral-100);border-radius:50%;font-size:18px;cursor:pointer;color:var(--color-text-heading)')}><i className="ph ph-list" /></button>

@@ -1,4 +1,5 @@
 import AuthMenu from '@/features/auth/components/AuthMenu'
+import ChatNotifyBell from '@/features/chat/components/ChatNotifyBell'
 import Logo from '@/components/ui/Logo'
 import { s } from '../data'
 import type { StorefrontHub } from '../use-storefront'
@@ -53,10 +54,12 @@ export default function HomeHeader({ hub }: { hub: StorefrontHub }) {
               <span style={s('position:absolute;top:-6px;right:-6px;background:var(--orange-600);color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:11px;display:flex;align-items:center;justify-content:center;padding:0 5px')}>{cc}</span>
             ) : null}
           </button>
+          <ChatNotifyBell />
           <AuthMenu variant="light" />
         </div>
         {/* Icon mobile: tìm kiếm + menu */}
         <div className="qt-hmobile" style={s('align-items:center;gap:8px;margin-left:auto')}>
+          <ChatNotifyBell />
           <button aria-label="Tìm kiếm" onClick={() => { setMobSearch((v) => !v); setMobMenu(false) }} style={s('display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;background:var(--neutral-100);border-radius:50%;font-size:18px;cursor:pointer;color:var(--color-brand-primary)')}>
             <i className="ph ph-magnifying-glass" />
           </button>

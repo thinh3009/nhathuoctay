@@ -1,20 +1,18 @@
 import { z } from 'zod'
 import { getAuthUser } from '@/lib/auth'
 import { getUserById } from '@/features/users/queries'
+import { addChatMessage, getUserMessages, markReadByUser } from '@/features/chat/queries'
 
-// Khung "chat" nay chi chuyen tiep tin nhan khach toi Telegram cua duoc si —
-// khong con goi AI. Duoc si nhan tin trong Telegram va lien he lai voi khach.
+// Chat tư vấn 2 chiều: khách gửi tin (POST) và lấy tin mới (GET) để hiện tin
+// dược sĩ trả lời từ trang /admin/chat. Bắt buộc đăng nhập.
 export const runtime = 'nodejs'
 
-const requestSchema = z.object({
+const postSchema = z.object({
   message: z.string().trim().min(1, 'Nội dung trống').max(2000),
-  // Ngữ cảnh không bắt buộc: SĐT khách để lại + trang đang xem.
-  contact: z.string().trim().max(120).optional(),
-  pageUrl: z.string().trim().max(300).optional(),
 })
 
 // Chống spam đơn giản theo IP (in-memory, best-effort trên serverless).
-const RATE_LIMIT = 8 // số tin / cửa sổ
+const RATE_LIMIT = 12
 const RATE_WINDOW_MS = 60_000
 const hits = new Map<string, number[]>()
 
@@ -30,26 +28,39 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-export async function POST(request: Request) {
-  const body = await request.json().catch(() => null)
-  const parsed = requestSchema.safeParse(body)
-  if (!parsed.success) {
-    return Response.json({ error: 'Yêu cầu không hợp lệ' }, { status: 400 })
+// Báo Telegram cho dược sĩ biết có tin mới (tuỳ chọn, không chặn nếu chưa cấu hình).
+async function notifyTelegram(name: string, message: string) {
+  const token = process.env.TELEGRAM_BOT_TOKEN
+  const chatId = process.env.TELEGRAM_CHAT_ID
+  if (!token || !chatId) return
+  const text = [
+    `🩺 <b>${escapeHtml(name)}</b> vừa nhắn tư vấn:`,
+    '',
+    escapeHtml(message),
+    '',
+    '↩️ Trả lời khách tại trang <b>Quản trị → Tư vấn</b>.',
+  ].join('\n')
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true }),
+    })
+  } catch (e) {
+    console.error('Telegram notify failed:', e)
   }
+}
 
-  // Bắt buộc đăng nhập mới được gửi tư vấn (bảo mật hơn, tránh spam ẩn danh).
+export async function POST(request: Request) {
   const authUser = await getAuthUser()
   if (!authUser) {
     return Response.json({ error: 'Vui lòng đăng nhập để được tư vấn.' }, { status: 401 })
   }
 
-  const token = process.env.TELEGRAM_BOT_TOKEN
-  const chatId = process.env.TELEGRAM_CHAT_ID
-  if (!token || !chatId) {
-    return Response.json(
-      { error: 'Chưa cấu hình Telegram (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID)' },
-      { status: 500 },
-    )
+  const body = await request.json().catch(() => null)
+  const parsed = postSchema.safeParse(body)
+  if (!parsed.success) {
+    return Response.json({ error: parsed.error.issues[0]?.message ?? 'Yêu cầu không hợp lệ' }, { status: 400 })
   }
 
   const ip =
@@ -60,44 +71,26 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Bạn gửi hơi nhanh, vui lòng thử lại sau ít phút.' }, { status: 429 })
   }
 
-  const { message, contact, pageUrl } = parsed.data
+  const saved = await addChatMessage(authUser.userId, 'user', parsed.data.message)
 
-  // Tên lấy từ tài khoản đã đăng nhập (đáng tin, không cho client giả mạo).
   const dbUser = await getUserById(authUser.userId)
-  const senderName = dbUser?.fullName?.trim() || 'Khách hàng'
-  // Ưu tiên SĐT khách để lại trong ô liên hệ, nếu trống thì lấy SĐT hồ sơ.
-  const contactPhone = contact?.trim() || dbUser?.phone || ''
+  void notifyTelegram(dbUser?.fullName?.trim() || 'Khách hàng', parsed.data.message)
 
-  const lines = [
-    `🩺 <b>Tư vấn từ ${escapeHtml(senderName)} (thành viên) — Quầy thuốc 16</b>`,
-    '',
-    escapeHtml(message),
-  ]
-  if (contactPhone) lines.push('', `📞 Liên hệ: ${escapeHtml(contactPhone)}`)
-  if (pageUrl) lines.push(`🔗 Trang: ${escapeHtml(pageUrl)}`)
-  lines.push(`🕒 ${new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })}`)
+  return Response.json({ ok: true, message: saved })
+}
 
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: lines.join('\n'),
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-      }),
-    })
-
-    if (!res.ok) {
-      const detail = await res.text().catch(() => '')
-      console.error('Telegram sendMessage failed:', res.status, detail)
-      return Response.json({ error: 'Không gửi được tới dược sĩ, vui lòng thử lại.' }, { status: 502 })
-    }
-
-    return Response.json({ ok: true })
-  } catch (error) {
-    console.error('Telegram error:', error)
-    return Response.json({ error: 'Lỗi kết nối, vui lòng thử lại.' }, { status: 502 })
+export async function GET(request: Request) {
+  const authUser = await getAuthUser()
+  if (!authUser) {
+    return Response.json({ error: 'Chưa đăng nhập' }, { status: 401 })
   }
+
+  const afterParam = new URL(request.url).searchParams.get('after')
+  const after = afterParam ? new Date(afterParam) : undefined
+  const messages = await getUserMessages(authUser.userId, after && !Number.isNaN(after.getTime()) ? after : undefined)
+
+  // Khách vừa xem → đánh dấu tin của admin là đã đọc.
+  void markReadByUser(authUser.userId)
+
+  return Response.json({ messages })
 }

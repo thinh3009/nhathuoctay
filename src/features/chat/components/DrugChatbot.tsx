@@ -1,42 +1,40 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-type ChatRole = 'user' | 'assistant'
-
-type ChatMessage = {
-  role: ChatRole
+type MessageVM = {
+  id: string
+  sender: 'user' | 'admin'
   content: string
+  createdAt: string
 }
 
-const WELCOME: ChatMessage = {
-  role: 'assistant',
-  content:
-    'Xin chào! Bạn cần tư vấn về thuốc hay sản phẩm nào? Để lại câu hỏi (và số điện thoại nếu muốn được gọi lại), dược sĩ của Quầy thuốc 16 sẽ liên hệ với bạn sớm nhất.',
-}
+const WELCOME =
+  'Xin chào! Bạn cần tư vấn về thuốc hay sản phẩm nào? Nhắn cho dược sĩ ở đây, dược sĩ của Quầy thuốc 16 sẽ trả lời ngay trong khung chat này.'
 
 export default function DrugChatbot() {
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME])
+  const [messages, setMessages] = useState<MessageVM[]>([])
   const [input, setInput] = useState('')
-  const [contact, setContact] = useState('')
   const [isSending, setIsSending] = useState(false)
   // undefined = chưa kiểm tra · null = chưa đăng nhập · object = đã đăng nhập.
   const [member, setMember] = useState<{ fullName: string } | null | undefined>(undefined)
-  // Đường dẫn quay lại sau khi đăng nhập (cập nhật sau khi mount, an toàn khi hydrate).
-  const [returnUrl, setReturnUrl] = useState('/')
+  const [loadedHistory, setLoadedHistory] = useState(false)
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    setReturnUrl(window.location.pathname + window.location.search)
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+  }, [messages, isOpen, member])
+
+  // Mở khung tư vấn khi bấm nút "Tư vấn bác sĩ" ở header/hero.
+  useEffect(() => {
+    const onOpen = () => setIsOpen(true)
+    window.addEventListener('qt:open-consult', onOpen)
+    return () => window.removeEventListener('qt:open-consult', onOpen)
   }, [])
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages, isOpen])
-
-  // Khi mở khung: kiểm tra đăng nhập để lấy tên từ DB. Chưa đăng nhập → yêu cầu đăng nhập.
+  // Khi mở khung: kiểm tra đăng nhập.
   useEffect(() => {
     if (!isOpen || member !== undefined) return
     let active = true
@@ -53,63 +51,79 @@ export default function DrugChatbot() {
     }
   }, [isOpen, member])
 
-  // Mở khung tư vấn khi bấm nút "Tư vấn bác sĩ" ở header/hero (sự kiện qt:open-consult).
-  useEffect(() => {
-    const onOpen = () => setIsOpen(true)
-    window.addEventListener('qt:open-consult', onOpen)
-    return () => window.removeEventListener('qt:open-consult', onOpen)
+  const mergeMessages = useCallback((incoming: MessageVM[]) => {
+    if (!incoming.length) return
+    setMessages((cur) => {
+      const seen = new Set(cur.map((m) => m.id))
+      const added = incoming.filter((m) => !seen.has(m.id))
+      return added.length ? [...cur, ...added] : cur
+    })
   }, [])
+
+  // Tải lịch sử tin nhắn khi đã đăng nhập.
+  useEffect(() => {
+    if (!isOpen || !member || loadedHistory) return
+    let active = true
+    fetch('/api/chat', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : { messages: [] }))
+      .then((data) => {
+        if (active) {
+          setMessages(data.messages ?? [])
+          setLoadedHistory(true)
+        }
+      })
+      .catch(() => {
+        if (active) setLoadedHistory(true)
+      })
+    return () => {
+      active = false
+    }
+  }, [isOpen, member, loadedHistory])
+
+  // Poll tin mới (dược sĩ trả lời) mỗi 5s khi khung mở & đã đăng nhập.
+  useEffect(() => {
+    if (!isOpen || !member || !loadedHistory) return
+    const t = setInterval(async () => {
+      const last = messages[messages.length - 1]?.createdAt
+      const url = last ? `/api/chat?after=${encodeURIComponent(last)}` : '/api/chat'
+      try {
+        const res = await fetch(url, { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json()
+        mergeMessages(data.messages ?? [])
+      } catch {
+        /* noop */
+      }
+    }, 5000)
+    return () => clearInterval(t)
+  }, [isOpen, member, loadedHistory, messages, mergeMessages])
 
   async function sendMessage() {
     const text = input.trim()
-    if (!text || isSending || !member) {
-      return
-    }
-
-    setMessages((current) => [...current, { role: 'user', content: text }])
+    if (!text || isSending || !member) return
     setInput('')
     setIsSending(true)
-
     try {
-      const response = await fetch('/api/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          contact: contact.trim() || undefined,
-          pageUrl: typeof window !== 'undefined' ? window.location.href : undefined,
-        }),
+        body: JSON.stringify({ message: text }),
       })
-
-      if (response.status === 401) {
-        // Phiên hết hạn giữa chừng → nhắc đăng nhập lại.
+      if (res.status === 401) {
         setMember(null)
-        throw new Error('Vui lòng đăng nhập để được tư vấn.')
+        return
       }
-      if (!response.ok) {
-        const data = await response.json().catch(() => null)
-        throw new Error(data?.error ?? `HTTP ${response.status}`)
-      }
-
-      setMessages((current) => [
-        ...current,
+      if (!res.ok) throw new Error('send failed')
+      const data = await res.json()
+      if (data.message) mergeMessages([data.message])
+    } catch {
+      setMessages((cur) => [
+        ...cur,
         {
-          role: 'assistant',
-          content:
-            'Đã gửi tới dược sĩ ✅ Dược sĩ sẽ xem và liên hệ với bạn trong thời gian sớm nhất. Bạn có thể nhắn thêm thông tin nếu cần.',
-        },
-      ])
-    } catch (error) {
-      const known =
-        error instanceof Error &&
-        (error.message.includes('nhanh') || error.message.includes('đăng nhập'))
-      setMessages((current) => [
-        ...current,
-        {
-          role: 'assistant',
-          content: known
-            ? (error as Error).message
-            : 'Xin lỗi, hiện chưa gửi được. Vui lòng thử lại hoặc gọi hotline 1900 16 16.',
+          id: `err-${Date.now()}`,
+          sender: 'admin',
+          content: 'Xin lỗi, hiện chưa gửi được. Vui lòng thử lại hoặc gọi hotline 1900 16 16.',
+          createdAt: new Date().toISOString(),
         },
       ])
     } finally {
@@ -169,24 +183,25 @@ export default function DrugChatbot() {
             </span>
             <div>
               <p className="text-sm font-bold text-brand-800">Tư vấn dược sĩ</p>
-              <p className="text-xs text-stone-500">Nhắn tin, dược sĩ sẽ liên hệ lại</p>
+              <p className="text-xs text-stone-500">Dược sĩ trả lời trực tiếp trong khung này</p>
             </div>
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4" ref={scrollRef}>
-            {messages.map((message, index) => (
-              <div
-                className={message.role === 'user' ? 'flex justify-end' : 'flex justify-start'}
-                key={index}
-              >
+            {/* Lời chào tĩnh luôn hiển thị đầu khung */}
+            <div className="flex justify-start">
+              <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl bg-stone-100 px-3 py-2 text-sm text-stone-800">
+                {WELCOME}
+              </div>
+            </div>
+            {messages.map((m) => (
+              <div key={m.id} className={m.sender === 'user' ? 'flex justify-end' : 'flex justify-start'}>
                 <div
                   className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
-                    message.role === 'user'
-                      ? 'bg-brand-700 text-white'
-                      : 'bg-stone-100 text-stone-800'
+                    m.sender === 'user' ? 'bg-brand-700 text-white' : 'bg-stone-100 text-stone-800'
                   }`}
                 >
-                  {message.content}
+                  {m.content}
                 </div>
               </div>
             ))}
@@ -208,11 +223,11 @@ export default function DrugChatbot() {
                 </span>
                 <p className="text-sm font-semibold text-stone-700">Cần đăng nhập để được tư vấn</p>
                 <p className="text-xs text-stone-500">
-                  Vui lòng đăng nhập để dược sĩ biết bạn là ai và tiện liên hệ lại.
+                  Vui lòng đăng nhập để dược sĩ biết bạn là ai và trả lời trực tiếp cho bạn.
                 </p>
                 <Link
                   className="w-full rounded-full bg-brand-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-brand-800"
-                  href={`/auth/login?from=${encodeURIComponent(returnUrl)}`}
+                  href={`/auth/login?from=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/')}`}
                 >
                   Đăng nhập
                 </Link>
@@ -228,13 +243,6 @@ export default function DrugChatbot() {
                 <p className="mb-2 text-xs text-stone-500">
                   Đang tư vấn với tư cách <span className="font-semibold text-brand-700">{member.fullName || 'thành viên'}</span>
                 </p>
-                <input
-                  className="mb-2 w-full rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-                  inputMode="tel"
-                  onChange={(event) => setContact(event.target.value)}
-                  placeholder="Số điện thoại để dược sĩ gọi lại (tuỳ chọn)"
-                  value={contact}
-                />
                 <div className="flex items-end gap-2">
                   <textarea
                     className="max-h-24 min-h-[2.5rem] flex-1 resize-none rounded-xl border border-stone-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"

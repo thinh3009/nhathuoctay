@@ -4,9 +4,9 @@
 để quản lý sản phẩm, danh mục, combo, bài viết, đơn hàng, người dùng và hình ảnh.
 
 - **Storefront**: trang chủ SPA "Quầy thuốc 16", danh mục, chi tiết sản phẩm, giỏ hàng, thanh toán,
-  blog, đặt thuốc theo toa, tư vấn dược sĩ (gửi tin qua Telegram).
-- **Admin** (`/admin`): CRUD sản phẩm/danh mục/combo/bài viết, quản lý đơn hàng, người dùng và
-  ảnh (Storage + ảnh hero trang chủ).
+  blog, đặt thuốc theo toa, tư vấn dược sĩ (chat 2 chiều với admin, cần đăng nhập).
+- **Admin** (`/admin`): CRUD sản phẩm/danh mục/combo/bài viết, quản lý đơn hàng, người dùng, ảnh
+  (Storage + ảnh hero trang chủ) và **trả lời tư vấn** khách (`/admin/chat`).
 
 ---
 
@@ -20,7 +20,7 @@
 | Xác thực | JWT (`jose`) + cookie phiên, mật khẩu băm bằng `bcryptjs` |
 | Validate | **Zod** (schema dùng chung client ↔ server) |
 | Lưu trữ ảnh | **Supabase Storage** (bucket `product-images`, public) |
-| Tư vấn | Khung "Tư vấn dược sĩ" gửi tin thẳng vào **Telegram bot** (không dùng AI) |
+| Tư vấn | Chat **2 chiều** khách ↔ dược sĩ, lưu DB (`chat_messages`) + polling; Telegram chỉ báo tin mới. Không dùng AI |
 | Bảo vệ server code | `server-only` (chặn import query/DB vào client) |
 | Triển khai | Vercel |
 
@@ -59,7 +59,7 @@ trò **định tuyến + khung giao diện**, gọi hàm từ feature rồi rend
 ```
 src/
 ├── app/                          # 1. ROUTING LAYER — chỉ định tuyến & khung giao diện
-│   ├── layout.tsx                #   Root layout (gắn chatbot toàn cục)
+│   ├── layout.tsx                #   Root layout (gắn khung Tư vấn dược sĩ toàn cục + nạp Phosphor icons)
 │   ├── (landing)/page.tsx        #   Trang chủ: đọc DB → storefront SPA
 │   ├── category/[categorySlug]/  #   Danh sách sản phẩm theo danh mục
 │   ├── product/[slug]/           #   Chi tiết sản phẩm
@@ -67,8 +67,8 @@ src/
 │   ├── bai-viet/ · account/      #   Blog công khai & đơn hàng của tôi
 │   ├── auth/                     #   Đăng nhập / đăng ký
 │   ├── admin/                    #   Khu quản trị (requireAdmin, AdminShell)
-│   │   ├── products/ categories/ combos/ articles/ orders/ users/ images/
-│   └── api/                      #   Route handlers (auth, cart, checkout, chat, upload ảnh…)
+│   │   ├── products/ categories/ combos/ articles/ orders/ users/ images/ chat/
+│   └── api/                      #   Route handlers (auth, cart, checkout, chat, admin/chat, upload ảnh…)
 │
 ├── features/                     # 2. BUSINESS LOGIC LAYER — trái tim ứng dụng
 │   ├── products/                 #   { actions, queries, schemas, types, components/ }
@@ -79,7 +79,7 @@ src/
 │   ├── users/                    #   { actions, queries, schemas, types, components/ }
 │   ├── auth/                     #   { components/ } — cấu hình auth nằm ở lib/auth.ts
 │   ├── cart/                     #   { queries, types, components/ }
-│   ├── chat/                     #   { components/ } — khung tư vấn dược sĩ (gửi Telegram)
+│   ├── chat/                     #   { queries, components/ } — chat tư vấn 2 chiều (DrugChatbot, ChatInbox, ChatNotifyBell)
 │   ├── images/                   #   { queries, storage, types, components/ } — Storage & ảnh hero
 │   └── storefront/               #   SPA "Quầy thuốc 16"
 │       ├── queries.ts            #     dữ liệu trang chủ (sản phẩm/tin/combo/hero)
@@ -88,8 +88,8 @@ src/
 │       └── components/           #     QuayThuoc16, screens/, cards, header/footer
 │
 ├── components/                   # 3. GLOBAL UI — dùng chung toàn dự án
-│   ├── ui/                       #   AnimateIn, MarkdownContent, PaginationControls, QuantitySelector
-│   └── layout/                   #   SiteHeader, SiteFooter, AdminShell, AdminLogoutButton
+│   ├── ui/                       #   Logo (ảnh cứng public/logo_brand.svg), AnimateIn, MarkdownContent, PaginationControls, QuantitySelector
+│   └── layout/                   #   SiteHeader, SiteFooter, AdminShell, AdminLogoutButton (đều gắn chuông tư vấn)
 │
 ├── lib/                          # 4. CONFIG & SHARED — cấu hình + logic miền dùng chung
 │   ├── db.ts                     #   Khởi tạo kết nối Drizzle/Postgres (lazy proxy)
@@ -114,6 +114,7 @@ src/
 └── middleware.ts                 # Bảo vệ route (chuyển sang "proxy" ở Next mới)
 
 drizzle/                          # Migration SQL (kèm manual-*.sql chạy tay trên Supabase)
+public/                           # Ảnh tĩnh: logo_brand.svg (logo cứng), favicon.svg, icons.svg (sprite), demo-products/
 ```
 
 ---
@@ -148,6 +149,10 @@ Bảng chính (xem `src/db/schema.ts`):
 - `product_reviews`, `articles`, `carts`/`cart_items`, `orders`/`order_items`, `wishlists`.
 - `combos` + `combo_items` — combo admin tạo (thành viên tham chiếu `products.slug`).
 - `hero_images` — ảnh banner hero trang chủ.
+- `site_images` — ảnh giao diện admin đặt (hero/cta). Logo **không** còn ở đây (dùng ảnh cứng).
+- `chat_messages` — tin nhắn tư vấn 2 chiều khách ↔ dược sĩ (xem mục 8).
+  Cột: `user_id`, `sender('user'|'admin')`, `content`, `read_by_admin`, `read_by_user`, `created_at`.
+  Mỗi user = 1 hội thoại. Migration: `drizzle/manual-0005-chat-messages.sql`.
 
 ### Bảo mật RLS
 - RLS **bật trên toàn bộ bảng, KHÔNG có policy** → chặn REST Data API công khai (anon key) đọc/ghi.
@@ -161,7 +166,11 @@ Bảng chính (xem `src/db/schema.ts`):
 ### Ảnh & Storage
 - Ảnh sản phẩm/hero upload lên bucket `product-images` qua `lib/supabaseStorage.ts`
   (cần `SUPABASE_SERVICE_ROLE_KEY`). Ảnh sản phẩm prefix `uploads/{key}/`, ảnh hero prefix `hero/`.
-- `/admin/images` liệt kê Storage + dung lượng và quản lý ảnh hero.
+- `/admin/images` liệt kê Storage + dung lượng và quản lý ảnh hero/CTA.
+- **Logo** là ảnh cứng `public/logo_brand.svg` (component `components/ui/Logo.tsx`) — dùng ở header,
+  footer, checkout; **không** đổi qua admin nữa (đã gỡ slot logo khỏi `AppearanceManager`).
+- Icon giao diện dùng **Phosphor Icons** (nạp CDN 3 weight regular/bold/fill trong `app/layout.tsx`);
+  icon thương hiệu nhiều màu để trong sprite `public/icons.svg` (`<use href="/icons.svg#id" />`).
 
 ---
 
@@ -203,7 +212,43 @@ Xem `.env.example`. Nhóm chính:
 
 ---
 
-## 8. Kiểm thử & chất lượng
+## 8. Tư vấn dược sĩ (chat 2 chiều + thông báo)
+
+Khung "Tư vấn dược sĩ" — nút bác sĩ 🩺 nổi ở góc phải màn hình (`features/chat/components/DrugChatbot.tsx`,
+gắn toàn cục trong `app/layout.tsx`) — là **chat 2 chiều lưu trong DB**, không dùng AI:
+
+- **Bắt buộc đăng nhập** mới gửi được (chưa đăng nhập → hiện nút Đăng nhập ngay trong khung). Tên
+  người gửi lấy từ tài khoản (server, không tin client).
+- Khách gửi → lưu `chat_messages` (sender=`user`); nếu có `TELEGRAM_*` thì **báo Telegram** cho dược sĩ.
+- Dược sĩ/admin trả lời tại **`/admin/chat`** (mục "Tư vấn" trên sidebar, `ChatInbox.tsx`): cột trái là
+  danh sách hội thoại (mỗi user 1 hội thoại) + badge chưa đọc, cột phải là khung trả lời. Tin lưu sender=`admin`.
+- Web **tự cập nhật bằng polling** (không websocket): khách 5s, admin thread 4s, danh sách hội thoại 8s.
+- **Chuông thông báo** (badge số tin chưa đọc):
+  - Khách: `ChatNotifyBell` trong `SiteHeader` + `HomeHeader` (chỉ hiện khi đã đăng nhập), poll 15s.
+    Bấm chuông mở khung tư vấn (sự kiện `qt:open-consult`).
+  - Admin: chuông trong `AdminShell` (sidebar + topbar mobile) + badge trên mục "Tư vấn", poll 10s.
+
+### Route API tư vấn
+
+| Route | Vai trò |
+|---|---|
+| `POST /api/chat` | Khách gửi tin (auth) → lưu DB + báo Telegram |
+| `GET  /api/chat?after=` | Khách lấy tin (polling) + đánh dấu tin dược sĩ đã đọc |
+| `GET  /api/chat/unread` | Số tin dược sĩ khách chưa đọc (chuông khách) |
+| `GET  /api/admin/chat` | Danh sách hội thoại (admin) |
+| `GET  /api/admin/chat/[userId]` | Xem thread + đánh dấu đã đọc (admin) |
+| `POST /api/admin/chat/[userId]` | Dược sĩ trả lời khách |
+| `GET  /api/admin/chat/unread` | Tổng tin khách chưa đọc (chuông admin) |
+
+Đọc/ghi tin gom trong `features/chat/queries.ts` (server-only): `addChatMessage`, `getUserMessages`,
+`markReadByAdmin/User`, `listConversations`, `countUnreadForAdmin/User`.
+
+> ⚠️ Telegram chỉ **thông báo** cho dược sĩ có tin mới; **trả lời làm trên web** (`/admin/chat`).
+> Cần `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` set trên Vercel để có thông báo (không có vẫn chạy, chỉ mất thông báo).
+
+---
+
+## 9. Kiểm thử & chất lượng
 
 - `npx tsc --noEmit` — kiểm tra kiểu.
 - `npm run lint` — ESLint.
