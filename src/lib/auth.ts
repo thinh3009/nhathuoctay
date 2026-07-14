@@ -3,14 +3,18 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { AUTH_COOKIE_NAME } from './constants'
 
-// Production BẮT BUỘC có JWT_SECRET riêng — fallback chỉ dành cho dev local.
+// Production BẮT BUỘC có secret ký JWT — fallback chỉ dành cho dev local.
 // Secret rơi vào git = ai cũng forge được token admin.
+// Đọc JWT_SECRET (nếu tự đặt) HOẶC SUPABASE_JWT_SECRET (biến tích hợp Supabase↔Vercel
+// tự thêm sẵn) — tránh 500 khi deploy chỉ vì tên biến không khớp.
 // Lazy (gọi trong hàm, không phải lúc import) để `next build` không cần env này.
 function getJwtSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET
+  const secret = process.env.JWT_SECRET ?? process.env.SUPABASE_JWT_SECRET
   if (secret) return new TextEncoder().encode(secret)
   if (process.env.NODE_ENV === 'production') {
-    throw new Error('JWT_SECRET chưa được cấu hình. Đặt biến môi trường JWT_SECRET trước khi chạy production.')
+    throw new Error(
+      'Thiếu secret ký JWT. Đặt JWT_SECRET (hoặc SUPABASE_JWT_SECRET) trong biến môi trường trước khi chạy production.',
+    )
   }
   return new TextEncoder().encode('nhathuoc16-dev-only-secret')
 }
