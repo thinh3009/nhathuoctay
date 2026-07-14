@@ -1,8 +1,11 @@
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { listCombosWithMembers } from '@/features/combos/queries'
 import { deleteCombo } from '@/features/combos/actions'
 
 export default async function AdminCombosPage() {
+  await requireAdmin()
+
   const rows = await listCombosWithMembers()
 
   return (

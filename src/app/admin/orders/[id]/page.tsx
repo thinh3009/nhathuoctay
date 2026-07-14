@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getOrderById } from '@/features/orders/queries'
@@ -15,6 +16,8 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin()
+
   const { id } = await params
   const order = await getOrderById(id)
   if (!order) notFound()

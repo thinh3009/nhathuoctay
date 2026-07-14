@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getArticleById } from '@/features/articles/queries'
@@ -9,6 +10,8 @@ type EditArticlePageProps = {
 }
 
 export default async function EditArticlePage({ params }: EditArticlePageProps) {
+  await requireAdmin()
+
   const { id } = await params
   const article = await getArticleById(id)
 

@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { searchAdminProducts } from '@/features/products/queries'
 import { formatPrice } from '@/utils/format'
@@ -7,6 +8,8 @@ export default async function AdminProductsPage({
 }: {
   searchParams: Promise<{ q?: string }>
 }) {
+  await requireAdmin()
+
   const { q } = await searchParams
   const query = q?.trim() ?? ''
 

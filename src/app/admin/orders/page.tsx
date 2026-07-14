@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { getAllOrders, updateOrderStatus } from '@/features/orders/queries'
 import { formatPrice } from '@/utils/format'
@@ -23,6 +24,8 @@ const STATUS_CLASS: Record<string, string> = {
 }
 
 export default async function AdminOrdersPage() {
+  await requireAdmin()
+
   const orders = await getAllOrders(100)
 
   return (

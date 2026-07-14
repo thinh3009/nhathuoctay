@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { listCategoryOptions } from '@/features/products/queries'
 import { createProduct } from '@/features/products/actions'
@@ -5,6 +6,8 @@ import ProductImageManager from '@/features/products/components/ProductImageMana
 import CategoryPrescriptionFields from '@/features/products/components/CategoryPrescriptionFields'
 
 export default async function AdminNewProductPage() {
+  await requireAdmin()
+
   const cats = await listCategoryOptions()
 
   return (

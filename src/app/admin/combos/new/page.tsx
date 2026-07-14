@@ -1,9 +1,12 @@
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { getComboBuilderData } from '@/features/combos/queries'
 import { createCombo } from '@/features/combos/actions'
 import ComboBuilder from '@/features/combos/components/ComboBuilder'
 
 export default async function AdminNewComboPage() {
+  await requireAdmin()
+
   const { products: productList, categories: categoryList } = await getComboBuilderData()
 
   return (

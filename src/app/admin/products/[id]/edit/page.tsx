@@ -1,3 +1,4 @@
+import { requireAdmin } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getProductForEdit, listCategoryOptions } from '@/features/products/queries'
@@ -8,6 +9,8 @@ import CategoryPrescriptionFields from '@/features/products/components/CategoryP
 import type { CategorySlug } from '@/lib/constants'
 
 export default async function AdminEditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin()
+
   const { id } = await params
 
   const [product, cats] = await Promise.all([getProductForEdit(id), listCategoryOptions()])

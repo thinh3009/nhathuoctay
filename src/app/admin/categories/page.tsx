@@ -1,7 +1,10 @@
+import { requireAdmin } from '@/lib/auth'
 import { listAdminCategories } from '@/features/categories/queries'
 import { createCategory, toggleCategoryActive } from '@/features/categories/actions'
 
 export default async function AdminCategoriesPage() {
+  await requireAdmin()
+
   const cats = await listAdminCategories()
 
   return (

@@ -3,9 +3,17 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { AUTH_COOKIE_NAME } from './constants'
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET ?? 'nhathuoc16-secret-key-change-in-production-2026'
-)
+// Production BẮT BUỘC có JWT_SECRET riêng — fallback chỉ dành cho dev local.
+// Secret rơi vào git = ai cũng forge được token admin.
+// Lazy (gọi trong hàm, không phải lúc import) để `next build` không cần env này.
+function getJwtSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET
+  if (secret) return new TextEncoder().encode(secret)
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET chưa được cấu hình. Đặt biến môi trường JWT_SECRET trước khi chạy production.')
+  }
+  return new TextEncoder().encode('nhathuoc16-dev-only-secret')
+}
 
 export type JWTPayload = {
   userId: string
@@ -19,12 +27,12 @@ export async function signJWT(payload: JWTPayload): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(JWT_SECRET)
+    .sign(getJwtSecret())
 }
 
 export async function verifyJWT(token: string): Promise<JWTPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET)
+    const { payload } = await jwtVerify(token, getJwtSecret())
     return payload as unknown as JWTPayload
   } catch {
     return null

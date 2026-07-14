@@ -1,7 +1,10 @@
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { listArticles } from '@/features/articles/queries'
 
 export default async function AdminArticlesPage() {
+  await requireAdmin()
+
   const rows = await listArticles()
 
   return (
