@@ -60,6 +60,7 @@ export default function AuthMenu({
     setUser(null)
     setOpen(false)
     onNavigate?.()
+    window.dispatchEvent(new CustomEvent('qt:auth-changed'))
     router.refresh()
   }
 

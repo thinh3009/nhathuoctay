@@ -8,7 +8,7 @@ async function seedCatalog() {
     process.loadEnvFile?.('.env')
   }
 
-  const [{ db }, { categories, productReviews, products: productsTable }, { categoryNavItems, products }] =
+  const [{ db }, { categories, products: productsTable }, { categoryNavItems, products }] =
     await Promise.all([
       import('../lib/db.ts'),
       import('./schema.ts'),
@@ -72,6 +72,8 @@ async function seedCatalog() {
       })
       .onConflictDoUpdate({
         target: productsTable.slug,
+        // Không set rating/reviewCount/commentCount ở đây: các số này giờ tính từ
+        // đánh giá thật của khách (product_reviews) — seed lại không được ghi đè mất.
         set: {
           categorySlug: product.topCategorySlug,
           name: product.name,
@@ -86,9 +88,6 @@ async function seedCatalog() {
           unit: product.unit,
           defaultQuantity: product.defaultQuantity,
           sku: product.sku,
-          rating: product.rating,
-          reviewCount: product.reviewCount,
-          commentCount: product.commentCount,
           officialName: product.officialName,
           registrationNumber: product.registrationNumber,
           form: product.form,
@@ -101,25 +100,6 @@ async function seedCatalog() {
           updatedAt: new Date(),
         },
       })
-  }
-
-  await db.delete(productReviews)
-
-  for (const product of products) {
-    if (product.reviews.length === 0) {
-      continue
-    }
-
-    await db.insert(productReviews).values(
-      product.reviews.map((review) => ({
-        productSlug: product.slug,
-        author: review.author,
-        rating: review.rating,
-        date: review.date,
-        title: review.title,
-        content: review.content,
-      })),
-    )
   }
 }
 

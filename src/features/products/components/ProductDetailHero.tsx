@@ -178,6 +178,38 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
               />
               <PharmacyFinder productName={product.name} />
             </div>
+
+            {product.shopeeUrl || product.tiktokUrl ? (
+              <div className="flex flex-wrap items-center gap-2.5">
+                <p className="text-xs font-medium text-stone-500">Cũng có bán trên:</p>
+                {product.shopeeUrl ? (
+                  <a
+                    aria-label="Xem sản phẩm này trên Shopee"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:scale-105 hover:opacity-90"
+                    href={product.shopeeUrl}
+                    rel="noopener noreferrer"
+                    style={{ background: '#EE4D2D' }}
+                    target="_blank"
+                    title="Xem trên Shopee"
+                  >
+                    <i className="ph-fill ph-shopping-bag-open" style={{ fontSize: 17 }} />
+                  </a>
+                ) : null}
+                {product.tiktokUrl ? (
+                  <a
+                    aria-label="Xem sản phẩm này trên TikTok Shop"
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:scale-105 hover:opacity-90"
+                    href={product.tiktokUrl}
+                    rel="noopener noreferrer"
+                    style={{ background: '#010101' }}
+                    target="_blank"
+                    title="Xem trên TikTok Shop"
+                  >
+                    <i className="ph-fill ph-music-notes" style={{ fontSize: 17 }} />
+                  </a>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           <p className="mt-6 text-base leading-7 text-stone-700">{product.shortDescription}</p>

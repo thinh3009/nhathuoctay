@@ -8,6 +8,7 @@ import {
 } from './constants.ts'
 
 export const reviewSchema = z.object({
+  id: z.string().min(1).optional(),
   author: z.string().min(1),
   rating: z.number().int().min(1).max(5),
   date: z.string().min(1),
@@ -60,6 +61,8 @@ export const productSchema = z.object({
   ingredientHighlight: z.string(),
   images: z.array(productImageSchema).min(1),
   reviews: z.array(reviewSchema),
+  shopeeUrl: z.string().min(1).nullable().default(null),
+  tiktokUrl: z.string().min(1).nullable().default(null),
 })
 
 export const productSearchParamsSchema = z.object({

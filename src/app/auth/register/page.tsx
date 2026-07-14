@@ -39,6 +39,7 @@ export default function RegisterPage() {
         return
       }
 
+      window.dispatchEvent(new CustomEvent('qt:auth-changed'))
       router.push('/')
       router.refresh()
     } catch {

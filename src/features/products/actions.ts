@@ -17,6 +17,12 @@ function text(formData: FormData, key: string): string {
   return typeof value === 'string' ? value : ''
 }
 
+// Đọc field text tuỳ chọn (chuỗi rỗng → null) — dùng cho link Shopee/TikTok.
+function nullableText(formData: FormData, key: string): string | null {
+  const value = text(formData, key).trim()
+  return value || null
+}
+
 export async function createProduct(formData: FormData) {
   await requireAdmin()
 
@@ -72,6 +78,8 @@ export async function createProduct(formData: FormData) {
     stockQuantity,
     // 3 trạng thái: 'true' = kê đơn, 'false' = không kê đơn, '' = trống (null).
     prescriptionRequired: parsePrescription(formData.get('prescriptionRequired')),
+    shopeeUrl: nullableText(formData, 'shopeeUrl'),
+    tiktokUrl: nullableText(formData, 'tiktokUrl'),
   })
 
   revalidatePath('/admin/products')
@@ -117,6 +125,8 @@ export async function updateProduct(id: string, formData: FormData) {
       isActive: formData.get('isActive') === 'true',
       // 3 trạng thái: 'true' = kê đơn, 'false' = không kê đơn, '' = trống (null).
       prescriptionRequired: parsePrescription(formData.get('prescriptionRequired')),
+      shopeeUrl: nullableText(formData, 'shopeeUrl'),
+      tiktokUrl: nullableText(formData, 'tiktokUrl'),
       images,
       updatedAt: new Date(),
     })

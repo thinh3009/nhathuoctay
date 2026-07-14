@@ -1,5 +1,5 @@
 import 'server-only'
-import { eq, ilike, or } from 'drizzle-orm'
+import { and, desc, eq, ilike, or, sql } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { categories, productReviews, products as productsTable } from '@/db/schema'
 import {
@@ -28,6 +28,7 @@ type ProductRow = typeof productsTable.$inferSelect & {
 
 function mapReview(row: typeof productReviews.$inferSelect): Review {
   return reviewSchema.parse({
+    id: row.id,
     author: row.author,
     rating: row.rating,
     date: row.date,
@@ -66,6 +67,8 @@ function mapProduct(row: ProductRow): Product {
     ingredientHighlight: row.ingredientHighlight,
     images: normalizeProductImages(row.categorySlug as CategorySlug, row.slug, row.images),
     reviews: row.reviews.map(mapReview),
+    shopeeUrl: row.shopeeUrl,
+    tiktokUrl: row.tiktokUrl,
   })
 }
 
@@ -74,7 +77,7 @@ async function getProductsByCategorySlug(categorySlug: string) {
     where: eq(productsTable.categorySlug, categorySlug),
     with: {
       category: true,
-      reviews: true,
+      reviews: { orderBy: [desc(productReviews.createdAt)] },
     },
   })
 
@@ -159,7 +162,7 @@ export async function getProductBySlug(slug: string) {
     where: eq(productsTable.slug, slug),
     with: {
       category: true,
-      reviews: true,
+      reviews: { orderBy: [desc(productReviews.createdAt)] },
     },
   })
 
@@ -190,6 +193,83 @@ export async function getRelatedProducts(product: Product, limit = 4) {
       })
       .slice(0, limit),
   }).items
+}
+
+// Tính lại rating trung bình + số đánh giá/bình luận của sản phẩm từ dữ liệu thật trong product_reviews.
+async function recomputeProductRatingStats(productSlug: string) {
+  const [agg] = await db
+    .select({
+      count: sql<number>`count(*)`,
+      avgRating: sql<number>`coalesce(avg(${productReviews.rating}), 0)`,
+    })
+    .from(productReviews)
+    .where(eq(productReviews.productSlug, productSlug))
+
+  const count = Number(agg?.count ?? 0)
+  const avgRating = Number(agg?.avgRating ?? 0)
+
+  await db
+    .update(productsTable)
+    .set({
+      rating: count > 0 ? Math.round(avgRating * 10) / 10 : 5,
+      reviewCount: count,
+      commentCount: count,
+      updatedAt: new Date(),
+    })
+    .where(eq(productsTable.slug, productSlug))
+}
+
+// Một user chỉ có 1 đánh giá / sản phẩm — gửi lại thì cập nhật đánh giá cũ thay vì tạo thêm dòng mới.
+export async function upsertProductReview(params: {
+  productSlug: string
+  userId: string
+  author: string
+  rating: number
+  title: string
+  content: string
+}) {
+  const { productSlug, userId, author, rating, title, content } = params
+  const date = new Date().toLocaleDateString('vi-VN')
+
+  const existing = await db.query.productReviews.findFirst({
+    where: and(eq(productReviews.productSlug, productSlug), eq(productReviews.userId, userId)),
+  })
+
+  if (existing) {
+    await db
+      .update(productReviews)
+      .set({ author, rating, title, content, date, updatedAt: new Date() })
+      .where(eq(productReviews.id, existing.id))
+  } else {
+    await db.insert(productReviews).values({ productSlug, userId, author, rating, title, content, date })
+  }
+
+  await recomputeProductRatingStats(productSlug)
+
+  return getProductReviews(productSlug)
+}
+
+export async function getUserReviewForProduct(productSlug: string, userId: string) {
+  const row = await db.query.productReviews.findFirst({
+    where: and(eq(productReviews.productSlug, productSlug), eq(productReviews.userId, userId)),
+  })
+  return row ? mapReview(row) : null
+}
+
+// Xoá một đánh giá (admin kiểm duyệt). Trả về null nếu review không thuộc sản phẩm này.
+export async function deleteProductReview(productSlug: string, reviewId: string) {
+  const [deleted] = await db
+    .delete(productReviews)
+    .where(and(eq(productReviews.id, reviewId), eq(productReviews.productSlug, productSlug)))
+    .returning({ id: productReviews.id })
+
+  if (!deleted) {
+    return null
+  }
+
+  await recomputeProductRatingStats(productSlug)
+
+  return getProductReviews(productSlug)
 }
 
 export async function getProductReviews(slug: string) {

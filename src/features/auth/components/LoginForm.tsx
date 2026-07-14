@@ -32,6 +32,7 @@ export default function LoginForm() {
         return
       }
 
+      window.dispatchEvent(new CustomEvent('qt:auth-changed'))
       router.push(from)
       router.refresh()
     } catch {

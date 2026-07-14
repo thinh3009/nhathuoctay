@@ -34,6 +34,19 @@ export default function DrugChatbot() {
     return () => window.removeEventListener('qt:open-consult', onOpen)
   }, [])
 
+  // DrugChatbot gắn ở root layout nên không remount khi điều hướng (vd. từ /auth/login về
+  // trang trước đó bằng router.push). Phải tự nghe sự kiện đăng nhập/đăng xuất để kiểm tra
+  // lại trạng thái, nếu không nút chat sẽ giữ nguyên trạng thái "chưa đăng nhập" đã cache.
+  useEffect(() => {
+    const onAuthChanged = () => {
+      setMember(undefined)
+      setMessages([])
+      setLoadedHistory(false)
+    }
+    window.addEventListener('qt:auth-changed', onAuthChanged)
+    return () => window.removeEventListener('qt:auth-changed', onAuthChanged)
+  }, [])
+
   // Khi mở khung: kiểm tra đăng nhập.
   useEffect(() => {
     if (!isOpen || member !== undefined) return

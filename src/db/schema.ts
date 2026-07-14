@@ -111,6 +111,9 @@ export const products = pgTable(
     images: jsonb('images').$type<ProductImage[]>().notNull(),
     // 3 trạng thái: null = trống (không phân loại), false = không kê đơn, true = kê đơn.
     prescriptionRequired: boolean('prescription_required'),
+    // Link sản phẩm trên sàn khác (hiện icon cạnh nút "Thêm vào giỏ" nếu có).
+    shopeeUrl: text('shopee_url'),
+    tiktokUrl: text('tiktok_url'),
     isActive: boolean('is_active').notNull().default(true),
     stockQuantity: integer('stock_quantity').notNull().default(0),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -126,6 +129,8 @@ export const productReviews = pgTable('product_reviews', {
   productSlug: text('product_slug')
     .notNull()
     .references(() => products.slug, { onDelete: 'cascade' }),
+  // Tài khoản thật đã đăng nhập gửi đánh giá. Nullable vì dữ liệu mẫu cũ (seed) không có user.
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
   author: text('author').notNull(),
   rating: integer('rating').notNull(),
   date: text('date').notNull(),
@@ -307,6 +312,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
   wishlists: many(wishlists),
   carts: many(carts),
+  reviews: many(productReviews),
 }))
 
 export const userAddressesRelations = relations(userAddresses, ({ one }) => ({
@@ -332,6 +338,10 @@ export const productReviewsRelations = relations(productReviews, ({ one }) => ({
   product: one(products, {
     fields: [productReviews.productSlug],
     references: [products.slug],
+  }),
+  user: one(users, {
+    fields: [productReviews.userId],
+    references: [users.id],
   }),
 }))
 

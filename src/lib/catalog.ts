@@ -7,7 +7,6 @@ import {
   productSchema,
   productSearchParamsSchema,
   type ProductSearchParams,
-  type Review,
 } from './schemas.ts'
 
 type ProductSeed = {
@@ -44,33 +43,6 @@ const categoryMetaMap: Record<CategorySlug, CategoryMeta> = {
   thuoc: { ...CATEGORY_CONFIG[3], prefix: 'THUOC' },
 }
 
-function createReviews(name: string): Review[] {
-  return [
-    {
-      author: 'Ngọc Anh',
-      rating: 5,
-      date: '08/06/2026',
-      title: 'Dùng đều thấy ổn',
-      content: `${name} đóng gói chắc chắn, giao nhanh và dễ dùng trong sinh hoạt hằng ngày.`,
-    },
-    {
-      author: 'Minh Khang',
-      rating: 4,
-      date: '03/06/2026',
-      title: 'Thông tin rõ ràng',
-      content:
-        'Trang chi tiết ghi đủ thành phần, cách dùng và quy cách nên dễ cân nhắc trước khi mua.',
-    },
-    {
-      author: 'Thanh Vy',
-      rating: 5,
-      date: '28/05/2026',
-      title: 'Phù hợp với nhu cầu',
-      content: 'Mình tìm được đúng nhóm sản phẩm đang cần và phần mô tả khá dễ đọc.',
-    },
-  ]
-}
-
 function createProduct(category: CategoryMeta, seed: ProductSeed, index: number): Product {
   return productSchema.parse({
     slug: seed.slug,
@@ -100,7 +72,10 @@ function createProduct(category: CategoryMeta, seed: ProductSeed, index: number)
     shelfLife: seed.shelfLife,
     ingredientHighlight: seed.ingredientHighlight,
     images: buildProductImages(category.slug, seed.slug),
-    reviews: createReviews(seed.name),
+    // Đánh giá/bình luận là dữ liệu thật do khách hàng gửi qua app, không seed dữ liệu mẫu.
+    reviews: [],
+    shopeeUrl: null,
+    tiktokUrl: null,
   })
 }
 

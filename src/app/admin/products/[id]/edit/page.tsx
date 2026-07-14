@@ -142,6 +142,23 @@ export default async function AdminEditProductPage({ params }: { params: Promise
           </div>
         </div>
 
+        <div className="rounded-2xl border border-stone-200 bg-white p-6">
+          <h2 className="mb-4 font-bold text-stone-900">Link bán trên sàn khác</h2>
+          <p className="mb-4 text-sm text-stone-500">
+            Để trống nếu sản phẩm chưa bán trên sàn đó — icon tương ứng sẽ không hiện ở trang sản phẩm.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-stone-700">Link Shopee</label>
+              <input className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" defaultValue={product.shopeeUrl ?? ''} name="shopeeUrl" placeholder="https://shopee.vn/..." type="url" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-stone-700">Link TikTok Shop</label>
+              <input className="w-full rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" defaultValue={product.tiktokUrl ?? ''} name="tiktokUrl" placeholder="https://vt.tiktok.com/..." type="url" />
+            </div>
+          </div>
+        </div>
+
         <div className="flex gap-3">
           <button className="rounded-xl bg-emerald-700 px-6 py-3 font-bold text-white transition hover:bg-emerald-800" type="submit">
             Lưu thay đổi

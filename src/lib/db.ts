@@ -34,6 +34,10 @@ function createDb(): PostgresJsDatabase<typeof schema> {
       // Trả connection rảnh về pool nhanh trên môi trường serverless.
       idle_timeout: 20,
       connect_timeout: 10,
+      // Tự đóng & mở lại connection sau 30 phút, tránh dùng phải connection đã "chết"
+      // (pooler phía Supabase âm thầm ngắt) — connection chết mà không bị đóng sẽ khiến
+      // mọi query dùng lại nó bị treo vô thời hạn (gặp trên dev server chạy lâu ngày).
+      max_lifetime: 60 * 30,
     })
 
   if (process.env.NODE_ENV !== 'production') {
