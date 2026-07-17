@@ -1,7 +1,8 @@
-﻿import Link from 'next/link'
+﻿import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
-import { listProducts } from '@/features/products/queries'
+import { getCategoryBySlug, listProducts } from '@/features/products/queries'
 import CategoryFilters from '@/features/products/components/CategoryFilters'
 import PaginationControls from '@/components/ui/PaginationControls'
 import ProductCard from '@/features/products/components/ProductCard'
@@ -22,6 +23,29 @@ type CategoryPageProps = {
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value
+}
+
+// Title/description/canonical riêng cho từng danh mục. Điểm mấu chốt: canonical GOM mọi biến
+// thể lọc/sắp xếp (?subCategory/priceRange/sort) về URL sạch để không sinh trang trùng lặp;
+// chỉ GIỮ ?page vì mỗi trang phân trang là nội dung khác nhau, cần index riêng.
+export async function generateMetadata({ params, searchParams }: CategoryPageProps): Promise<Metadata> {
+  const { categorySlug } = await params
+  const category = await getCategoryBySlug(categorySlug)
+
+  if (!category) {
+    return { title: 'Không tìm thấy danh mục' }
+  }
+
+  const rawPage = firstParam((await searchParams).page)
+  const pageNum = Math.max(1, Number.parseInt(rawPage ?? '1', 10) || 1)
+  const canonical =
+    pageNum > 1 ? `/category/${category.slug}?page=${pageNum}` : `/category/${category.slug}`
+
+  return {
+    title: pageNum > 1 ? `${category.label} — Trang ${pageNum}` : category.label,
+    description: category.heroDescription,
+    alternates: { canonical },
+  }
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {

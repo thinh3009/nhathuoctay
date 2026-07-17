@@ -1,4 +1,5 @@
-﻿import Link from 'next/link'
+﻿import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { getProductBySlug, getRelatedProducts } from '@/features/products/queries'
@@ -8,10 +9,50 @@ import ReviewSection from '@/features/products/components/ReviewSection'
 import SiteFooter from '@/components/layout/SiteFooter'
 import SiteHeader from '@/components/layout/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
+import { SITE_NAME } from '@/config/site'
 import type { Product } from '@/lib/schemas'
 
 // Render theo từng request (không prerender lúc build) để build không cần DB.
 export const dynamic = 'force-dynamic'
+
+type ProductPageProps = {
+  params: Promise<{
+    slug: string
+  }>
+}
+
+// Title/description/canonical/OG riêng cho từng sản phẩm — nếu thiếu, mọi trang sản phẩm
+// sẽ dùng chung title mặc định và không có gì để search index (xem CLAUDE.md mục 10).
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProductBySlug(slug)
+
+  if (!product) {
+    return { title: 'Không tìm thấy sản phẩm' }
+  }
+
+  const rawDescription =
+    product.shortDescription?.trim() ||
+    product.benefit?.trim() ||
+    product.description?.trim() ||
+    `${product.name} chính hãng tại ${SITE_NAME}.`
+  const description = rawDescription.slice(0, 300)
+  const canonical = `/product/${product.slug}`
+  const image = product.images?.[0]?.src
+
+  return {
+    title: product.name,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title: product.name,
+      description,
+      url: canonical,
+      type: 'website',
+      images: image ? [{ url: image }] : undefined,
+    },
+  }
+}
 
 // Khối "sản phẩm liên quan" tự truy vấn DB riêng và được stream qua Suspense,
 // để phần thông tin sản phẩm chính (hero + đánh giá) hiện trước, không phải chờ.
@@ -31,12 +72,6 @@ function RelatedProductsSkeleton() {
       </div>
     </section>
   )
-}
-
-type ProductPageProps = {
-  params: Promise<{
-    slug: string
-  }>
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
