@@ -6,6 +6,8 @@ import MarkdownContent from '@/components/ui/MarkdownContent'
 import SiteFooter from '@/components/layout/SiteFooter'
 import SiteHeader from '@/components/layout/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
+import { JsonLd, toAbsoluteUrl } from '@/components/ui/JsonLd'
+import { SITE_NAME, SITE_URL } from '@/config/site'
 
 // Render theo từng request (không prerender lúc build) để build không cần DB.
 export const dynamic = 'force-dynamic'
@@ -34,8 +36,39 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     notFound()
   }
 
+  const articleUrl = `${SITE_URL}/bai-viet/${article.slug}`
+  const articleLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Article',
+        headline: article.title,
+        description: article.excerpt,
+        image: article.coverImage ? [toAbsoluteUrl(article.coverImage)] : undefined,
+        datePublished: article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined,
+        dateModified: article.updatedAt ? new Date(article.updatedAt).toISOString() : undefined,
+        author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+        publisher: {
+          '@type': 'Organization',
+          name: SITE_NAME,
+          logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo_brand.svg` },
+        },
+        mainEntityOfPage: articleUrl,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Bài viết', item: `${SITE_URL}/bai-viet` },
+          { '@type': 'ListItem', position: 3, name: article.title, item: articleUrl },
+        ],
+      },
+    ],
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-bg-page)] text-stone-900">
+      <JsonLd data={articleLd} />
       <SiteHeader activeCategorySlug="" cartCount={cartCount} />
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">

@@ -9,8 +9,59 @@ import ReviewSection from '@/features/products/components/ReviewSection'
 import SiteFooter from '@/components/layout/SiteFooter'
 import SiteHeader from '@/components/layout/SiteHeader'
 import { getServerCartCount } from '@/lib/cart'
-import { SITE_NAME } from '@/config/site'
+import { JsonLd, toAbsoluteUrl } from '@/components/ui/JsonLd'
+import { SITE_NAME, SITE_URL } from '@/config/site'
 import type { Product } from '@/lib/schemas'
+
+// Structured data cho trang sản phẩm: Product (+ Offer, + AggregateRating nếu có review thật)
+// và BreadcrumbList. Dùng dữ liệu thật trong DB — KHÔNG bịa rating khi chưa có đánh giá
+// (Google phạt manual action nếu markup rating giả).
+function buildProductJsonLd(product: Product) {
+  const url = `${SITE_URL}/product/${product.slug}`
+  const description =
+    product.shortDescription?.trim() || product.benefit?.trim() || product.description?.trim() || product.name
+
+  const productLd: Record<string, unknown> = {
+    '@type': 'Product',
+    name: product.name,
+    description,
+    image: product.images?.map((image) => toAbsoluteUrl(image.src)) ?? [],
+    sku: product.sku || undefined,
+    ...(product.manufacturer ? { brand: { '@type': 'Brand', name: product.manufacturer } } : {}),
+    offers: {
+      '@type': 'Offer',
+      price: product.price,
+      priceCurrency: 'VND',
+      availability: 'https://schema.org/InStock',
+      url,
+    },
+  }
+
+  // Chỉ nhúng AggregateRating khi thực sự có đánh giá (reviewCount > 0).
+  if (product.reviewCount > 0) {
+    productLd.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: product.rating,
+      reviewCount: product.reviewCount,
+    }
+  }
+
+  const breadcrumbLd = {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: SITE_URL },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: product.topCategory,
+        item: `${SITE_URL}/category/${product.topCategorySlug}`,
+      },
+      { '@type': 'ListItem', position: 3, name: product.name, item: url },
+    ],
+  }
+
+  return { '@context': 'https://schema.org', '@graph': [productLd, breadcrumbLd] }
+}
 
 // Render theo từng request (không prerender lúc build) để build không cần DB.
 export const dynamic = 'force-dynamic'
@@ -88,6 +139,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-bg-page)] text-stone-900">
+      <JsonLd data={buildProductJsonLd(product)} />
       <SiteHeader activeCategorySlug={product.topCategorySlug} cartCount={cartCount} />
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
         <div>
