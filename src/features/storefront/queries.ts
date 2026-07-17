@@ -52,6 +52,8 @@ async function fetchStorefrontProducts(): Promise<Product[]> {
     reviews: row.reviewCount,
     unit: row.unit,
     badge: row.badge || undefined,
+    shopeeUrl: row.shopeeUrl ?? undefined,
+    tiktokUrl: row.tiktokUrl ?? undefined,
   }))
 }
 

@@ -42,6 +42,21 @@ export default function ProductScreen({ hub }: { hub: StorefrontHub }) {
             <button onClick={d.add} style={s('flex:1;background:var(--neutral-0);color:var(--color-brand-primary);border:1.5px solid var(--color-brand-primary);padding:14px;border-radius:var(--radius-pill);font-weight:700;font-size:15px;cursor:pointer')}>Thêm vào giỏ</button>
             <button onClick={d.buyNow} style={s('flex:1;background:var(--color-brand-primary);color:#fff;border:none;padding:14px;border-radius:var(--radius-pill);font-weight:700;font-size:15px;cursor:pointer')}>Mua ngay</button>
           </div>
+          {d.shopeeUrl || d.tiktokUrl ? (
+            <div style={s('display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px')}>
+              <span style={s('font-size:13px;font-weight:500;color:var(--color-text-muted)')}>Cũng có bán trên:</span>
+              {d.shopeeUrl ? (
+                <a aria-label="Xem sản phẩm này trên Shopee" href={d.shopeeUrl} rel="noopener noreferrer" target="_blank" title="Xem trên Shopee" style={{ ...s('display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;text-decoration:none'), background: '#EE4D2D' }}>
+                  <i className="ph-fill ph-shopping-bag-open" style={{ fontSize: 17 }} />
+                </a>
+              ) : null}
+              {d.tiktokUrl ? (
+                <a aria-label="Xem sản phẩm này trên TikTok Shop" href={d.tiktokUrl} rel="noopener noreferrer" target="_blank" title="Xem trên TikTok Shop" style={{ ...s('display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;text-decoration:none'), background: '#010101' }}>
+                  <i className="ph-fill ph-music-notes" style={{ fontSize: 17 }} />
+                </a>
+              ) : null}
+            </div>
+          ) : null}
           <div style={s('margin-top:24px;padding:18px 20px;background:var(--teal-50);border-radius:var(--radius-md);font-size:14px;color:var(--color-text-body);line-height:1.65')}>{d.desc}</div>
         </div>
       </div>

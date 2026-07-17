@@ -589,6 +589,8 @@ export function useStorefront({
     unit: sel.unit,
     usesText: sel.uses.join(', '),
     badge: sel.badge ?? '',
+    shopeeUrl: sel.shopeeUrl ?? '',
+    tiktokUrl: sel.tiktokUrl ?? '',
     tintBg: dt.bg,
     tintFg: dt.fg,
     desc:

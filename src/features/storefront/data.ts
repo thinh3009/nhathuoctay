@@ -18,6 +18,9 @@ export type Product = {
   badge?: string
   // URL ảnh chính (Supabase Storage hoặc ảnh demo). Trống → vẽ hình trang trí theo danh mục.
   image?: string
+  // Link sản phẩm trên sàn khác (admin đặt) → hiện icon ở màn chi tiết. Trống → ẩn.
+  shopeeUrl?: string
+  tiktokUrl?: string
 }
 
 export const products: Product[] = [
