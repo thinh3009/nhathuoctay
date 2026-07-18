@@ -342,6 +342,57 @@ xếp dọc, lưới 2 cột, bộ lọc dạng drawer di động); desktop dùn
 > Entry mới nhất **trên cùng**. Mỗi entry: ngày, việc đã làm, trạng thái (xong/dang dở/đã revert),
 > việc tiếp theo nếu có. Lịch sử commit đầy đủ xem `git log --oneline`.
 
+### 2026-07-18 (5) — Sửa soft-404 (bỏ loading.tsx) + rate limit login/register
+- **Soft-404 (đã sửa)**: `/product|/category|/bai-viet` với slug sai giờ trả **HTTP 404 thật**
+  (trước trả 200 → hại SEO). **Root cause tìm được qua reproduce local** (`npm run build && next start`,
+  KHÔNG đoán): `loading.tsx` ở segment tạo Suspense boundary → Next **flush shell 200 sớm** rồi mới
+  stream, nên `notFound()` (chạy trong lúc stream) không đổi được status. Thử `notFound()` trong
+  `generateMetadata` KHÔNG cứu được vì Next 16 **stream metadata** (kể cả cho Googlebot UA — đã test).
+  ⇒ **Fix = BỎ `loading.tsx`** của các route dùng `notFound()`:
+  - Đã xóa: `product/[slug]/loading.tsx`, `category/[categorySlug]/loading.tsx`,
+    `bai-viet/[slug]/loading.tsx`, **và `bai-viet/loading.tsx`** (segment CHA cascade Suspense
+    xuống `[slug]`, nên phải xóa cả nó — chỉ xóa loading con là chưa đủ, `[slug]` vẫn 200).
+  - **⚠️ ĐỪNG THÊM LẠI `loading.tsx` cho 3 route chi tiết này** — sẽ tái diễn soft-404. Đánh đổi:
+    mất skeleton khi điều hướng client-side (bù lại render <0.5s nhờ sin1; SSR lần đầu vốn không có
+    skeleton). Nếu muốn skeleton lại, phải giải quyết vụ status trước (vd tách notFound ra tầng
+    không stream) chứ không phải thêm loading.tsx.
+  - **Bonus fix `category` 500**: `listProducts` parse `category` bằng Zod enum → slug lạ THROW
+    ZodError (500) trước khi `if (!result) notFound()` bắt. Đã thêm guard `getCategoryBySlug()` →
+    `notFound()` **trước** `listProducts` trong `category/[categorySlug]/page.tsx`.
+  - `generateMetadata` của 3 trang cũng đổi `return {title:'Không tìm thấy…'}` → `notFound()`
+    (phòng thủ tầng metadata, tuy không tự đủ). Đã verify: slug sai→404, slug đúng→200 cả 3 (local).
+- **Rate limit auth (mới)**: tái dùng `createRateLimiter`/`getClientIp` (`lib/rateLimit.ts`) —
+  `/api/auth/login` **10 lần/phút/IP** (chống brute-force), `/api/auth/register` **5 lần/phút/IP**
+  (chống tạo tài khoản hàng loạt) → trả **429** khi vượt. Verify local: login 10×401 rồi 429,
+  register 5×400 rồi 429. Best-effort in-memory per-instance (không tuyệt đối multi-instance, đủ
+  chặn spam thô); nếu cần chặt hơn dùng Vercel WAF.
+- **Verify**: `npx tsc --noEmit` (build) + `npm run lint` sạch; reproduce đầy đủ bằng `next start`
+  local (DB Supabase). Chưa test lại trên production tại thời điểm ghi (deploy ngay sau).
+
+### 2026-07-18 (4) — Deploy tính năng phiên 17/07 + gỡ hẳn vision-fill + review Notion
+- **Deploy các tính năng chưa commit** (commit `175f9ac`, push `main` → Vercel auto-deploy): RSS
+  sync, đặt thuốc theo toa (`/api/prescriptions`), xóa hội thoại tư vấn, nút xóa bài viết, logo
+  Shopee/TikTok, favicon, module chung `telegram.ts`/`rateLimit.ts`/`rss.ts`, `manual-0008` sql,
+  `docker-compose.yml`, `docs/test-plan.md`. Live giờ đã có đủ (trước chỉ có tới commit SEO).
+- **GỠ HẲN tính năng AI đọc ảnh tự điền SP (vision-fill/OpenRouter)** theo yêu cầu user (không muốn
+  phụ thuộc OpenRouter): xóa `lib/openrouter.ts`, `ProductVisionFill.tsx`, route
+  `/api/admin/products/vision-fill` (cả thư mục), biến `OPENROUTER_*` trong `.env`+`.env.example`,
+  bỏ import + `<ProductVisionFill/>` khỏi `admin/products/new` + `[id]/edit`. Xác nhận live:
+  `/api/admin/products/vision-fill` → **404**. Mục 7/9/10 đã cập nhật.
+- **Verify**: `npx tsc --noEmit` (sau khi xóa `.next` để bỏ type cache cũ) + `npm run lint` +
+  `npm run build` sạch. Smoke-test live sau deploy: trang chủ/SP/bài/giỏ **200**, `/api/prescriptions`
+  POST không auth **401**, `/admin/articles` chưa login **307**, favicon **200**, region vẫn **sin1**.
+- **Bug xác nhận trên production**: **soft-404** — `/product|/category|/bai-viet` với slug sai trả
+  **HTTP 200** thay vì 404 (trước chỉ nghi ở dev, nay chắc chắn còn trên prod). Chưa sửa — đã cập
+  nhật vào Notion.
+- **Review Notion "Web nhà thuốc development"** (Projects DB): tick 4 mục go-live đã xong
+  (DATABASE_URL→Supabase, regions sin1, commit favicon, quyết bỏ dữ liệu local) + đánh dấu 2 mục
+  vision-fill VÔ HIỆU. **Việc còn tồn (chưa xử lý)** — xem mục kế tiếp trong báo cáo/Notion: soft-404;
+  rate limit login/register/checkout (đề xuất Vercel WAF); thu hồi quyền tức thì (requireAdmin đối
+  chiếu DB); cookie cart thiếu `secure`; validate UUID order status; `next@latest` (CVE); self-host
+  Phosphor Icons; ISR product/category; OG images; `NEXT_PUBLIC_SITE_URL`=domain thật; Pharmacy
+  schema + NAP thật (chờ địa chỉ/SĐT thật); RSS cron; middleware→proxy (Next 16 deprecation).
+
 ### 2026-07-18 (3) — Fix perf Vercel: ép function region sin1 (Singapore) + deploy + test live
 - **Nguyên nhân gốc xác nhận từ header live** (`X-Vercel-Id: hkg1::iad1::…` + `Cache-Control:
   no-store`): function chạy **iad1 (US East)** trong khi Supabase ở **ap-southeast-1 (Singapore)**

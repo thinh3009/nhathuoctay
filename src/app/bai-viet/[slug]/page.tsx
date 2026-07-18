@@ -19,8 +19,10 @@ type ArticlePageProps = {
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params
   const article = await getPublishedArticleBySlug(slug)
+  // notFound() ở generateMetadata → HTTP 404 thật cho slug sai (loading.tsx làm notFound() ở
+  // component trả soft-404 200). Xem CLAUDE.md.
   if (!article) {
-    return { title: 'Không tìm thấy bài viết' }
+    notFound()
   }
   return { title: article.title, description: article.excerpt }
 }

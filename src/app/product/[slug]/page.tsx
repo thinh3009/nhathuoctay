@@ -78,8 +78,11 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const { slug } = await params
   const product = await getProductBySlug(slug)
 
+  // notFound() ngay trong generateMetadata (resolve TRƯỚC khi stream <head>/loading.tsx) để trả
+  // HTTP 404 THẬT. Nếu chỉ dựa vào notFound() trong component bên dưới, loading.tsx đã flush shell
+  // 200 trước → soft-404 (status 200 cho slug sai, hại SEO). Xem CLAUDE.md.
   if (!product) {
-    return { title: 'Không tìm thấy sản phẩm' }
+    notFound()
   }
 
   const rawDescription =

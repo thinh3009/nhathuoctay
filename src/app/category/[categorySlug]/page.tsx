@@ -32,8 +32,10 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
   const { categorySlug } = await params
   const category = await getCategoryBySlug(categorySlug)
 
+  // notFound() ở generateMetadata → HTTP 404 thật cho slug sai (loading.tsx làm notFound() ở
+  // component trả soft-404 200). Xem CLAUDE.md.
   if (!category) {
-    return { title: 'Không tìm thấy danh mục' }
+    notFound()
   }
 
   const rawPage = firstParam((await searchParams).page)
@@ -50,6 +52,14 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { categorySlug } = await params
+  // Chặn slug danh mục lạ TRƯỚC khi gọi listProducts — listProducts parse `category` bằng Zod
+  // enum, slug sai sẽ THROW ZodError (→ HTTP 500) thay vì để `if (!result) notFound()` bắt.
+  // Check tồn tại ở đây → notFound() (404) sạch. (loading.tsx của route đã bỏ để 404 không bị
+  // Suspense flush thành soft-404 200 — xem CLAUDE.md.)
+  const category = await getCategoryBySlug(categorySlug)
+  if (!category) {
+    notFound()
+  }
   const rawSearchParams = await searchParams
   const cartCount = await getServerCartCount()
   const result = await listProducts({

@@ -4,6 +4,7 @@ import { getUserByEmail, getUserByPhone, createUser } from '@/features/users/que
 import { classifyIdentifier } from '@/lib/identifier'
 import { hashPassword } from '@/lib/password'
 import { signJWT, setAuthCookie } from '@/lib/auth'
+import { createRateLimiter, getClientIp } from '@/lib/rateLimit'
 
 const registerSchema = z.object({
   fullName: z.string().trim().min(2, 'Họ tên tối thiểu 2 ký tự'),
@@ -12,8 +13,18 @@ const registerSchema = z.object({
   password: z.string().min(6, 'Mật khẩu tối thiểu 6 ký tự'),
 })
 
+// Chống tạo tài khoản hàng loạt: tối đa 5 lần/phút/IP (best-effort in-memory, xem lib/rateLimit).
+const isRateLimited = createRateLimiter(5, 60_000)
+
 export async function POST(request: Request) {
   try {
+    if (isRateLimited(getClientIp(request))) {
+      return NextResponse.json(
+        { error: 'Bạn thao tác quá nhiều lần, vui lòng đợi ít phút rồi thử lại.' },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json()
     const parsed = registerSchema.safeParse(body)
 
