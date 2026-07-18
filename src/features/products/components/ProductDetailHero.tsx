@@ -185,27 +185,27 @@ export default function ProductDetailHero({ product }: ProductDetailHeroProps) {
                 {product.shopeeUrl ? (
                   <a
                     aria-label="Xem sản phẩm này trên Shopee"
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:scale-105 hover:opacity-90"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white shadow-sm transition hover:scale-105 hover:shadow"
                     href={product.shopeeUrl}
                     rel="noopener noreferrer"
-                    style={{ background: '#EE4D2D' }}
                     target="_blank"
                     title="Xem trên Shopee"
                   >
-                    <i className="ph-fill ph-shopping-bag-open" style={{ fontSize: 17 }} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img alt="Shopee" className="h-6 w-6" src="/icons8-shopee.svg" />
                   </a>
                 ) : null}
                 {product.tiktokUrl ? (
                   <a
                     aria-label="Xem sản phẩm này trên TikTok Shop"
-                    className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition hover:scale-105 hover:opacity-90"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 bg-white shadow-sm transition hover:scale-105 hover:shadow"
                     href={product.tiktokUrl}
                     rel="noopener noreferrer"
-                    style={{ background: '#010101' }}
                     target="_blank"
                     title="Xem trên TikTok Shop"
                   >
-                    <i className="ph-fill ph-music-notes" style={{ fontSize: 17 }} />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img alt="TikTok Shop" className="h-6 w-6" src="/icons8-tiktok.svg" />
                   </a>
                 ) : null}
               </div>

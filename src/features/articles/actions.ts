@@ -7,11 +7,13 @@ import {
   deleteArticle,
   getArticleById,
   getArticleBySlug,
+  getArticleBySourceUrl,
   updateArticle,
   type ArticleStatus,
 } from '@/features/articles/queries'
 import { STOREFRONT_CACHE_TAG } from '@/features/storefront/queries'
 import { requireAdmin } from '@/lib/auth'
+import { fetchRssCandidates } from '@/lib/rss'
 
 export type ArticleFormState = { error?: string }
 
@@ -78,6 +80,49 @@ export async function saveArticleAction(
   revalidatePath(`/bai-viet/${slug}`)
   updateTag(STOREFRONT_CACHE_TAG) // mục tin tức trên trang chủ cập nhật ngay
   redirect('/admin/articles')
+}
+
+// Đồng bộ tin tức từ RSS (nút bấm thủ công ở /admin/articles, không có cron). Luôn tạo bài
+// dưới dạng NHÁP (status='draft') — không bao giờ tự đăng, vì nội dung chỉ là tóm tắt lấy từ
+// RSS (tránh vi phạm bản quyền), admin phải mở link nguồn viết lại trước khi xuất bản.
+export async function syncNewsFromRssAction(): Promise<void> {
+  const admin = await requireAdmin()
+  const candidates = await fetchRssCandidates()
+
+  let created = 0
+  for (const candidate of candidates) {
+    // Chống trùng: đã lấy link này trước đó thì bỏ qua (không phụ thuộc slug/tiêu đề).
+    if (await getArticleBySourceUrl(candidate.sourceLink)) continue
+
+    let slug = slugify(candidate.title) || `bai-viet-${Date.now()}`
+    if (await getArticleBySlug(slug)) slug = `${slug}-${Date.now()}`
+
+    const content = [
+      candidate.excerpt || '(Chưa có tóm tắt — vui lòng mở link gốc bên dưới để viết lại nội dung.)',
+      '',
+      `*Nguồn: [${candidate.sourceName}](${candidate.sourceLink})*`,
+      '',
+      '> ⚠️ Nội dung trên chỉ là tóm tắt lấy từ RSS, KHÔNG phải bài đầy đủ. Vui lòng mở link nguồn, ' +
+        'đọc và viết lại bằng lời văn của bạn trước khi đăng để tránh vi phạm bản quyền.',
+    ].join('\n')
+
+    await createArticle({
+      slug,
+      title: candidate.title,
+      excerpt: candidate.excerpt || candidate.title,
+      content,
+      category: 'Tin sức khỏe',
+      coverImage: null,
+      status: 'draft',
+      authorId: admin.userId,
+      publishedAt: null,
+      sourceUrl: candidate.sourceLink,
+    })
+    created += 1
+  }
+
+  revalidatePath('/admin/articles')
+  redirect(`/admin/articles?synced=${created}`)
 }
 
 export async function deleteArticleAction(formData: FormData): Promise<void> {

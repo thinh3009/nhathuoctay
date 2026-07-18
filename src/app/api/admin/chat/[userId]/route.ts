@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { getAuthUser } from '@/lib/auth'
 import { getUserById } from '@/features/users/queries'
-import { addChatMessage, getUserMessages, markReadByAdmin } from '@/features/chat/queries'
+import { addChatMessage, deleteConversation, getUserMessages, markReadByAdmin } from '@/features/chat/queries'
 
 export const runtime = 'nodejs'
 
@@ -61,4 +61,16 @@ export async function POST(request: Request, ctx: Ctx) {
   const adminUser = await getUserById(admin.userId)
   const saved = await addChatMessage(userId, 'admin', parsed.data.content, adminUser?.fullName?.trim() || 'Dược sĩ')
   return Response.json({ ok: true, message: saved })
+}
+
+// Xóa toàn bộ hội thoại (dọn bớt dữ liệu cũ) — KHÔNG thể hoàn tác.
+export async function DELETE(_request: Request, ctx: Ctx) {
+  const admin = await getAuthUser()
+  if (!admin || admin.role !== 'admin') {
+    return Response.json({ error: 'Không có quyền' }, { status: 403 })
+  }
+  const { userId } = await ctx.params
+
+  await deleteConversation(userId)
+  return Response.json({ ok: true })
 }

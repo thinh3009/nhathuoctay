@@ -174,6 +174,39 @@ export async function uploadSiteImage(file: Blob, mimeType: string, slot: string
   return { storagePath, publicUrl: getPublicUrl(storagePath) }
 }
 
+// Tải ảnh toa thuốc (khách gửi qua "Đặt thuốc theo toa") lên bucket, prefix `prescriptions/{userId}/`
+// — tách riêng khỏi ảnh sản phẩm/hero/site vì đây là dữ liệu khách hàng, không phải ảnh giao diện.
+export async function uploadPrescriptionImage(
+  file: Blob,
+  mimeType: string,
+  userId: string,
+): Promise<UploadedImage> {
+  const { supabaseUrl, serviceRoleKey } = getStorageConfig()
+  await ensureBucket()
+  const ext = EXTENSION_BY_MIME[mimeType] ?? 'jpg'
+  const storagePath = `prescriptions/${userId}/${randomUUID()}.${ext}`
+
+  const response = await fetch(
+    `${supabaseUrl}/storage/v1/object/${PRODUCT_IMAGE_BUCKET}/${storagePath}`,
+    {
+      method: 'POST',
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+        'content-type': mimeType,
+        'cache-control': '3600',
+      },
+      body: file,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`Upload thất bại (${response.status}): ${await response.text()}`)
+  }
+
+  return { storagePath, publicUrl: getPublicUrl(storagePath) }
+}
+
 // Xoá một object khỏi Storage. Trả về true nếu thành công (hoặc file vốn không tồn tại).
 export async function deleteProductImage(storagePath: string): Promise<boolean> {
   const { supabaseUrl, serviceRoleKey } = getStorageConfig()

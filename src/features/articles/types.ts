@@ -16,4 +16,5 @@ export type ArticleInput = {
   status: ArticleStatus
   authorId?: string | null
   publishedAt?: Date | null
+  sourceUrl?: string | null
 }

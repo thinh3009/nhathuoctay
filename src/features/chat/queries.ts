@@ -127,6 +127,12 @@ export async function listConversations(): Promise<ChatConversation[]> {
   }))
 }
 
+// Xóa toàn bộ tin nhắn của một hội thoại (dọn bớt dữ liệu cũ, tiết kiệm bộ nhớ DB).
+// KHÔNG thể hoàn tác — mất hết lịch sử tư vấn của user này.
+export async function deleteConversation(userId: string) {
+  await db.delete(chatMessages).where(eq(chatMessages.userId, userId))
+}
+
 // Tổng số tin khách chưa đọc (badge chuông trên nav admin).
 export async function countUnreadForAdmin(): Promise<number> {
   const [row] = await db

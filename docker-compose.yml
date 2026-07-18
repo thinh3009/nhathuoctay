@@ -1,0 +1,34 @@
+# Postgres local TẠM THỜI thay Supabase khi phát triển (xem CLAUDE.md — lý do: Vercel
+# function ở US East query Supabase Singapore gây cold-start 504 + chậm). Chỉ thay lớp DB;
+# Storage ảnh vẫn dùng Supabase (NEXT_PUBLIC_SUPABASE_URL + SERVICE_ROLE_KEY không đổi).
+#
+#   docker compose up -d      # bật DB local (cổng host 5433)
+#   docker compose down       # tắt (giữ dữ liệu trong volume)
+#   docker compose down -v    # tắt + XÓA dữ liệu
+#
+# DATABASE_URL local: postgres://postgres:postgres@localhost:5433/postgres
+services:
+  db:
+    image: postgres:17
+    container_name: nhathuoctay-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - nhathuoctay_pgdata:/var/lib/postgresql/data
+      # Máy Windows dùng múi giờ tên cũ "Asia/Saigon"; tzdata trong image chỉ có
+      # "Asia/Ho_Chi_Minh" → client (DBeaver…) gửi Asia/Saigon sẽ bị Postgres từ chối
+      # (FATAL: invalid value for parameter "TimeZone"). Mount alias để mọi client kết nối được.
+      - ./docker/zoneinfo/Saigon:/usr/share/zoneinfo/Asia/Saigon:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  nhathuoctay_pgdata:

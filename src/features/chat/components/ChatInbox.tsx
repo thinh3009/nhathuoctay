@@ -39,12 +39,21 @@ export default function ChatInbox({ initialConversations }: { initialConversatio
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
   const [loadingThread, setLoadingThread] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const searchParams = useSearchParams()
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
+
+  // Xác nhận xóa tự thu lại sau 4s nếu không bấm (không dùng window.confirm để tránh chặn luồng).
+  useEffect(() => {
+    if (!confirmDelete) return
+    const t = setTimeout(() => setConfirmDelete(false), 4000)
+    return () => clearTimeout(t)
+  }, [confirmDelete])
 
   const refreshConversations = useCallback(async () => {
     try {
@@ -62,6 +71,7 @@ export default function ChatInbox({ initialConversations }: { initialConversatio
     setActiveUserId(userId)
     setLoadingThread(true)
     setMessages([])
+    setConfirmDelete(false)
     try {
       const res = await fetch(`/api/admin/chat/${userId}`, { cache: 'no-store' })
       if (res.ok) {
@@ -141,6 +151,26 @@ export default function ChatInbox({ initialConversations }: { initialConversatio
     }
   }
 
+  // Xóa toàn bộ hội thoại đang mở (dọn bộ nhớ) — KHÔNG thể hoàn tác.
+  async function deleteActiveConversation() {
+    if (!activeUserId || deleting) return
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/admin/chat/${activeUserId}`, { method: 'DELETE' })
+      if (res.ok) {
+        setActiveUserId(null)
+        setActiveUser(null)
+        setMessages([])
+        setConfirmDelete(false)
+        setConversations((cur) => cur.filter((c) => c.userId !== activeUserId))
+      }
+    } catch {
+      /* noop */
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   const totalUnread = conversations.reduce((s, c) => s + c.unread, 0)
 
   return (
@@ -217,12 +247,41 @@ export default function ChatInbox({ initialConversations }: { initialConversatio
                 >
                   <i className="ph-bold ph-arrow-left" />
                 </button>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-bold text-stone-800">{activeUser?.fullName ?? 'Khách hàng'}</p>
                   <p className="truncate text-xs text-stone-400">
                     {activeUser?.phone ?? activeUser?.email ?? ''}
                   </p>
                 </div>
+
+                {!confirmDelete ? (
+                  <button
+                    className="flex h-8 flex-shrink-0 items-center gap-1 rounded-lg px-2.5 text-xs font-semibold text-stone-500 hover:bg-red-50 hover:text-red-600"
+                    onClick={() => setConfirmDelete(true)}
+                    type="button"
+                  >
+                    <i className="ph-bold ph-trash" /> Xóa hội thoại
+                  </button>
+                ) : (
+                  <div className="flex flex-shrink-0 items-center gap-1.5">
+                    <button
+                      className="rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-red-700 disabled:opacity-60"
+                      disabled={deleting}
+                      onClick={() => void deleteActiveConversation()}
+                      type="button"
+                    >
+                      {deleting ? 'Đang xóa…' : 'Chắc chắn?'}
+                    </button>
+                    <button
+                      className="rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-500 hover:bg-stone-100"
+                      disabled={deleting}
+                      onClick={() => setConfirmDelete(false)}
+                      type="button"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 space-y-3 overflow-y-auto bg-stone-50 px-4 py-4" ref={scrollRef}>

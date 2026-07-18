@@ -61,6 +61,10 @@ type State = {
   detailQty: number
   showRx: boolean
   rxName: string
+  rxFile: File | null
+  // undefined = chưa kiểm tra đăng nhập · null = chưa đăng nhập · object = đã đăng nhập.
+  rxMember: { fullName: string } | null | undefined
+  sendingRx: boolean
   toast: string
   toastSeq: number
   ordered: string | null
@@ -85,6 +89,9 @@ const INITIAL: State = {
   detailQty: 1,
   showRx: false,
   rxName: '',
+  rxFile: null,
+  rxMember: undefined,
+  sendingRx: false,
   toast: '',
   toastSeq: 0,
   ordered: null,
@@ -209,6 +216,31 @@ export function useStorefront({
     const id = setTimeout(() => setState((prev) => ({ ...prev, toast: '' })), 2000)
     return () => clearTimeout(id)
   }, [state.toastSeq, state.toast])
+
+  // Modal "Đặt thuốc theo toa" mở ra mới kiểm tra đăng nhập (giống DrugChatbot) — tránh gọi
+  // /api/auth/me ngay khi vào trang chủ dù khách không dùng tính năng này.
+  useEffect(() => {
+    if (!state.showRx || state.rxMember !== undefined) return
+    let active = true
+    fetch('/api/auth/me')
+      .then((res) => (res.ok ? res.json() : { user: null }))
+      .then((data) => {
+        if (active) set({ rxMember: data.user ? { fullName: (data.user.fullName ?? '').trim() } : null })
+      })
+      .catch(() => {
+        if (active) set({ rxMember: null })
+      })
+    return () => {
+      active = false
+    }
+  }, [state.showRx, state.rxMember])
+
+  // Đăng nhập/đăng xuất ở nơi khác (vd từ /auth/login) → kiểm tra lại lần mở modal kế tiếp.
+  useEffect(() => {
+    const onAuthChanged = () => set({ rxMember: undefined })
+    window.addEventListener('qt:auth-changed', onAuthChanged)
+    return () => window.removeEventListener('qt:auth-changed', onAuthChanged)
+  }, [])
 
   // Ghi màn hình hiện tại lên URL bằng replaceState (không điều hướng, không re-render)
   // để F5 giữ nguyên màn danh mục/sản phẩm/tin tức đang xem thay vì về trang chủ.
@@ -339,11 +371,51 @@ export function useStorefront({
   const closeRx = () => set({ showRx: false })
   const onRxFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0]
-    if (file) set({ rxName: file.name })
+    if (file) set({ rxName: file.name, rxFile: file })
   }
-  const submitRx = () => {
-    set({ showRx: false, rxName: '' })
-    toastMsg('Đã gửi toa, dược sĩ sẽ liên hệ với bạn')
+  // Gửi toa: upload ảnh + SĐT lên server, lưu thành 1 tin nhắn tư vấn bình thường
+  // (chat_messages) để dược sĩ trả lời trong /admin/chat — không có luồng riêng.
+  const submitRx = async () => {
+    if (state.sendingRx) return
+    if (!state.rxMember) return toastMsg('Vui lòng đăng nhập để gửi toa thuốc')
+    if (!state.rxFile) return toastMsg('Vui lòng chọn ảnh toa thuốc')
+    if (state.form.phone.trim().length < 9) return toastMsg('Số điện thoại chưa hợp lệ')
+
+    set({ sendingRx: true })
+    try {
+      const body = new FormData()
+      body.append('file', state.rxFile)
+      body.append('phone', state.form.phone.trim())
+      const res = await fetch('/api/prescriptions', { method: 'POST', body })
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        setState((prev) => ({
+          ...prev,
+          sendingRx: false,
+          toast: (data && data.error) || 'Gửi toa thất bại, vui lòng thử lại',
+          toastSeq: prev.toastSeq + 1,
+        }))
+        return
+      }
+
+      setState((prev) => ({
+        ...prev,
+        sendingRx: false,
+        showRx: false,
+        rxName: '',
+        rxFile: null,
+        toast: 'Đã gửi toa, dược sĩ sẽ liên hệ với bạn',
+        toastSeq: prev.toastSeq + 1,
+      }))
+    } catch {
+      setState((prev) => ({
+        ...prev,
+        sendingRx: false,
+        toast: 'Lỗi kết nối, vui lòng thử lại',
+        toastSeq: prev.toastSeq + 1,
+      }))
+    }
   }
   const placeOrder = async () => {
     if (state.placingOrder) return

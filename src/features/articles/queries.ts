@@ -59,6 +59,12 @@ export async function getArticleBySlug(slug: string) {
   return result[0] ?? null
 }
 
+// Chống trùng khi đồng bộ RSS: bỏ qua bài đã lấy trước đó (cùng link nguồn).
+export async function getArticleBySourceUrl(sourceUrl: string) {
+  const result = await db.select().from(articles).where(eq(articles.sourceUrl, sourceUrl)).limit(1)
+  return result[0] ?? null
+}
+
 export async function createArticle(data: ArticleInput) {
   const result = await db.insert(articles).values(data).returning()
   return result[0]!

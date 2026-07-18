@@ -46,13 +46,15 @@ export default function ProductScreen({ hub }: { hub: StorefrontHub }) {
             <div style={s('display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px')}>
               <span style={s('font-size:13px;font-weight:500;color:var(--color-text-muted)')}>Cũng có bán trên:</span>
               {d.shopeeUrl ? (
-                <a aria-label="Xem sản phẩm này trên Shopee" href={d.shopeeUrl} rel="noopener noreferrer" target="_blank" title="Xem trên Shopee" style={{ ...s('display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;text-decoration:none'), background: '#EE4D2D' }}>
-                  <i className="ph-fill ph-shopping-bag-open" style={{ fontSize: 17 }} />
+                <a aria-label="Xem sản phẩm này trên Shopee" href={d.shopeeUrl} rel="noopener noreferrer" target="_blank" title="Xem trên Shopee" style={s('display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--neutral-200);text-decoration:none')}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img alt="Shopee" src="/icons8-shopee.svg" style={s('width:24px;height:24px;display:block')} />
                 </a>
               ) : null}
               {d.tiktokUrl ? (
-                <a aria-label="Xem sản phẩm này trên TikTok Shop" href={d.tiktokUrl} rel="noopener noreferrer" target="_blank" title="Xem trên TikTok Shop" style={{ ...s('display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;color:#fff;text-decoration:none'), background: '#010101' }}>
-                  <i className="ph-fill ph-music-notes" style={{ fontSize: 17 }} />
+                <a aria-label="Xem sản phẩm này trên TikTok Shop" href={d.tiktokUrl} rel="noopener noreferrer" target="_blank" title="Xem trên TikTok Shop" style={s('display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#fff;border:1px solid var(--neutral-200);text-decoration:none')}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img alt="TikTok Shop" src="/icons8-tiktok.svg" style={s('width:24px;height:24px;display:block')} />
                 </a>
               ) : null}
             </div>

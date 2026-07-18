@@ -1,10 +1,17 @@
 import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 import { listArticles } from '@/features/articles/queries'
+import { deleteArticleAction, syncNewsFromRssAction } from '@/features/articles/actions'
+import DeleteArticleButton from '@/features/articles/components/DeleteArticleButton'
 
-export default async function AdminArticlesPage() {
+export default async function AdminArticlesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ synced?: string }>
+}) {
   await requireAdmin()
 
+  const { synced } = await searchParams
   const rows = await listArticles()
 
   return (
@@ -14,13 +21,31 @@ export default async function AdminArticlesPage() {
           <h1 className="text-3xl font-black text-stone-900">Bài viết</h1>
           <p className="mt-1 text-stone-500">{rows.length} bài viết</p>
         </div>
-        <Link
-          className="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
-          href="/admin/articles/new"
-        >
-          + Viết bài
-        </Link>
+        <div className="flex gap-2">
+          <form action={syncNewsFromRssAction}>
+            <button
+              className="rounded-xl border border-emerald-700 px-5 py-2.5 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50"
+              type="submit"
+            >
+              Đồng bộ tin tức (RSS)
+            </button>
+          </form>
+          <Link
+            className="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800"
+            href="/admin/articles/new"
+          >
+            + Viết bài
+          </Link>
+        </div>
       </div>
+
+      {synced !== undefined ? (
+        <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700" role="status">
+          {Number(synced) > 0
+            ? `Đã thêm ${synced} bài nháp mới từ RSS — vào từng bài để kiểm tra và viết lại trước khi đăng.`
+            : 'Không có bài mới (đã có sẵn hoặc feed tạm thời không lấy được).'}
+        </p>
+      ) : null}
 
       {rows.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-stone-300 bg-white py-16 text-center" role="status">
@@ -69,12 +94,15 @@ export default async function AdminArticlesPage() {
                       {new Date(article.updatedAt).toLocaleDateString('vi-VN')}
                     </td>
                     <td className="px-4 py-3">
-                      <Link
-                        className="rounded-lg bg-stone-100 px-3 py-1.5 text-xs font-semibold text-stone-600 hover:bg-emerald-100 hover:text-emerald-700"
-                        href={`/admin/articles/${article.id}/edit`}
-                      >
-                        Sửa
-                      </Link>
+                      <div className="flex items-center gap-1.5">
+                        <Link
+                          className="rounded-lg bg-stone-100 px-3 py-1.5 text-xs font-semibold text-stone-600 hover:bg-emerald-100 hover:text-emerald-700"
+                          href={`/admin/articles/${article.id}/edit`}
+                        >
+                          Sửa
+                        </Link>
+                        <DeleteArticleButton action={deleteArticleAction} articleId={article.id} />
+                      </div>
                     </td>
                   </tr>
                 ))}

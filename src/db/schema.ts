@@ -150,6 +150,8 @@ export const articles = pgTable('articles', {
   excerpt: text('excerpt').notNull(),
   content: text('content').notNull(),
   coverImage: text('cover_image'),
+  // Link bài gốc khi bài viết được tạo tự động từ đồng bộ RSS (dùng để chống trùng).
+  sourceUrl: text('source_url'),
   category: text('category').notNull().default('Tin sức khỏe'),
   status: text('status', { enum: ['draft', 'published'] }).notNull().default('draft'),
   authorId: uuid('author_id').references(() => users.id, { onDelete: 'set null' }),
